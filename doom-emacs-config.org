@@ -663,44 +663,20 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 (require 's)
 #+end_src
 
-**** Ignore the heading with "ignore" tag
-#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
-; ignore headlines with "ignore" when export
-(defun my/org-export-ignore-headlines (data backend info)
-  "Remove headlines tagged \"ignore\" retaining contents and promoting children.
-Each headline tagged \"ignore\" will be removed retaining its
-contents and promoting any children headlines to the level of the parent."
-  (org-element-map data 'headline
-    (lambda (object)
-      (when (member "ignore" (org-element-property :tags object))
-        (let ((level-top (org-element-property :level object))
-              level-diff)
-          (mapc (lambda (el)
-                  ;; recursively promote all nested headlines
-                  (org-element-map el 'headline
-                    (lambda (el)
-                      (when (equal 'headline (org-element-type el))
-                        (unless level-diff
-                          (setq level-diff (- (org-element-property :level el)
-                                              level-top)))
-                        (org-element-put-property el
-                          :level (- (org-element-property :level el)
-                                    level-diff)))))
-                  ;; insert back into parse tree
-                  (org-element-insert-before el object))
-                (org-element-contents object)))
-        (org-element-extract-element object)))
-    info nil)
-  data)
-(add-hook 'org-export-filter-parse-tree-functions 'my/org-export-ignore-headlines)
-#+end_src
-
 **** General configuration for all languages
 
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (after! ox
   (setq org-export-broken-links 'mark)
 )
+#+end_src
+
+**** Extra functionality by ~ox-extra~
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(use-package! ox-extra
+  :after org
+  :config
+  (ox-extras-activate '(ignore-headlines)))
 #+end_src
 
 **** LaTeX/Beamer
