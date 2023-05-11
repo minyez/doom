@@ -331,20 +331,22 @@ Use modus theme by Prot
  (if (file-exists-p img)
    (setq fancy-splash-image img)))
 
-;; remove the footer, i.e. the GitHub icon
-(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
-;; remove short menu
-;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-;; add a new button
-(add-to-list '+doom-dashboard-menu-sections
-             '("Browse roam nodes"
-               :icon (all-the-icons-fileicon "org" :face 'doom-dashboard-menu-title)
-               :when (featurep! :lang org +roam2)
-               :face (:inherit (doom-dashboard-menu-title))
-               :action org-roam-node-find))
-;; remove some of the buttons
-(dolist (btname '("Open project" "Open org-agenda" "Reload last session"))
-  (assoc-delete-all btname +doom-dashboard-menu-sections))
+(when (modulep! :ui doom-dashboard)
+  ;; remove the footer, i.e. the GitHub icon
+  (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
+  ;; remove short menu
+  ;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+  ;; add a new button
+  (add-to-list '+doom-dashboard-menu-sections
+               '("Browse roam nodes"
+                 :icon (all-the-icons-fileicon "org" :face 'doom-dashboard-menu-title)
+                 :when (featurep! :lang org +roam2)
+                 :face (:inherit (doom-dashboard-menu-title))
+                 :action org-roam-node-find))
+  ;; remove some of the buttons
+  (dolist (btname '("Open project" "Open org-agenda" "Reload last session"))
+    (assoc-delete-all btname +doom-dashboard-menu-sections))
+)
 #+end_src
 
 *** Epilogue
