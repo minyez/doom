@@ -680,7 +680,7 @@ Disable ~org-fancy-priorities~ introduced by ~+pretty~ feature of ~org~ module.
 **** Extra functionality by ~ox-extra~
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (use-package! ox-extra
-  :after org
+  :after ox
   :config
   (ox-extras-activate '(ignore-headlines)))
 #+end_src
@@ -1009,6 +1009,28 @@ First define two variables for handling headers for latex export
 
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-rss)
+#+end_src
+
+*** Git: magit, git-gutter
+
+#+begin_src emacs-lisp :tangle lisp/config-git.el :mkdirp yes
+;;; config-git.el -*- lexical-binding: t; -*-
+
+;; use "SPC g a" for add hunk, aside from the default "SPC g s"
+(map! :leader
+      (:prefix-map ("g" . "git")
+       (:when (modulep! :ui vc-gutter)
+        :desc "stage hunk at point"       "a"   #'+vc-gutter/stage-hunk)))
+
+;; do not ask confirm for stage/revert
+(after! git-gutter
+  (setq git-gutter:ask-p nil))
+
+(provide 'config-git)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-git)
 #+end_src
 
 * Customizations
