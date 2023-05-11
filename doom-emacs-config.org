@@ -59,7 +59,7 @@ doom              ; what makes DOOM look the way it does
 doom-dashboard    ; a nifty splash screen for Emacs
 hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
 ;;indent-guides     ; highlighted indent columns
-;;ligatures         ; ligatures and symbols to make your code pretty again
+ligatures         ; ligatures and symbols to make your code pretty again
 ;;minimap           ; show a map of the code on the side
 modeline          ; snazzy, Atom-inspired modeline, plus API
 ;;nav-flash         ; blink cursor line after big motions
@@ -81,11 +81,12 @@ Editor
 file-templates      ; auto-snippets for empty files
 fold                ; (nigh) universal code folding
 ;;(format +onsave)  ; automated prettiness
-;;multiple-cursors  ; editing in many places at once
+multiple-cursors  ; editing in many places at once
 ;;objed             ; text object editing for the innocent
 ;;parinfer          ; turn lisp into python, sort of
-;;rotate-text       ; cycle region at point between text candidates
+rotate-text       ; cycle region at point between text candidates
 snippets          ; my elves. They type so I don't have to
+word-wrap
 #+end_src
 
 Tools
@@ -157,7 +158,7 @@ Emacs
 #+begin_src emacs-lisp
 (dired +icons)    ; making dired pretty [functional]
 electric          ; smarter, keyword-based electric-indent
-;;ibuffer         ; interactive buffer management
+(ibuffer +icons)  ; interactive buffer management
 (undo +tree)      ; persistent, smarter undo for your inevitable mistakes
 vc                ; version-control and Emacs, sitting in a tree
 #+end_src
@@ -736,6 +737,7 @@ First define two variables for handling headers for latex export
 
   ;; prefer custom label
   (setq org-latex-prefer-user-labels t)
+
   ;; remove default hyperset with author names included
   ;; for local variable setup, use for each file
   ;; # -*- org-latex-hyperref-template: nil; -*-
@@ -755,13 +757,13 @@ First define two variables for handling headers for latex export
       (""     "fontspec"  nil ("xelatex", "xetex", "lualatex", "luatex"))
       (""     "graphicx"  t)
       (""     "xcolor"  t)
-      ;("nottoc,numbib"     "tocbibind" nil)
+      ; ("nottoc,numbib"     "tocbibind" nil)
       ; corresponding to "setq org-latex-listings t"
-      ;(""           "listings"   nil)
-	    ; but minted is better to use
+      ; (""           "listings"   nil)
+      ; but minted is better to use
       ("newfloat,cache=true"   "minted"   nil)
       (""     "grffile"   t)
-      (""     "longtable" nil)
+      ; (""     "longtable" nil)
       (""     "mdframed" nil)   ; for creating blockquote
       (""     "float" nil)
       (""     "wrapfig"   nil)
@@ -903,15 +905,14 @@ Use the new maintained repository
 #+begin_src emacs-lisp :tangle packages.el
 (when (modulep! :lang org +noter)
   (package! org-noter :recipe
-    (:host github :repo "org-noter/org-noter")))
+    (:host github :repo "org-noter/org-noter"
+     :files ("*.el" "modules/*.el"))))
 #+end_src
 
 #+begin_src emacs-lisp :tangle lisp/config-org-noter.el :mkdirp yes
 ;;; config-org-noter.el -*- lexical-binding: t; -*-
 
-(use-package! org-noter
-  :after (:any org pdf-view)
-  :config
+(after! org-noter
   (setq org-noter-always-create-frame nil  ;; Please stop opening frames
         org-noter-hide-other nil           ;; I want to see the whole file
 
