@@ -139,6 +139,7 @@ markdown            ; writing docs for people to ignore
      +present
      +pretty
      +pandoc
+     +noter
      +roam2)        ; organize your plain life in plain text
 ;;plantuml          ; diagrams for confusing people more
 python              ; beautiful is better than ugly
@@ -886,6 +887,39 @@ First define two variables for handling headers for latex export
 
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-org-roam)
+#+end_src
+
+*** noter
+
+Use the new maintained repository
+#+begin_src emacs-lisp :tangle packages.el
+(when (modulep! :lang org +noter)
+  (package! org-noter :recipe
+    (:host github :repo "org-noter/org-noter")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org-noter.el :mkdirp yes
+;;; config-org-noter.el -*- lexical-binding: t; -*-
+
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq org-noter-always-create-frame nil  ;; Please stop opening frames
+        org-noter-hide-other nil           ;; I want to see the whole file
+
+        ;; Everything is relative to the main notes file
+        org-noter-notes-search-path (list my/org-dir)
+
+        ;; split fraction. default (0.5 . 0.5). slightly larger on vertical
+        org-noter-doc-split-fraction '(0.58 . 0.5)
+  )
+)
+
+(provide 'config-org-noter)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-org-noter)
 #+end_src
 
 ** Tools
