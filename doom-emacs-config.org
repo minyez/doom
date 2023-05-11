@@ -362,6 +362,7 @@ Use modus theme by Prot
 *** Epilogue
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (provide 'config-ui)
+;;; config-ui.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el :mkdirp yes
@@ -392,6 +393,7 @@ Use modus theme by Prot
 
 #+begin_src emacs-lisp :tangle lisp/config-evil.el :mkdirp yes
 (provide 'config-evil)
+;;; config-evil.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -406,6 +408,7 @@ Use modus theme by Prot
 
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
 (provide 'config-cjk)
+;;; config-cjk.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -459,13 +462,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
        ;; may add further elisp expression to suppress interaction for description
   ) ;; (org-display-inline-images) ;; inline显示图片
 )
-#+end_src
-
-#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 
 (map!
   :nv "SPC m u" #'outline-up-heading)
+#+end_src
 
+The main setting
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org
   :init
   (setq org-directory my/org-dir)
@@ -600,13 +603,20 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
     (add-to-list 'org-tags-exclude-from-inheritance elem))
 )
+#+end_src
 
+~org-cliplink~ for quick extraction of link
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-cliplink
   :after org
   :bind
   (:map org-mode-map
         ("C-c m l c" . org-cliplink)))
+#+end_src
 
+~org-appear~ for showing raw content of rendered markup at cursor.
+It is included with feature ~+pretty~.
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-appear
   :hook
   (org-mode . org-appear-mode)
@@ -614,27 +624,32 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq org-appear-autolinks t
         org-appear-autoentities t)
 )
-
-(use-package! org-download
-  :after org
-  :config
-  (setq-default org-download-image-dir (concat org-directory "/images/downloads"))
-  )
-
-(use-package! org-archive
-  :after org
-  :config
-  (setq org-archive-mark-done t) ; change subtree state to DONE when archived
-)
-
-(provide 'config-org)
 #+end_src
 
+Set ~org-download~ image directory
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+(after! org-download
+  (setq-default org-download-image-dir (concat org-directory "/images/downloads"))
+)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+(after! org-archive
+  (setq org-archive-mark-done t) ; change subtree state to DONE when archived
+)
+#+end_src
+
+Here we finishes
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+(provide 'config-org)
+;;; config-org.el ends here
+#+end_src
+and load it in the main config file.
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-org)
 #+end_src
 
-Disable ~org-fancy-priorities~ introduced by ~+pretty~ feature of ~org~ module.
+Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
@@ -665,6 +680,7 @@ Disable ~org-fancy-priorities~ introduced by ~+pretty~ feature of ~org~ module.
 )
 
 (provide 'config-org-drill)
+;;; config-org-drill.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el :mkdirp yes
@@ -812,6 +828,7 @@ First define two variables for handling headers for latex export
 **** Epilogue
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (provide 'config-ox)
+;;; config-ox.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -838,6 +855,7 @@ First define two variables for handling headers for latex export
 )
 
 (provide 'config-org-present)
+;;; config-org-present.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el :mkdirp yes
@@ -893,6 +911,7 @@ First define two variables for handling headers for latex export
 )
 
 (provide 'config-org-roam)
+;;; config-org-roam.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -925,6 +944,7 @@ Use the new maintained repository
 )
 
 (provide 'config-org-noter)
+;;; config-org-noter.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -942,6 +962,7 @@ Use the new maintained repository
 (use-package! command-log-mode)
 
 (provide 'config-command-log-mode)
+;;; config-command-log-mode.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -968,6 +989,7 @@ Use the new maintained repository
 )
 
 (provide 'config-dictionary)
+;;; config-dictionary.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -998,6 +1020,7 @@ Use the new maintained repository
 )
 
 (provide 'config-rg)
+;;; config-rg.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -1025,6 +1048,7 @@ Use the new maintained repository
 )
 
 (provide 'config-pdf)
+;;; config-pdf.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -1048,6 +1072,7 @@ Use the new maintained repository
 )
 
 (provide 'config-rss)
+;;; config-rss.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
@@ -1070,6 +1095,7 @@ Use the new maintained repository
   (setq git-gutter:ask-p nil))
 
 (provide 'config-git)
+;;; config-git.el ends here
 #+end_src
 
 #+begin_src emacs-lisp :tangle config.el
