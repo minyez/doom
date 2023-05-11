@@ -624,6 +624,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 (require 'config-org)
 #+end_src
 
+Disable ~org-fancy-priorities~ introduced by ~+pretty~ feature of ~org~ module.
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(if (modulep! :lang org +pretty)
+    (package! org-fancy-priorities :disable t))
+#+end_src
+
 *** Drill
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-drill
