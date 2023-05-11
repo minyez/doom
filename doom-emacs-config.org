@@ -350,6 +350,14 @@ Use modus theme by Prot
 )
 #+end_src
 
+*** Treemacs
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(map! :leader
+      (:prefix-map ("t" . "toggle")
+       (:when (modulep! :ui treemacs)
+        :desc "treemacs" "t" #'treemacs)))
+#+end_src
+
 *** Epilogue
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (provide 'config-ui)
