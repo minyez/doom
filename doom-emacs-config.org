@@ -1,0 +1,1059 @@
+#+title: Doom Emacs Literate Configuration
+#+author: Minye Zhang
+#+auto_tangle: t
+#+latex_class: article
+
+This is my attempt (not the first) to write a literate Emacs configuration on top of
+the well-known [[https://github.com/doomemacs/doomemacs][Doom Emacs framework]].
+
+* Preface
+** Why Emacs?
+I use Emacs mostly for its fantastic [[https://orgmode.org/][org-mode]].
+I got to know Emacs when I started to use [[https://www.orgroam.com/][org-roam]]
+to practice Zettelkasten method in 2020.
+
+** Why Doom?
+Mostly because I have been using it since the very beginning of my Emacs
+journey.  It includes a variety of batteries. The defaults, although
+opinionated, suit me well.  I have tried a couple of times setting my own
+vanilla Emacs, but I always find something not that comfortable and don't have
+enough skills, patience and time to figure out.  So I decide to continue to use
+Doom, but improve my current configuration to adopt
+
+** How is the configuration written?
+Since I have little to none Emacs Lisp skills, most of the codes are either
+snippets directly copy-pasted from StackOverflow, r/emacs, EmacsChina or Emacs
+configuration repositories of others, or naively adapted from them for my own
+use case.  Attention has been carefully paid to credit the source near the
+relevant code, but it might be blown out in some frustrated nights.
+
+The idea and organization of this literate configuration follows
+[[https://github.com/elken/doom][Elken's]] and
+[[https://github.com/tecosaur/emacs-config][tecosaur's]].
+
+* Load pre-defined modules with =init.el=
+Input method
+#+name: doom-init-input
+#+begin_src emacs-lisp
+;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
+(chinese +rime)
+;;japanese
+layout            ; auie,ctsrnm is the superior home row
+#+end_src
+
+Completion
+#+name: doom-init-completion
+#+begin_src emacs-lisp
+(company +auto
+         +capf)   ; the ultimate code completion backend
+;;helm            ; the *other* search engine for love and life
+;;ido             ; the other *other* search engine...
+;;ivy             ; a search engine for love and life
+(vertico +icons)  ; the search engine of the future
+#+end_src
+
+UI
+#+name: doom-init-ui
+#+begin_src emacs-lisp
+doom              ; what makes DOOM look the way it does
+doom-dashboard    ; a nifty splash screen for Emacs
+hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+;;indent-guides     ; highlighted indent columns
+;;ligatures         ; ligatures and symbols to make your code pretty again
+;;minimap           ; show a map of the code on the side
+modeline          ; snazzy, Atom-inspired modeline, plus API
+;;nav-flash         ; blink cursor line after big motions
+ophints           ; highlight the region an operation acts on
+(popup +defaults)   ; tame sudden yet inevitable temporary windows
+;;tabs              ; a tab bar for Emacs
+treemacs          ; a project drawer, like neotree but cooler
+unicode           ; extended unicode support for various languages
+(vc-gutter +pretty) ; vcs diff in the fringe
+vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+window-select     ; visually switch windows
+workspaces        ; tab emulation, persistence & separate workspaces
+#+end_src
+
+Editor
+#+name: doom-init-editor
+#+begin_src emacs-lisp
+(evil +everywhere)  ; come to the dark side, we have cookies
+file-templates      ; auto-snippets for empty files
+fold                ; (nigh) universal code folding
+;;(format +onsave)  ; automated prettiness
+;;multiple-cursors  ; editing in many places at once
+;;objed             ; text object editing for the innocent
+;;parinfer          ; turn lisp into python, sort of
+;;rotate-text       ; cycle region at point between text candidates
+snippets          ; my elves. They type so I don't have to
+#+end_src
+
+Tools
+#+name: doom-init-tools
+#+begin_src emacs-lisp
+;;ansible
+;;biblio            ; Writes a PhD for you (citation needed)
+;;debugger          ; FIXME stepping through code, to help you add bugs
+direnv
+;;docker
+editorconfig        ; let someone else argue about tabs vs spaces
+;;ein               ; tame Jupyter notebooks with emacs
+(eval +overlay)     ; run code, run (also, repls)
+(lookup +docsets)   ; navigate your code and its documentation
+(lsp +eglot)        ; M-x vscode
+(magit +forge)      ; a git porcelain for Emacs
+make                ; run make tasks from Emacs
+;;pass              ; password manager for nerds
+pdf                 ; pdf enhancements
+rgb                 ; creating color strings
+;;taskrunner        ; taskrunner for all your projects
+;;tmux              ; an API for interacting with tmux
+tree-sitter         ; syntax and parsing, sitting in a tree...
+upload              ; map local to remote projects via ssh/ftp
+#+end_src
+
+Langauge support
+#+name: doom-init-lang
+#+begin_src emacs-lisp
+;;(cc +lsp)         ; C > C++ == 1
+;;clojure           ; java with a lisp
+data                ; config/data formats
+;;elm               ; care for a cup of TEA?
+(emacs-lisp +treesitter)       ; drown in parentheses
+fortran             ; in FORTRAN, GOD is REAL (unless declared INTEGER)
+(json +treesitter)  ; At least it ain't XML
+javascript          ; all(hope(abandon(ye(who(enter(here))))))
+;;julia             ; a better, faster MATLAB
+(latex +latexmk
+       +cdlatex)    ; writing papers in Emacs has never been so fun
+lua               ; one-based indices? one-based indices
+markdown            ; writing docs for people to ignore
+;;nix               ; I hereby declare "nix geht mehr!"
+;;ocaml             ; an objective camel
+(org
+     +dragndrop
+     +gnuplot
+     +contacts
+     +ipython
+     +jupyter
+     +present
+     +pretty
+     +pandoc
+     +roam2)        ; organize your plain life in plain text
+;;plantuml          ; diagrams for confusing people more
+python              ; beautiful is better than ugly
+;;qt                ; the 'cutest' gui framework ever
+rst               ; ReST in peace
+;;(rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+(sh +zsh)           ; she sells {ba,z,fi}sh shells on the C xor
+;;swift             ; who asked for emoji variables?
+;;web               ; the tubes
+yaml              ; JSON, but readable
+#+end_src
+
+Emacs
+#+name: doom-init-emacs
+#+begin_src emacs-lisp
+(dired +icons)    ; making dired pretty [functional]
+electric          ; smarter, keyword-based electric-indent
+;;ibuffer         ; interactive buffer management
+(undo +tree)      ; persistent, smarter undo for your inevitable mistakes
+vc                ; version-control and Emacs, sitting in a tree
+#+end_src
+
+Terminal support
+#+name: doom-init-term
+#+begin_src emacs-lisp
+;;eshell            ; the elisp shell that works everywhere
+;;shell             ; simple shell REPL for Emacs
+;;term              ; basic terminal emulator for Emacs
+vterm             ; the best terminal emulation in Emacs
+#+end_src
+
+Syntax/grammaer checkers
+#+name: doom-init-checkers
+#+begin_src emacs-lisp
+syntax              ; tasing you for every semicolon you forget
+;;(spell +flyspell) ; tasing you for misspelling mispelling
+;;grammar           ; tasing grammar mistake every you make
+#+end_src
+
+Applications.
+#+name: doom-init-app
+#+begin_src emacs-lisp
+calendar
+(rss +org)        ; emacs as an RSS reader
+#+end_src
+
+Email functionality. For now I am not using it.
+#+name: doom-init-email
+#+begin_src emacs-lisp
+;;(mu4e +org +gmail)
+;;notmuch
+;;(wanderlust +gmail)
+#+end_src
+
+General config.
+Since the literate config is not named ~config.org~, and ~init.el~ is also literate,
+switch on ~literate~ module will lead to error in doom sync.
+#+name: doom-init-config
+#+begin_src emacs-lisp
+;;literate
+(default +bindings +smartparens)
+#+end_src
+
+Now put them together and tangle to ~init.el~
+#+begin_src emacs-lisp :tangle init.el :noweb no-export :results none
+;;; init.el -*- lexical-binding: t; -*-
+(doom! :input
+       <<doom-init-input>>
+
+       :completion
+       <<doom-init-completion>>
+
+       :ui
+       <<doom-init-ui>>
+
+       :editor
+       <<doom-init-editor>>
+
+       :emacs
+       <<doom-init-emacs>>
+
+       :term
+       <<doom-init-term>>
+
+       :checkers
+       <<doom-init-checkers>>
+
+       :tools
+       <<doom-init-tools>>
+
+       :os
+       (:if IS-MAC macos)  ; improve compatibility with macOS
+       ;;tty               ; improve the terminal Emacs experience
+
+       :lang
+       <<doom-init-lang>>
+
+       :email
+       <<doom-init-email>>
+
+       :app
+       <<doom-init-app>>
+
+       :config
+       <<doom-init-config>>
+)
+#+end_src
+
+* Configuration
+** Global
+Enable ~lexical-binding~ in the main configuration file ~config.el~ to speed up
+#+begin_src emacs-lisp :tangle config.el
+;;; config.el -*- lexical-binding: t; -*-
+#+end_src
+
+Define myself
+#+begin_src emacs-lisp :tangle config.el
+(setq user-full-name "Minye Zhang"
+      user-mail-address "minyez.physchem@gmail.com")
+#+end_src
+
+Add ~lisp~ to ~load-path~ for later importing
+#+begin_src emacs-lisp :tangle config.el
+(add-to-list 'load-path (concat doom-private-dir "lisp"))
+#+end_src
+
+Profiling use-package when environment variable ~EMACS_PROF~ is defined
+#+begin_src emacs-lisp :tangle config.el
+(if (getenv "EMACS_PROF")
+    (setq use-package-verbose t
+          use-package-expand-minimally nil
+          use-package-compute-statistics t)
+  (setq use-package-verbose nil
+        use-package-expand-minimally t))
+#+end_src
+
+# Define global variables to be used later
+# #+begin_src emacs-lisp :tangle config.el
+# (defvar my/bibtex-bibliography
+#   (expand-file-name (concat "zotero_" (system-name) ".bib") "~/database/")
+#   "bibtex file of bibliography")
+# #+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(setq confirm-kill-emacs nil)     ; do not ask if I would like to go
+#+end_src
+
+** UI
+*** Prologue
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+;;; config-ui.el -*- lexical-binding: t; -*-
+#+end_src
+
+*** Font
+Use Nerd-Font-patched Sarasa font
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(let ((font "Sarasa Fixed SC Nerd Font")
+      (size 14))
+  (setq doom-font (font-spec :family font :size size)
+        doom-variable-pitch-font (font-spec :family font :size size)
+        doom-unicode-font (font-spec :family font :size size)
+        doom-big-font (font-spec :family font :size (+ size 4))))
+#+end_src
+
+*** Theme
+Use modus theme by Prot
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(use-package! emacs
+  :init
+  ;; Add all your customizations prior to loading the themes
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs nil
+        modus-themes-org-blocks 'tinted-background
+	;;; 'gray-background is not clear in modus-vivendi
+        modus-themes-region '(bg-only no-extend)
+        modus-themes-paren-match '(bold intense)
+        modus-themes-links '(neutral-underline background)
+        modus-themes-deuteranopia t
+        modus-themes-mode-line '(accented borderless (padding . 4) (height . 0.9)))
+  :bind ("<f5>" . modus-themes-toggle)
+)
+(setq doom-theme 'modus-operandi)
+#+end_src
+
+*** window-numbering
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! window-numbering
+  :recipe (:host github :repo "nschum/window-numbering.el"
+           :files ("window-numbering.el")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(use-package! window-numbering
+  :config
+  (window-numbering-mode)
+  ;; redefine workspaces shortcuts to resolve the conflict with +doom/workspaces
+)
+#+end_src
+
+*** WIP dashboard
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+;; dashboard configuration
+;; set custom splash image if it exists
+(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
+ (if (file-exists-p img)
+   (setq fancy-splash-image img)))
+
+;; remove the footer, i.e. the GitHub icon
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
+;; remove short menu
+;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+;; add a new button
+(add-to-list '+doom-dashboard-menu-sections
+             '("Browse roam nodes"
+               :icon (all-the-icons-fileicon "org" :face 'doom-dashboard-menu-title)
+               :when (featurep! :lang org +roam2)
+               :face (:inherit (doom-dashboard-menu-title))
+               :action org-roam-node-find))
+;; remove some of the buttons
+(dolist (btname '("Open project" "Open org-agenda" "Reload last session"))
+  (assoc-delete-all btname +doom-dashboard-menu-sections))
+#+end_src
+
+*** Epilogue
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(provide 'config-ui)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-ui)
+#+end_src
+
+** Evil
+#+begin_src emacs-lisp :tangle lisp/config-evil.el :mkdirp yes
+;;; config-evil.el -*- lexical-binding: t; -*-
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-evil.el :mkdirp yes
+(use-package! evil
+  :config
+  (evil-select-search-module 'evil-search-module 'evil-search)
+  (evil-set-initial-state 'dired-mode 'normal)
+  (evil-set-initial-state 'elpaca-ui-mode 'motion)
+  (dolist (mode '(delve-mode
+                  elfeed-search-mode
+                  easy-hugo-mode
+                  eshell-mode
+                  git-rebase-mode
+                  vterm-mode
+                  term-mode
+                  calc-mode))
+    (evil-set-initial-state mode 'emacs)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-evil.el :mkdirp yes
+(provide 'config-evil)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-evil)
+#+end_src
+
+** CJK Input
+
+#+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
+;;; config-cjk.el -*- lexical-binding: t; -*-
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
+(provide 'config-cjk)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-cjk)
+#+end_src
+
+** TODO Completion
+
+** Org Mode
+*** Basics
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+;;; config-org.el -*- lexical-binding: t; -*-
+(defvar my/org-dir
+  (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
+  "org directory")
+
+;; for paste picture from clipboard to org-mode
+;; adapted from https://emacs-china.org/t/topic/6601/4
+(defun my/org-insert-image ()
+  "Insert PNG image from the clipboard to the buffer by using =pngpaste= (macos) or =xclip= (linux)
+
+The image will be created under 'images' directory in =org-directory=
+with the name from user input. If image with the same name exists, the paste
+will be stopped, but the link will still be created.
+Note that =pngpaste=/=xclip= should be installed outside Emacs"
+  (interactive)
+  (let*
+    (
+     (cpcmd (pcase system-type
+        ('darwin "pngpaste %s")
+        ('gnu/linux "xclip -selection clipboard -t image/png -o > %s")
+        ))
+     (path (concat mz/org-notes "/images/"))
+     (fn (format "%s" (read-string "Enter image name (w/o png):")))
+  	   (image-file (concat path fn ".png"))
+    )
+      (if (not (file-exists-p path)) (mkdir path))
+      (if (file-exists-p image-file)
+  	(message (format "Warning: found image %s.png in %s" fn path))
+              (if cpcmd (shell-command (format cpcmd image-file))
+  	              (message "Warning: clipboard -> file not suppored on this OS")
+                ))
+       (insert (format "#+name: fig:%s\n" fn))
+       (insert "#+caption:\n")
+       (insert ":IMAGE:\n")
+       (insert "#+attr_org: :width 300\n")
+       (insert "#+attr_latex: :width 0.6\\linewidth\n")
+   (org-insert-link nil (concat "file:./images/" fn ".png") "")
+       ;(insert "\n:PROPERTIES:\n:CREATED: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n:END:\n")
+       (insert "\n:END:")
+       ;; may add further elisp expression to suppress interaction for description
+  ) ;; (org-display-inline-images) ;; inline显示图片
+)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+
+(map!
+  :nv "SPC m u" #'outline-up-heading)
+
+(use-package! org
+  :init
+  (setq org-directory my/org-dir)
+  (setq org-fold-core-style 'overlays)
+  :hook
+  ((org-mode . org-indent-mode)
+   (org-mode . visual-line-mode)
+   (before-save . org-update-all-dblocks))
+  :bind
+  (:map org-mode-map
+        ("C-c l" . org-insert-link)
+        ("C-c m l l" . org-insert-link) ; similar to org-clip
+        ("C-c m i" . org-toggle-item)
+        ("C-c m h" . org-toggle-heading)
+        ("C-c m o" . org-set-property)
+        ("C-c i" . my/org-insert-image)
+        ("C-c C-i" . org-time-stamp-inactive)
+        ("C-c e v" . (lambda () "make verbatim"       (interactive) (org-emphasize 61)))  ; =
+        ("C-c e b" . (lambda () "make bold"           (interactive) (org-emphasize 42)))  ; *
+        ("C-c e s" . (lambda () "make strike-through" (interactive) (org-emphasize 43)))  ; +
+        ("C-c e i" . (lambda () "make italic"         (interactive) (org-emphasize 47)))  ; /
+        ("C-c e u" . (lambda () "make underline"      (interactive) (org-emphasize 95)))  ; _
+        ("C-c e c" . (lambda () "make code"           (interactive) (org-emphasize 126))) ; ~
+      )
+  :config
+  (map! :map org-mode-map
+        :nv "SPC d"     #'+org/remove-link
+        :nv "SPC f A"   #'org-save-all-org-buffers
+        :nv "SPC a t"   #'org-agenda-todo
+        :nv "DEL"       #'org-mark-ring-goto
+        :nv "M-j"       #'org-metadown
+        :nv "M-k"       #'org-metaup
+        :nv "M-n"       #'org-next-link
+        :nv "M-p"       #'org-previous-link
+        :nv "SPC v n"   #'org-narrow-to-subtree
+        :nv "SPC v w"   #'widen
+        )
+  (setq org-src-tab-acts-natively nil)
+  ;; hide emphasis markers, display when move to the line (enabled by org-appera)
+  (setq org-hide-emphasis-markers t)
+  (setq org-archive-location (concat org-directory "/archive.org::* From %s"))
+  (setq org-default-notes-file "todos.org")
+  (setq org-footnote-auto-adjust t)
+  (setq org-tags-column -80)
+  (setq org-extend-today-until 4)    ;; end of each day
+  (setq org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts nil)
+  (setq org-clock-persist 'history
+        org-clock-idle-time 10
+        org-clock-mode-line-total 'current  ; show current clocking time in mode-line
+                                            ; 'auto for total; 'today
+  )
+  (setq org-enforce-todo-checkbox-dependencies t)
+
+  ;; agenda
+  (setq org-agenda-files (concat org-directory "/org-agenda.org")
+        org-agenda-skip-scheduled-if-done 't
+        org-agenda-dim-blocked-tasks nil
+        org-agenda-inhibit-startup 't
+        org-log-into-drawer 't
+        ; org-log-done 'time
+        org-agenda-use-tag-inheritance '(search timeline agenda)
+        org-agenda-window-setup 'reorganize-frame
+  )
+
+  ;;; capture templates
+  (setq org-capture-templates
+        `(
+          ("t"  "Quick TODO item in todos.org")
+          ("ti" "Inbox" entry
+                (file+headline ,org-default-notes-file "Inbox")
+                "* TODO %u %?\n%i\n%a" :prepend t)
+          ("tw" "Work" entry
+                (file+headline ,org-default-notes-file "工作 Work")
+                "* TODO %u %?\nDEADLINE: %t" :prepend t)
+          ("tl" "Life" entry
+                (file+headline ,org-default-notes-file "生活 Life")
+                "* TODO %u %?\nDEADLINE: %t" :prepend t)
+          )
+        )
+  ;; org-table related.
+  ;; commonly used constants for formulas
+  (setq org-table-formula-constants
+        '(("pi" . "3.14159265358")
+          ("RY" . "13.60569301")
+          ("HBAR" . "1.0545718e-34")
+          ("EPS0" . "8.8541878128e−12")
+          ("FSCA" . "0.0072973525664")
+          ("KB" . "1.38064852e-23")
+          ("CLIGHT" . "2.99792458e8")
+          ("CE" . "1.6021766208e-19") ; electron charge
+          ("BOHR2ANG" . "0.5291772")
+          ("ANG2M" . "1e-10")
+          ("EV2J" . "1.6021766208e-19")
+          ("HA2EV" . "27.21138602")
+          ("THZ2HA" . "1.519829846e-4") ; 10^12 h in Ha unit
+          ))
+  ;; default precision of formula results
+  (plist-put org-calc-default-modes 'calc-internal-prec 20)
+  (plist-put org-calc-default-modes 'calc-float-format '(float 12))
+
+  ;; TODO keywords
+  ; each state with ! is recorded as state change
+  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "WAIT(w!)" "REVIEW(r!)" "|" "DONE(d!)" "CANCELLED(c!@)"))
+        org-todo-keyword-faces
+          '(("REVIEW" :foreground "#ff9933" :weight bold)
+            ("WAIT" :foreground  "#9f7efe")
+            ("WIP" :foreground "#0098dd" :weight bold)
+            ("TODO" :foreground "#8c1400" :weight bold)
+            ("DONE" :foreground "#50a14f")
+            ("CANCELLED" :foreground "#ff6480" :strike-through t)
+             )
+  )
+  ;; faces for org priority, from https://emacs.stackexchange.com/a/17405
+  (setq org-priority-faces '((?A . (:foreground "red" :weight bold))
+                             (?B . (:foreground "yellow"))
+                             (?C . (:foreground "green"))))
+
+  ;; more link abbreviaiton
+  (let ((link-abbrev-l '(("ytb" . "https://www.youtube.com/watch?v=%s")
+                         ("isbn" . "http://books.google.com/books?vid=ISBN%s")
+                         ("issn" . "http://books.google.com/books?vid=ISSN%s")
+                         ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
+                         ("arxiv" . "https://arxiv.org/abs/%s"))))
+    (dolist (elem link-abbrev-l) (add-to-list 'org-link-abbrev-alist elem)))
+
+  ;; org-babel related
+  (setq org-babel-results-keyword "results")
+  (setq org-confirm-babel-evaluate nil)  ;; do not need to confirm when evaluate
+
+  ;; disable some tags from inheriting to descendants
+  (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
+    (add-to-list 'org-tags-exclude-from-inheritance elem))
+)
+
+(use-package! org-cliplink
+  :after org
+  :bind
+  (:map org-mode-map
+        ("C-c m l c" . org-cliplink)))
+
+(use-package! org-appear
+  :hook
+  (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t
+        org-appear-autoentities t)
+)
+
+(use-package! org-download
+  :after org
+  :config
+  (setq-default org-download-image-dir (concat org-directory "/images/downloads"))
+  )
+
+(use-package! org-archive
+  :after org
+  :config
+  (setq org-archive-mark-done t) ; change subtree state to DONE when archived
+)
+
+(provide 'config-org)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-org)
+#+end_src
+
+*** Drill
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-drill
+  :recipe (:host gitlab :repo "phillord/org-drill"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org-drill.el :mkdirp yes
+;;; config-org-drill.el -*- lexical-binding: t; -*-
+(use-package! org-drill
+  :after org
+  :commands org-drill org-drill-resume
+  :init
+  (map! :map org-mode-map
+        :nv "SPC m d d" #'org-drill
+        :nv "SPC m d r" #'org-drill-resume)
+  :config
+  (setq org-drill-scope 'directory)
+  (setq org-drill-spaced-repetition-algorithm 'sm2)
+  (setq org-drill-adjust-intervals-for-early-and-late-repetitions-p t)
+  (setq org-drill-add-random-noise-to-intervals-p t)
+  ;; reduce space, repeat more
+  (setq org-drill-learn-fraction 0.30)
+)
+
+(provide 'config-org-drill)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-org-drill)
+#+end_src
+
+*** Export
+
+**** Prologue
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+;;; config-ox.el -*- lexical-binding: t; -*-
+(require 's)
+#+end_src
+
+**** Ignore the heading with "ignore" tag
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+; ignore headlines with "ignore" when export
+(defun my/org-export-ignore-headlines (data backend info)
+  "Remove headlines tagged \"ignore\" retaining contents and promoting children.
+Each headline tagged \"ignore\" will be removed retaining its
+contents and promoting any children headlines to the level of the parent."
+  (org-element-map data 'headline
+    (lambda (object)
+      (when (member "ignore" (org-element-property :tags object))
+        (let ((level-top (org-element-property :level object))
+              level-diff)
+          (mapc (lambda (el)
+                  ;; recursively promote all nested headlines
+                  (org-element-map el 'headline
+                    (lambda (el)
+                      (when (equal 'headline (org-element-type el))
+                        (unless level-diff
+                          (setq level-diff (- (org-element-property :level el)
+                                              level-top)))
+                        (org-element-put-property el
+                          :level (- (org-element-property :level el)
+                                    level-diff)))))
+                  ;; insert back into parse tree
+                  (org-element-insert-before el object))
+                (org-element-contents object)))
+        (org-element-extract-element object)))
+    info nil)
+  data)
+(add-hook 'org-export-filter-parse-tree-functions 'my/org-export-ignore-headlines)
+#+end_src
+
+**** General configuration for all languages
+
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(after! ox
+  (setq org-export-broken-links 'mark)
+)
+#+end_src
+
+**** LaTeX/Beamer
+First define two variables for handling headers for latex export
+
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(defvar my/org-latex-classes-common-header-passoptions
+  (s-join "\n"
+    '("\\PassOptionsToPackage{usenames,dvipsnames}{xcolor}"
+      "\\PassOptionsToPackage{colorlinks=true,linkcolor=,filecolor=Red,citecolor=Green,urlcolor=Rhodamine,pdfborder={0 0 0},breaklinks=true,linktoc=all}{hyperref}"))
+  "PassOptions setting before document class, included in org-latex-classes for exporting org to latex")
+
+(defvar my/org-latex-classes-common-header-after-default-pkgs
+  (s-join "\n"
+    '("% redefine quote environment - blockquote from eisvogel"
+      "\\definecolor{bg}{rgb}{0.95,0.95,0.95}"
+      "\\definecolor{bq-border}{RGB}{0, 63, 126}"
+      "\\newmdenv[rightline=false,bottomline=false,topline=false,linewidth=3pt,backgroundcolor=bg,%"
+      "           linecolor=bq-border,skipabove=\\parskip]{customblockquote}"
+      "\\renewenvironment{quote}{\\begin{customblockquote}\\itshape\\list{}{\\rightmargin=6pt\\leftmargin=6pt}%"
+      "\\item\\relax\\ignorespaces}{\\unskip\\unskip\\endlist\\end{customblockquote}}"
+      "\\let\\Oldtextbullet\\textbullet"
+      "\\renewcommand{\\textbullet}{\\textcolor{bq-border}{\\Oldtextbullet}}"
+      "% compact itemize by paralist packages"
+      "\\usepackage{paralist}"
+      "\\let\\itemize\\compactitem"
+      "\\let\\description\\compactdesc"
+      "\\let\\enumerate\\compactenum"
+      ))
+  "Headers after default packages setting, included in org-latex-classes for exporting org to latex")
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(use-package! ox-latex
+  :bind
+  ("C-c x l" . org-latex-export-to-latex)
+  ("C-c x o" . org-latex-export-to-pdf)
+  :config
+
+  ;; use latexmk to automate toolchain
+  (setq org-latex-pdf-process '("latexmk -latexoption=\"-interaction=nonstopmode -shell-escape\" -pdf -pdflatex=%latex -bibtex -f %f"))
+
+  ;; prefer custom label
+  (setq org-latex-prefer-user-labels t)
+  ;; remove default hyperset with author names included
+  ;; for local variable setup, use for each file
+  ;; # -*- org-latex-hyperref-template: nil; -*-
+
+  ;; default packages to load right after documentclass at first
+  (setq org-latex-default-packages-alist
+    '(
+      ("" "amsmath" t) ; to avoid iint and iiint error
+      ("" "amssymb" t)
+      ("" "wasysym" t) ; last to avoid iint and iint error
+      ("AUTO" "inputenc"  t ("pdflatex"))
+      ("T1"   "fontenc"   t ("pdflatex"))
+      (""     "CJKutf8"   t ("pdflatex"))
+      (""     "ifxetex"   nil)
+      (""     "ctex"      nil ("xelatex", "xetex"))
+      (""     "xeCJK"     nil ("xelatex", "xetex"))
+      (""     "fontspec"  nil ("xelatex", "xetex", "lualatex", "luatex"))
+      (""     "graphicx"  t)
+      (""     "xcolor"  t)
+      ;("nottoc,numbib"     "tocbibind" nil)
+      ; corresponding to "setq org-latex-listings t"
+      ;(""           "listings"   nil)
+	    ; but minted is better to use
+      ("newfloat,cache=true"   "minted"   nil)
+      (""     "grffile"   t)
+      (""     "longtable" nil)
+      (""     "mdframed" nil)   ; for creating blockquote
+      (""     "float" nil)
+      (""     "wrapfig"   nil)
+      (""     "subfig"    nil)
+      (""     "rotating"  nil)
+      ("normalem" "ulem"  t)    ; strikeout
+      (""     "textcomp"  t)
+      (""     "capt-of"   nil)
+      ("font={small},skip=1pt"     "caption"   nil)
+      (""     "parskip"   nil)  ; better paragraph spacing
+      (""     "booktabs"   nil) ; better table
+	 )
+  )
+
+  ; packages to load at last
+  (setq org-latex-packages-alist
+    '(
+      ; hyperref and cleverf should be the last packages to load
+      ("" "hyperref"  nil)
+      ("" "cleveref"  nil)
+     )
+  )
+
+  ; customized classes for latex export
+  (setq org-latex-classes
+               `(
+                ("article"
+                  ,(s-join "\n"
+                      `(
+                         ,my/org-latex-classes-common-header-passoptions
+                         "\\documentclass[11pt,a4paper]{article}"
+                         "[DEFAULT-PACKAGES]"
+                         ,my/org-latex-classes-common-header-after-default-pkgs
+                         "[EXTRA]"
+                         "[PACKAGES]"))
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+                )
+  )
+)
+#+end_src
+
+**** Epilogue
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(provide 'config-ox)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-ox)
+#+end_src
+
+*** Presentation
+#+begin_src emacs-lisp :tangle lisp/config-org-present.el :mkdirp yes
+;;; config-org-present.el -*- lexical-binding: t; -*-
+(use-package! org-tree-slide
+  :after org
+  :bind
+  (:map org-tree-slide-mode-map
+        ("<f9>" . 'org-tree-slide-move-previous-tree)
+        ("<f10>" . 'org-tree-slide-move-next-tree)
+        ("<f11>" . 'org-tree-slide-content))
+  (:map org-mode-map
+        ("<f8>" . 'org-tree-slide-mode)
+        ("S-<f8>" . 'org-tree-slide-skip-done-toggle))
+  :config
+  (setq org-tree-slide-skip-outline-level 4)
+  (org-tree-slide-narrowing-control-profile)
+  (setq org-tree-slide-skip-done nil)
+)
+
+(provide 'config-org-present)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-org-present)
+#+end_src
+
+*** Roam
+#+begin_src emacs-lisp :tangle lisp/config-org-roam.el :mkdirp yes
+;;; config-org-roam.el -*- lexical-binding: t; -*-
+
+(use-package! org-roam
+  :after org-roam
+  :init
+  (setq org-roam-directory org-directory
+        org-roam-index-file "index.org"
+        org-roam-graph-extra-config '(("overlap" . "false")) ; man dot for attributes setup
+        )
+  :bind
+  (:map org-mode-map
+        (("C-c r R" . org-roam-buffer-toggle)
+         ("C-c r ." . org-roam-node-find)
+         ("C-c r L" . org-roam-store-link)
+         ("C-c r a" . org-roam-alias-add)
+         ("C-c r u" . org-roam-unlinked-references)
+         ("C-c r r" . org-roam-find-ref)
+         ("C-c r d" . org-roam-find-directory)
+         ("C-c r j" . org-roam-jump-to-index)
+         ("C-c r b" . org-roam-switch-to-buffer)
+         ("C-c r n" . orb-note-actions)
+         ("C-c r i" . org-roam-node-insert)
+         )
+  )
+  :config
+  (add-to-list 'display-buffer-alist
+                '("\\*org-roam\\*"
+                  (display-buffer-in-direction)
+                  (direction . right)
+                  (window-width . 0.33)
+                  (window-height . fit-window-to-buffer)))
+  (setq org-roam-extract-new-file-path "${slug}.org")
+  (org-roam-db-autosync-mode)
+  (setq org-roam-capture-templates
+        '(
+          ("d" "default" plain "%?"
+           :if-new (file+head "${slug}.org"
+                              "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: content\n#+created: %U\n")
+           :unnarrowed t)
+          ("b" "non-STEM book note" plain "%?"
+           :if-new (file+head "bookrev/${slug}.org"
+           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
+           :unnarrowed t)
+         ))
+)
+
+(provide 'config-org-roam)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-org-roam)
+#+end_src
+
+** Tools
+*** command-log-mode
+#+begin_src emacs-lisp :tangle packages.el
+(package! command-log-mode)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-command-log-mode.el :mkdirp yes
+;;; config-command-log-mode.el -*- lexical-binding: t; -*-
+(use-package! command-log-mode)
+
+(provide 'config-command-log-mode)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-command-log-mode)
+#+end_src
+
+*** dictionary
+#+begin_src emacs-lisp :tangle packages.el
+(if IS-MAC
+  (package! osx-dictionary))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-dictionary.el :mkdirp yes
+;;; config-dictionary.el -*- lexical-binding: t; -*-
+(if IS-MAC
+  (progn
+    (use-package! osx-dictionary
+      :bind
+      (:map global-map
+            ("C-c d" . osx-dictionary-search-word-at-point))
+      :config
+    )
+  )
+)
+
+(provide 'config-dictionary)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-dictionary)
+#+end_src
+
+*** rg
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! rg)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-rg.el :mkdirp yes
+;;; config-rg.el -*- lexical-binding: t; -*-
+
+(use-package! rg
+  :bind
+  (:map global-map
+        ("C-c r g r" . rg)
+        ("C-c r g m" . rg-menu)
+        ("C-c r g d" . rg-dwim)
+        ("C-c r g f" . rg-dwim-current-file)
+      )
+  :config
+  (setq rg-keymap-prefix "\C-cg")
+  (setq rg-ignore-case 'smart)
+  (rg-enable-default-bindings)
+)
+
+(provide 'config-rg)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-rg)
+#+end_src
+
+*** PDF
+
+#+begin_src emacs-lisp :tangle lisp/config-pdf.el :mkdirp yes
+;;; config-pdf.el -*- lexical-binding: t; -*-
+(after! pdf-view
+  (map! :map pdf-view-mode-map
+        :nv "z g"        #'pdf-view-goto-page
+        :nv "z r"        #'image-rotate       ;; rotate the page (defined in image.el)
+        :nv "SPC a a l"  #'pdf-annot-list-annotations
+        :nv "SPC a a h"  #'pdf-annot-add-highlight-markup-annotation
+        :nv "SPC a a u"  #'pdf-annot-add-underline-markup-annotation
+        )
+)
+
+(after! pdf-tools
+  :config
+  ;; activate when opening pdf, otherwise the evil keybindings will not work
+  (pdf-loader-install)
+)
+
+(provide 'config-pdf)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-pdf)
+#+end_src
+
+*** RSS by elfeed
+
+#+begin_src emacs-lisp :tangle lisp/config-rss.el :mkdirp yes
+;;; config-rss.el -*- lexical-binding: t; -*-
+
+(after! elfeed
+  ;; override default 2-week-ago filter by doom emacs
+  (setq elfeed-search-filter "")
+)
+
+(use-package! elfeed-org
+  :after org
+  :preface
+  (setq rmh-elfeed-org-files `(,(expand-file-name "elfeed.org" org-directory)))
+)
+
+(provide 'config-rss)
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-rss)
+#+end_src
+
+* Customizations
+
+#+begin_src emacs-lisp :tangle custom.el
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values
+   '((org-latex-and-related-regexp)
+     (org-highlight-latex-and-related)
+     (org-drill-hide-item-headings-p . t)
+     (org-latex-hyperref-template)))
+)
+#+end_src

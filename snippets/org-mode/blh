@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+# key: blh
+# name: basic latex header including author and email
+# uuid: blh
+# group: latex
+# 
+# --
+#+latex_compiler: ${1:xelatex}
+#+latex_class: ${2:article}
+#+latex_header: \\usepackage\{${3:physics}\}
+#+setupfile: lh_symbols.org
+#+options: toc:nil tags:nil title:t email:nil author:nil date:nil
+
+# if you want a preface before toc,
+# write the preface below and uncomment the following latex line
+$0
+
+# a link-colored toc
+# #+latex: \{\\hypersetup\{linkcolor=Blue\}\\tableofcontents\}
+# #+latex: \clearpage
