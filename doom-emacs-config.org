@@ -59,7 +59,7 @@ doom              ; what makes DOOM look the way it does
 doom-dashboard    ; a nifty splash screen for Emacs
 hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
 ;;indent-guides     ; highlighted indent columns
-ligatures         ; ligatures and symbols to make your code pretty again
+(ligatures +extra); ligatures and symbols to make your code pretty again
 ;;minimap           ; show a map of the code on the side
 modeline          ; snazzy, Atom-inspired modeline, plus API
 ;;nav-flash         ; blink cursor line after big motions
@@ -68,7 +68,8 @@ ophints           ; highlight the region an operation acts on
 ;;tabs              ; a tab bar for Emacs
 treemacs          ; a project drawer, like neotree but cooler
 unicode           ; extended unicode support for various languages
-(vc-gutter +pretty) ; vcs diff in the fringe
+(vc-gutter +pretty
+           +diff-hl) ; vcs diff in the fringe
 vi-tilde-fringe   ; fringe tildes to mark beyond EOB
 (window-select +numbers)     ; visually switch windows
 workspaces        ; tab emulation, persistence & separate workspaces
@@ -286,6 +287,26 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 
 #+begin_src emacs-lisp :tangle config.el
 (setq confirm-kill-emacs nil)     ; do not ask if I would like to go
+#+end_src
+
+** Private keybindings
+#+begin_src emacs-lisp :tangle lisp/my-keybindings.el :mkdirp yes
+;;; my-keybindings.el -*- lexical-binding: t; -*-
+
+(map! :leader
+      (:prefix-map ("z" . "my")
+        (:prefix-map ("d" . "drill")
+         :desc "org-drill"         "d"   #'org-drill
+         :desc "org-drill-resume"  "r"   #'org-drill-resume)
+       :desc "org-roam-node-find"  "."   #'org-roam-node-find
+       ))
+
+(provide 'my-keybindings)
+;;; my-keybindings.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'my-keybindings)
 #+end_src
 
 ** UI
@@ -528,8 +549,8 @@ The main setting
         org-agenda-skip-scheduled-if-done 't
         org-agenda-dim-blocked-tasks nil
         org-agenda-inhibit-startup 't
-        org-log-into-drawer 't
-        ; org-log-done 'time
+        ; org-log-into-drawer 't
+        org-log-done 'time
         org-agenda-use-tag-inheritance '(search timeline agenda)
         org-agenda-window-setup 'reorganize-frame
   )
@@ -572,9 +593,9 @@ The main setting
 
   ;; TODO keywords
   ; each state with ! is recorded as state change
-  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "WAIT(w!)" "REVIEW(r!)" "|" "DONE(d!)" "CANCELLED(c!@)"))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "WAIT(w!)" "REV(r!)" "|" "DONE(d)" "CANCELLED(c!@)"))
         org-todo-keyword-faces
-          '(("REVIEW" :foreground "#ff9933" :weight bold)
+          '(("REV" :foreground "#ff9933" :weight bold)
             ("WAIT" :foreground  "#9f7efe")
             ("WIP" :foreground "#0098dd" :weight bold)
             ("TODO" :foreground "#8c1400" :weight bold)
@@ -653,6 +674,39 @@ Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
+#+end_src
+
+*** Recurring task
+
+Support by [[https://github.com/mrcnski/org-recur][~org-recur~]] package
+
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-recur
+  :recipe (:host github :repo "mrcnski/org-recur"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org-recur.el :mkdirp yes
+;;; config-org-recur.el -*- lexical-binding: t; -*-
+
+(use-package! org-recur
+  :hook ((org-mode . org-recur-mode)
+         (org-agenda-mode . org-recur-agenda-mode))
+  :config
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  (setq org-recur-finish-done t
+        org-recur-finish-archive t))
+
+(provide 'config-org-recur)
+;;; config-org-recur.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-org-recur)
 #+end_src
 
 *** Drill
@@ -897,6 +951,10 @@ First define two variables for handling headers for latex export
                   (window-height . fit-window-to-buffer)))
   (setq org-roam-extract-new-file-path "${slug}.org")
   (org-roam-db-autosync-mode)
+  (setq org-roam-node-display-template
+        (format "${doom-hierarchy:*} %s %s"
+                (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)
+                (propertize "${doom-tags:32}" 'face 'org-tag)))
   (setq org-roam-capture-templates
         '(
           ("d" "default" plain "%?"
