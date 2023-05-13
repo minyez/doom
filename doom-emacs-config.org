@@ -3,8 +3,11 @@
 #+auto_tangle: t
 #+latex_class: article
 
-This is my attempt (not the first) to write a literate Emacs configuration on top of
-the well-known [[https://github.com/doomemacs/doomemacs][Doom Emacs framework]].
+The repository represents my attempt to write a literate Emacs configuration on
+top of the well-known [[https://github.com/doomemacs/doomemacs][Doom Emacs framework]].
+This is my first time to try a literature configuration, but not the first to
+tweak Emacs - frustration has beaten me down several times for this seemingly
+endless task. I hope I could make more progress.
 
 * Preface
 ** Why Emacs?
@@ -14,11 +17,13 @@ to practice Zettelkasten method in 2020.
 
 ** Why Doom?
 Mostly because I have been using it since the very beginning of my Emacs
-journey.  It includes a variety of batteries. The defaults, although
-opinionated, suit me well.  I have tried a couple of times setting my own
-vanilla Emacs, but I always find something not that comfortable and don't have
-enough skills, patience and time to figure out.  So I decide to continue to use
-Doom, but improve my current configuration to adopt
+journey, as introduced by the org-roam community.  It includes a variety of
+batteries. The defaults, although opinionated, suit me well.  I have tried a
+couple of times setting my own vanilla Emacs, but I always find something
+not that comfortable and don't have enough skills, patience and time to
+figure out.  So I decide to continue to use Doom, but improve my current
+configuration to adopt myself to the extensive editor and exploit this great
+framework.
 
 ** How is the configuration written?
 Since I have little to none Emacs Lisp skills, most of the codes are either
@@ -294,11 +299,12 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 ;;; my-keybindings.el -*- lexical-binding: t; -*-
 
 (map! :leader
-      (:prefix-map ("z" . "my")
+      (:prefix-map ("e" . "extra-my")
         (:prefix-map ("d" . "drill")
          :desc "org-drill"         "d"   #'org-drill
          :desc "org-drill-resume"  "r"   #'org-drill-resume)
        :desc "org-roam-node-find"  "."   #'org-roam-node-find
+       :desc "org-agenda-list"     "a"   #'org-agenda-list
        ))
 
 (provide 'my-keybindings)
@@ -592,11 +598,12 @@ The main setting
   (plist-put org-calc-default-modes 'calc-float-format '(float 12))
 
   ;; TODO keywords
-  ; each state with ! is recorded as state change
-  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "WAIT(w!)" "REV(r!)" "|" "DONE(d)" "CANCELLED(c!@)"))
+  ; each state with ! is recorded as state change, @ require note
+  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "HOLD(h@)" "WAIT(w!)" "REV(r!)" "|" "DONE(d)" "CANCELLED(c!)"))
         org-todo-keyword-faces
           '(("REV" :foreground "#ff9933" :weight bold)
-            ("WAIT" :foreground  "#9f7efe")
+            ("WAIT" :foreground  "#9f7efe" :underline t)
+            ("HOLD" :foreground  "black" :box t)
             ("WIP" :foreground "#0098dd" :weight bold)
             ("TODO" :foreground "#8c1400" :weight bold)
             ("DONE" :foreground "#50a14f")
@@ -606,7 +613,8 @@ The main setting
   ;; faces for org priority, from https://emacs.stackexchange.com/a/17405
   (setq org-priority-faces '((?A . (:foreground "red" :weight bold))
                              (?B . (:foreground "yellow"))
-                             (?C . (:foreground "green"))))
+                             (?C . (:foreground "blue"))
+                             (?D . (:foreground "green"))))
 
   ;; more link abbreviaiton
   (let ((link-abbrev-l '(("ytb" . "https://www.youtube.com/watch?v=%s")
