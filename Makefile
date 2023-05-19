@@ -9,7 +9,7 @@ rebuild: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(CONFIG_ORG)
 	$(MAKE) tangle
-	@echo "Update tange stamp"
+	@echo "Update tangle stamp"
 	@echo "Doom build $(shell date)" > $(BUILD_STAMP)
 
 tangle: $(CONFIG_ORG)

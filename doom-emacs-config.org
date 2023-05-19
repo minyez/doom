@@ -301,11 +301,13 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 (map! :leader
       (:prefix-map ("e" . "extra-my")
         (:prefix-map ("d" . "drill")
-         :desc "org-drill"         "d"   #'org-drill
-         :desc "org-drill-resume"  "r"   #'org-drill-resume)
-       :desc "org-roam-node-find"  "."   #'org-roam-node-find
-       :desc "org-agenda-list"     "a"   #'org-agenda-list
-       ))
+         :desc "org-drill"          "d"   #'org-drill
+         :desc "org-drill-resume"   "r"   #'org-drill-resume)
+       :desc "org-roam-node-find"   "."   #'org-roam-node-find
+       :desc "org-agenda-list"      "a"   #'org-agenda-list
+       :desc "Sort entries by todo" "S"   '(lambda () (interactive) (org-sort-entries t ?o))
+       ;; :desc "Sort entries"         "S"   #'my/org-sort-entries-todo-deadline-level
+       :desc "org-schedule"         "s"   #'org-schedule))
 
 (provide 'my-keybindings)
 ;;; my-keybindings.el ends here
@@ -444,8 +446,43 @@ Use modus theme by Prot
 
 ** TODO Completion
 
+** Editing
+
+*** undo-tree
+Suppress the warning message saying that undo history could not be
+loaded because the file changed outside of Emacs.
+This is usually the case when some file is edited on other platforms
+and updated from git/cloud locally.
+Copied from raxod502's configuration, see
+[[https://github.com/radian-software/radian/issues/158][radian#158]]
+#+begin_src emacs-lisp :tangle lisp/config-undo-tree.el :mkdirp yes
+;;; config-undo-tree.el -*- lexical-binding: t; -*-
+
+(after! undo-tree
+  (defun radian--undo-tree-suppress-undo-history-saved-message
+        (undo-tree-save-history &rest args)
+      (let ((inhibit-message t))
+        (apply undo-tree-save-history args)))
+
+  (defun radian--undo-tree-suppress-buffer-modified-message
+      (undo-tree-load-history &rest args)
+    (let ((inhibit-message t))
+      (apply undo-tree-load-history args)))
+
+  (advice-add #'undo-tree-load-history :around
+              #'radian--undo-tree-suppress-buffer-modified-message))
+
+(provide 'config-undo-tree)
+;;; config-undo-tree.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-undo-tree)
+#+end_src
+
 ** Org Mode
 *** Basics
+Custom variables and functions
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 ;;; config-org.el -*- lexical-binding: t; -*-
 (defvar my/org-dir
@@ -489,6 +526,11 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
        ;; may add further elisp expression to suppress interaction for description
   ) ;; (org-display-inline-images) ;; inline显示图片
 )
+
+;; for sorting org-mode entries by org-sort-entries
+(defun my/org-sort-entries-todo-deadline-level ()
+  "Key generation function for sorting org entries by TODO state, deadline and priority level"
+  (interactive))
 
 (map!
   :nv "SPC m u" #'outline-up-heading)
@@ -612,9 +654,9 @@ The main setting
   )
   ;; faces for org priority, from https://emacs.stackexchange.com/a/17405
   (setq org-priority-faces '((?A . (:foreground "red" :weight bold))
-                             (?B . (:foreground "yellow"))
+                             (?B . (:foreground "#C88523"))
                              (?C . (:foreground "blue"))
-                             (?D . (:foreground "green"))))
+                             (?D . (:foreground "#4B7A47"))))
 
   ;; more link abbreviaiton
   (let ((link-abbrev-l '(("ytb" . "https://www.youtube.com/watch?v=%s")
@@ -678,7 +720,8 @@ and load it in the main config file.
 (require 'config-org)
 #+end_src
 
-Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature.
+Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature,
+as the symbols introduced are a bit too fancy for me.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
@@ -728,10 +771,6 @@ Support by [[https://github.com/mrcnski/org-recur][~org-recur~]] package
 (use-package! org-drill
   :after org
   :commands org-drill org-drill-resume
-  :init
-  (map! :map org-mode-map
-        :nv "SPC m d d" #'org-drill
-        :nv "SPC m d r" #'org-drill-resume)
   :config
   (setq org-drill-scope 'directory)
   (setq org-drill-spaced-repetition-algorithm 'sm2)
@@ -1018,6 +1057,22 @@ Use the new maintained repository
 #+end_src
 
 ** Tools
+*** Projectile
+
+#+begin_src emacs-lisp :tangle lisp/config-projectile.el :mkdirp yes
+;;; config-projectile.el -*- lexical-binding: t; -*-
+(use-package! projectile
+  :custom
+  (projectile-project-search-path (list "~/projects")))
+
+(provide 'config-projectile)
+;;; config-projectile.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-projectile)
+#+end_src
+
 *** command-log-mode
 #+begin_src emacs-lisp :tangle packages.el
 (package! command-log-mode)
