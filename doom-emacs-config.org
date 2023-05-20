@@ -152,6 +152,7 @@ markdown            ; writing docs for people to ignore
 python              ; beautiful is better than ugly
 ;;qt                ; the 'cutest' gui framework ever
 rst               ; ReST in peace
+ruby
 ;;(rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 (sh +zsh)           ; she sells {ba,z,fi}sh shells on the C xor
 ;;swift             ; who asked for emoji variables?
