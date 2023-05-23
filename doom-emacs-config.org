@@ -322,6 +322,8 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 *** Prologue
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 ;;; config-ui.el -*- lexical-binding: t; -*-
+
+(display-time-mode 1) ;; always show time
 #+end_src
 
 *** Font
@@ -387,6 +389,17 @@ Use modus theme by Prot
       (:prefix-map ("t" . "toggle")
        (:when (modulep! :ui treemacs)
         :desc "treemacs" "t" #'treemacs)))
+#+end_src
+
+*** doom-modeline
+
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(when (modulep! :ui modeline)
+  (use-package! doom-modeline
+    :config
+    (setq doom-modeline-time t
+          doom-modeline-enable-word-count t
+          doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))))
 #+end_src
 
 *** Epilogue
