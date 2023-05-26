@@ -183,7 +183,8 @@ Syntax/grammaer checkers
 #+name: doom-init-checkers
 #+begin_src emacs-lisp
 syntax              ; tasing you for every semicolon you forget
-;;(spell +flyspell) ; tasing you for misspelling mispelling
+(spell +flyspell
+       +hunspell)   ; tasing you for misspelling mispelling
 ;;grammar           ; tasing grammar mistake every you make
 #+end_src
 
@@ -492,6 +493,33 @@ Copied from raxod502's configuration, see
 
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-undo-tree)
+#+end_src
+
+*** Checkers
+
+**** Prologue
+#+begin_src emacs-lisp :tangle lisp/config-checker.el :mkdirp yes
+;;; config-checker.el -*- lexical-binding: t; -*-
+#+end_src
+
+**** ispell
+#+begin_src emacs-lisp :tangle lisp/config-checker.el :mkdirp yes
+(when (modulep! :checkers spell)
+  (after! ispell
+    (setq ispell-personal-dictionary (concat doom-private-dir "words"))
+  )
+)
+
+#+end_src
+
+**** Epilogue
+#+begin_src emacs-lisp :tangle lisp/config-checker.el :mkdirp yes
+(provide 'config-checker)
+;;; config-checker.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-checker)
 #+end_src
 
 ** Org Mode
