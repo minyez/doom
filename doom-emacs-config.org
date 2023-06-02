@@ -185,7 +185,7 @@ Syntax/grammaer checkers
 syntax              ; tasing you for every semicolon you forget
 (spell +flyspell
        +hunspell)   ; tasing you for misspelling mispelling
-;;grammar           ; tasing grammar mistake every you make
+grammar             ; tasing grammar mistake every you make
 #+end_src
 
 Applications.
@@ -303,13 +303,17 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 (map! :leader
       (:prefix-map ("e" . "extra-my")
         (:prefix-map ("d" . "drill")
-         :desc "org-drill"          "d"   #'org-drill
-         :desc "org-drill-resume"   "r"   #'org-drill-resume)
-       :desc "org-roam-node-find"   "."   #'org-roam-node-find
-       :desc "org-agenda-list"      "a"   #'org-agenda-list
-       :desc "Sort entries by todo" "S"   '(lambda () (interactive) (org-sort-entries t ?o))
-       ;; :desc "Sort entries"         "S"   #'my/org-sort-entries-todo-deadline-level
-       :desc "org-schedule"         "s"   #'org-schedule))
+          :desc "org-drill"          "d"   #'org-drill
+          :desc "org-drill-resume"   "r"   #'org-drill-resume)
+        :desc "org-roam-node-find"   "."   #'org-roam-node-find
+        :desc "org-agenda-list"      "a"   #'org-agenda-list
+        :desc "Sort entries by todo" "S"   '(lambda () (interactive) (org-sort-entries t ?o))
+        :desc "org-schedule"         "s"   #'org-schedule)
+
+        ;; supplement existing map
+        (:prefix-map ("t" . "toggle")
+          :desc "truncate-lines"       "L"   #'toggle-truncate-lines)
+)
 
 (provide 'my-keybindings)
 ;;; my-keybindings.el ends here
@@ -444,10 +448,20 @@ Use modus theme by Prot
 (require 'config-evil)
 #+end_src
 
-** CJK Input
+** CJK input
 
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
 ;;; config-cjk.el -*- lexical-binding: t; -*-
+#+end_src
+
+Add keybindings for quick change between input methods
+#+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
+(map! :leader
+      (:prefix-map ("e" . "extra-my")
+        (:prefix-map ("i" . "input")
+         :desc "Japanese"        "j"  '(lambda () (interactive) (set-input-method "japanese"))
+         :desc "Chinese (Pyim)"  "c"  '(lambda () (interactive) (set-input-method "pyim"))
+)))
 #+end_src
 
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
@@ -509,7 +523,13 @@ Copied from raxod502's configuration, see
     (setq ispell-personal-dictionary (concat doom-private-dir "words"))
   )
 )
+#+end_src
 
+**** grammar
+Disable language-tool in grammar module
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(if (modulep! :checkers grammar)
+  (package! langtool :disable t))
 #+end_src
 
 **** Epilogue
@@ -524,7 +544,7 @@ Copied from raxod502's configuration, see
 
 ** Org Mode
 *** Basics
-Custom variables and functions
+**** Custom variables and functions
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 ;;; config-org.el -*- lexical-binding: t; -*-
 (defvar my/org-dir
@@ -578,12 +598,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :nv "SPC m u" #'outline-up-heading)
 #+end_src
 
-The main setting
+**** Main setting
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org
   :init
   (setq org-directory my/org-dir)
-  (setq org-fold-core-style 'overlays)
+  (setq org-fold-core-style 'overlays
+        org-fold-catch-invisible-edits 'show)
   :hook
   ((org-mode . org-indent-mode)
    (org-mode . visual-line-mode)
@@ -718,7 +739,42 @@ The main setting
 )
 #+end_src
 
-~org-cliplink~ for quick extraction of link
+**** Create custom ID of an entry according to the title
+
+#+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
+(after! org
+  ;; create ID if there is no CUSTOM_ID
+  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+
+  ;; add a CUSTOM_ID according to the name of heading
+  ;; adapted from https://writequit.org/articles/emacs-org-mode-generate-ids.html
+  ;; the original one use id from org-id-new, which creates a non-human-readable id
+  (defun my/org-custom-id-get (&optional pom create)
+    "Get the CUSTOM_ID property of the entry at point-or-marker POM.
+     If POM is nil, refer to the entry at point. If the entry does
+     not have an CUSTOM_ID, the function returns nil. However, when
+     CREATE is non nil, create a CUSTOM_ID if none is present.
+     In any case, the CUSTOM_ID of the entry is returned."
+    (interactive)
+    (org-with-point-at pom
+      (let ((id (org-entry-get nil "CUSTOM_ID")))
+        (cond
+         ((and id (stringp id) (string-match "\\S-" id))
+          id)
+         (create
+          ;; naively remove emphasis
+          (setq id (replace-regexp-in-string "[~*+]" "" (org-entry-get nil "ITEM")))
+          (org-entry-put pom "CUSTOM_ID" id)
+          (org-id-add-location id (buffer-file-name (buffer-base-buffer)))
+          id)))))
+  (map! :leader
+        (:prefix-map ("e" . "extra-my")
+          (:prefix-map ("p" . "property")
+           :desc "Custom ID"  "i"  '(lambda () (interactive) (my/org-custom-id-get nil 'create)))))
+)
+#+end_src
+
+**** ~org-cliplink~ for quick extraction of link
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-cliplink
   :after org
@@ -727,7 +783,7 @@ The main setting
         ("C-c m l c" . org-cliplink)))
 #+end_src
 
-~org-appear~ for showing raw content of rendered markup at cursor.
+**** ~org-appear~ for showing raw content of rendered markup at cursor.
 It is included with feature ~+pretty~.
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-appear
@@ -739,7 +795,7 @@ It is included with feature ~+pretty~.
 )
 #+end_src
 
-Set ~org-download~ image directory
+**** Set ~org-download~ image directory
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (after! org-download
   (setq-default org-download-image-dir (concat org-directory "/images/downloads"))
@@ -752,24 +808,26 @@ Set ~org-download~ image directory
 )
 #+end_src
 
-Here we finishes
+**** Finishes
+
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (provide 'config-org)
 ;;; config-org.el ends here
 #+end_src
-and load it in the main config file.
+load it in the main config file.
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-org)
 #+end_src
 
-Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature,
-as the symbols introduced are a bit too fancy for me.
+**** Disable ~org-fancy-priorities~ introduced by the ~+pretty~ feature
+
+since the symbols introduced are a bit too fancy for me.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 #+end_src
 
-*** Recurring task
+*** Recurring task using org-recur
 
 Support by [[https://github.com/mrcnski/org-recur][~org-recur~]] package
 
