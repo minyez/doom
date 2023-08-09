@@ -296,6 +296,28 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 (setq confirm-kill-emacs nil)     ; do not ask if I would like to go
 #+end_src
 
+** Vairables
+
+Some global variables which are used in further per-package customization
+#+begin_src emacs-lisp :tangle lisp/my-variables.el :mkdirp yes
+;;; my-variables.el -*- lexical-binding: t; -*-
+
+(defvar my/org-dir
+  (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
+  "org directory")
+
+(defvar my/bibtex-file
+  (expand-file-name "bibliography.bib" "~/database")
+  "all-in-one bibtex file for referecnes")
+
+(provide 'my-variables)
+;;; my-variables.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'my-variables)
+#+end_src
+
 ** Private keybindings
 #+begin_src emacs-lisp :tangle lisp/my-keybindings.el :mkdirp yes
 ;;; my-keybindings.el -*- lexical-binding: t; -*-
@@ -337,7 +359,7 @@ Profiling use-package when environment variable ~EMACS_PROF~ is defined
 Use Nerd-Font-patched Sarasa font
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (let ((font "Sarasa Fixed SC Nerd Font")
-      (size 14))
+      (size 16))
   (setq doom-font (font-spec :family font :size size)
         doom-variable-pitch-font (font-spec :family font :size size)
         doom-unicode-font (font-spec :family font :size size)
@@ -470,9 +492,32 @@ Pyim configuration.
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
 (use-package! pyim
   :config
+  (global-set-key (kbd "M-\\") 'pyim-convert-string-at-point)
   (setq pyim-page-tooltip '(posframe popup))
+  (setq pyim-dcache-auto-update t)
   ;;; pyim-shuangping is derived from xiaohe-shuangpin
   (pyim-default-scheme 'pyim-shuangpin)
+  (setq pyim-page-length 9)
+  ;;; 中文使用全角标点，英文使用半角标点。
+  (setq pyim-punctuation-translate-p '(auto yes no))
+  ;;; painless CN/EN switch by probe
+  (defun my/pyim-probe-org-src-block ()
+    "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
+    (when (eq major-mode 'org-mode)
+      (not (eq (org-in-src-block-p) nil)))
+    )
+  ;; auto-english 会根据之前的字符来判断是否切换到英文输入, 输入空格时自动切换到英文
+  ;; 具体可用 describe-function 查看 docstring 来了解
+  ;; 在 latex 块和源码块中全部为英文输入
+  (setq-default pyim-english-input-switch-functions
+              '(pyim-probe-auto-english
+                pyim-probe-org-latex-mode
+                my/pyim-probe-org-src-block
+                ;pyim-probe-org-structure-template
+                pyim-probe-program-mode))
+  ;; 半角标点。主要情形是在行首使用 yasnippet 时有用
+  (setq-default pyim-punctuation-half-width-functions
+              '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
 )
 #+end_src
 
@@ -560,9 +605,6 @@ Disable language-tool in grammar module
 **** Custom variables and functions
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 ;;; config-org.el -*- lexical-binding: t; -*-
-(defvar my/org-dir
-  (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
-  "org directory")
 
 ;; for paste picture from clipboard to org-mode
 ;; adapted from https://emacs-china.org/t/topic/6601/4
@@ -580,7 +622,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         ('darwin "pngpaste %s")
         ('gnu/linux "xclip -selection clipboard -t image/png -o > %s")
         ))
-     (path (concat mz/org-notes "/images/"))
+     (path (concat my/org-dir "/images/"))
      (fn (format "%s" (read-string "Enter image name (w/o png):")))
   	   (image-file (concat path fn ".png"))
     )
@@ -878,6 +920,40 @@ Support by [[https://github.com/mrcnski/org-recur][~org-recur~]] package
 
 #+begin_src emacs-lisp :tangle config.el :mkdirp yes
 (require 'config-org-recur)
+#+end_src
+
+*** ~org-ref~ and related packages for scientific writing
+
+Before I was using version 2. Now I would like to give version 3 a try.
+
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-ref
+  :recipe (:host gitlab :repo "jkitchin/org-ref"))
+(package! bibtex-completion)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
+;;; config-org-ref.el -*- lexical-binding: t; -*-
+(use-package! bibtex-completion
+  :config
+  (setq bibtex-completion-notes-path (expand-file-name "ref" my/org-dir)
+        bibtex-completion-bibliography (list my/bibtex-file)
+        bibtex-completion-pdf-field "file"
+        bibtex-completion-additional-search-fields '(keywords, journaltitle)
+  )
+)
+
+(use-package! org-ref
+  :config
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+)
+
+(provide 'config-org-ref)
+;;; config-org-ref.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-org-ref)
 #+end_src
 
 *** Drill
