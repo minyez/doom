@@ -926,12 +926,18 @@ Support by [[https://github.com/mrcnski/org-recur][~org-recur~]] package
 
 Before I was using version 2. Now I would like to give version 3 a try.
 
+First install ~org-ref~ and ~bibtex-completion~.
+Note the Doom's ~biblio~ module can also be used to install ~bibtex-completion~,
+only when either ~ivy~ or ~helm~ completion engine is activated.
+Since I am using ~vertico~, I have to install it manually.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-ref
   :recipe (:host gitlab :repo "jkitchin/org-ref"))
 (package! bibtex-completion)
+(package! citar)
 #+end_src
 
+Configure the ~bibtex-completion~ package
 #+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
 ;;; config-org-ref.el -*- lexical-binding: t; -*-
 (use-package! bibtex-completion
@@ -942,21 +948,37 @@ Before I was using version 2. Now I would like to give version 3 a try.
         bibtex-completion-additional-search-fields '(keywords, journaltitle)
   )
 )
+#+end_src
 
+Configure the ~org-ref~ package. Simply add a shortcut to insert a citation link.
+#+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
 (use-package! org-ref
   :config
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 )
+#+end_src
 
+~citar~
+#+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
+(use-package citar
+  :custom
+  (citar-bibliography (list my/bibtex-file))
+  (citar-notes-paths (list (expand-file-name "ref" my/org-dir)))
+)
+#+end_src
+
+Conclude the configuration
+#+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
 (provide 'config-org-ref)
 ;;; config-org-ref.el ends here
 #+end_src
-
+and add it to the main config file
 #+begin_src emacs-lisp :tangle config.el :mkdirp yes
 (require 'config-org-ref)
 #+end_src
 
 *** Drill
+The ~org-drill~ package is used as an alternative to Anki for spaced repetition to memorize things.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-drill
   :recipe (:host gitlab :repo "phillord/org-drill"))
@@ -984,7 +1006,7 @@ Before I was using version 2. Now I would like to give version 3 a try.
 (require 'config-org-drill)
 #+end_src
 
-*** Export
+*** Org export ~ox~
 
 **** Prologue
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
@@ -1160,6 +1182,7 @@ First define two variables for handling headers for latex export
 #+end_src
 
 *** Roam
+For Zettelkasten note taking.
 #+begin_src emacs-lisp :tangle lisp/config-org-roam.el :mkdirp yes
 ;;; config-org-roam.el -*- lexical-binding: t; -*-
 
@@ -1200,9 +1223,28 @@ First define two variables for handling headers for latex export
                 (propertize "${doom-tags:32}" 'face 'org-tag)))
   (setq org-roam-capture-templates
         '(
-          ("d" "default" plain "%?"
+          ("d" "default quick note" plain "%?"
            :if-new (file+head "${slug}.org"
                               "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: content\n#+created: %U\n")
+           :unnarrowed t)
+          ("l" "Note for latex export" plain "%?"
+           :if-new (file+head "${slug}.org" "# -*- truncate-lines: t -*-
+#+title: ${title}
+#+startup: content
+#+created: %U\n
+#+latex_compiler: pdflatex
+#+latex_class: article
+#+latex_header: \\usepackage[margin=1in]{geometry}
+#+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]{biblatex}
+#+latex_header: \\addbibresource{~/database/bibliography.bib}
+# include commands preset
+#+setupfile: lh_symbols.org
+#+setupfile: lh_biblatex.org
+#+options: toc:nil tags:nil title:t email:nil author:t date:t
+
+# a link-colored toc
+#+latex: {\\hypersetup{linkcolor=Blue}\\tableofcontents}
+#+latex: \\clearpage\n\n* References\n#+latex: \\printbibliography[heading=none]")
            :unnarrowed t)
           ("b" "non-STEM book note" plain "%?"
            :if-new (file+head "bookrev/${slug}.org"
@@ -1210,11 +1252,79 @@ First define two variables for handling headers for latex export
            :unnarrowed t)
          ))
 )
+#+end_src
 
+~org-roam-bibtex~ plugin to interact org-roam with org-ref and citar.
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-roam-bibtex
+  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+(unpin! org-roam)
+(package! citar-org-roam)
+#+end_src
+
+Note that here I bind ~org-roam-bibtex-mode~ to ~org-mode~, such that
+whenever I tries to open note from org-ref link, notes will be searched by orb.
+#+begin_src emacs-lisp :tangle lisp/config-org-roam.el :mkdirp yes
+(use-package! org-roam-bibtex
+  :after org
+  :hook
+  (org-mode . org-roam-bibtex-mode)
+  :config
+  (require 'org-ref)
+  ; (setq org-ref-notes-function 'orb-edit-notes)
+  (setq orb-preformat-keywords
+    '("citekey"  "title" "author-or-editor" "date" "doi" "file" "journaltitle" "volume" "pages"))
+  ; (setq orb-roam-ref-format "org-ref-v3")
+  (advice-add 'bibtex-completion-candidates :filter-return 'reverse)
+  ; anystyle-related
+  (setq orb-autokey-format "%A*[1]%y*"
+        orb-pdf-scrapper-export-fields '("author" "journal" "date" "volume" "pages" "title"))
+  (add-to-list 'org-roam-capture-templates
+          '("r" "reference" plain "%?"
+           :if-new (file+head
+           "ref/note-${citekey}.org"
+           ":PROPERTIES:
+:TITLE: ${title}
+:AUTHOR: ${author-or-editor}
+:JOURNAL: ${journaltitle}
+:DATE: ${date}
+:VOLUME: ${volume}
+:PAGES: ${pages}
+:DOI: [[doi:%(replace-regexp-in-string \" \" \"\" \"${doi}\")]]
+:END:
+#+title: ${citekey}: ${title}
+#+startup: content
+#+created: %U
+
+,* Summary Notes
+
+,* Noter Notes :noter:
+:PROPERTIES:
+:NOTER_DOCUMENT: ${file}
+:END:
+"
+           )
+           :unnarrowed t))
+  ;;; connect to citar by citar-org-roam
+  (require 'citar-org-roam)
+  (citar-register-notes-source
+   'orb-citar-source (list :name "Org-Roam Notes"
+          :category 'org-roam-node
+          :items #'citar-org-roam--get-candidates
+          :hasitems #'citar-org-roam-has-notes
+          :open #'citar-org-roam-open-note
+          :create #'orb-citar-edit-note
+          :annotate #'citar-org-roam--annotate))
+  (setq citar-notes-source 'orb-citar-source)
+)
+#+end_src
+
+Finish the configuration
+#+begin_src emacs-lisp :tangle lisp/config-org-roam.el :mkdirp yes
 (provide 'config-org-roam)
 ;;; config-org-roam.el ends here
 #+end_src
-
+and include in the main config
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-org-roam)
 #+end_src
