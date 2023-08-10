@@ -930,6 +930,7 @@ First install ~org-ref~ and ~bibtex-completion~.
 Note the Doom's ~biblio~ module can also be used to install ~bibtex-completion~,
 only when either ~ivy~ or ~helm~ completion engine is activated.
 Since I am using ~vertico~, I have to install it manually.
+As a replacement to ~helm-bibtex~ or ~ivy-bibtex~, ~citar~ package is used.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-ref
   :recipe (:host gitlab :repo "jkitchin/org-ref"))
@@ -937,7 +938,7 @@ Since I am using ~vertico~, I have to install it manually.
 (package! citar)
 #+end_src
 
-Configure the ~bibtex-completion~ package
+Configure the ~bibtex-completion~ package, for notes searching and bibliography source
 #+begin_src emacs-lisp :tangle lisp/config-org-ref.el :mkdirp yes
 ;;; config-org-ref.el -*- lexical-binding: t; -*-
 (use-package! bibtex-completion
