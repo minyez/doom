@@ -1099,6 +1099,7 @@ First define two variables for handling headers for latex export
       (""     "ifxetex"   nil)
       (""     "xeCJK"     nil ("xelatex", "xetex"))
       (""     "fontspec"  nil ("xelatex", "xetex", "lualatex", "luatex"))
+      (""     "microtype"  nil) ; for typographic refinements
       (""     "graphicx"  t)
       (""     "xcolor"  t)
       ; ("nottoc,numbib"     "tocbibind" nil)
