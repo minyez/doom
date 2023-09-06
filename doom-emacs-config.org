@@ -1088,7 +1088,6 @@ First define two variables for handling headers for latex export
       ("T1"   "fontenc"   t ("pdflatex"))
       (""     "CJKutf8"   t ("pdflatex"))
       (""     "ifxetex"   nil)
-      (""     "ctex"      nil ("xelatex", "xetex"))
       (""     "xeCJK"     nil ("xelatex", "xetex"))
       (""     "fontspec"  nil ("xelatex", "xetex", "lualatex", "luatex"))
       (""     "graphicx"  t)
