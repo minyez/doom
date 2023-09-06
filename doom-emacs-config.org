@@ -694,7 +694,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         :nv "SPC v w"   #'widen
         )
   (setq org-src-tab-acts-natively nil)
-  ;; hide emphasis markers, display when move to the line (enabled by org-appera)
+  ;; hide emphasis markers, display when move to the line (enabled by org-appear)
   (setq org-hide-emphasis-markers t)
   (setq org-archive-location (concat org-directory "/archive.org::* From %s"))
   (setq org-default-notes-file "todos.org")
@@ -709,6 +709,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                                             ; 'auto for total; 'today
   )
   (setq org-enforce-todo-checkbox-dependencies t)
+  ;; highlight latex environment
+  ; (setq org-highlight-latex-and-related '(native script entities))
+  ; (setq org-highlight-latex-and-related '(native script))
 
   ;; agenda
   (setq org-agenda-files (concat org-directory "/org-agenda.org")
@@ -846,15 +849,21 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 #+end_src
 
 **** ~org-appear~ for showing raw content of rendered markup at cursor.
-It is included with feature ~+pretty~.
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-appear
   :hook
   (org-mode . org-appear-mode)
   :config
-  (setq org-appear-autolinks t
-        org-appear-autoentities t)
+  (setq org-appear-autolinks t      ;; not working right now in Doom, which is a bit annoying
+        org-link-descriptive nil    ;; so show the full link
+        org-appear-autoentities t 
+        org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
+#+end_src
+
+Unpin the org-appear version to resolve not-working problem of ~org-appear-autolinks~
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(unpin! org-appear)
 #+end_src
 
 **** Set ~org-download~ image directory
@@ -933,7 +942,7 @@ Since I am using ~vertico~, I have to install it manually.
 As a replacement to ~helm-bibtex~ or ~ivy-bibtex~, ~citar~ package is used.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-ref
-  :recipe (:host gitlab :repo "jkitchin/org-ref"))
+  :recipe (:host github :repo "jkitchin/org-ref"))
 (package! bibtex-completion)
 (package! citar)
 #+end_src
