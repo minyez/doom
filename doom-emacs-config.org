@@ -420,6 +420,37 @@ Use modus theme by Prot
         :desc "treemacs" "t" #'treemacs)))
 #+end_src
 
+*** Window selection
+Map window selection to simpler key combination.
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(when (modulep! :ui window-select +numbers)
+ (use-package! winum
+
+  :bind
+  (:map global-map
+        ("s-0" . winum-select-window-0-or-10)
+        ("s-1" . winum-select-window-1)
+        ("s-2" . winum-select-window-2)
+        ("s-3" . winum-select-window-3)
+        ("s-4" . winum-select-window-4)
+        ("s-5" . winum-select-window-5)
+        ("s-6" . winum-select-window-6)
+        ("s-7" . winum-select-window-7)
+        ("s-8" . winum-select-window-8)
+        ("s-9" . winum-select-window-9))
+  (:map evil-normal-state-map
+        ("s-0" . winum-select-window-0-or-10)
+        ("s-1" . winum-select-window-1)
+        ("s-2" . winum-select-window-2)
+        ("s-3" . winum-select-window-3)
+        ("s-4" . winum-select-window-4)
+        ("s-5" . winum-select-window-5)
+        ("s-6" . winum-select-window-6)
+        ("s-7" . winum-select-window-7)
+        ("s-8" . winum-select-window-8)
+        ("s-9" . winum-select-window-9))))
+#+end_src
+
 *** doom-modeline
 
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
