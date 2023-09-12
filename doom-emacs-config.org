@@ -647,7 +647,6 @@ Disable language-tool in grammar module
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 ;;; config-org.el -*- lexical-binding: t; -*-
 
-;; for paste picture from clipboard to org-mode
 ;; adapted from https://emacs-china.org/t/topic/6601/4
 (defun my/org-insert-image ()
   "Insert PNG image from the clipboard to the buffer by using =pngpaste= (macos) or =xclip= (linux)
@@ -685,10 +684,25 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ) ;; (org-display-inline-images) ;; inline显示图片
 )
 
-;; for sorting org-mode entries by org-sort-entries
 (defun my/org-sort-entries-todo-deadline-level ()
   "Key generation function for sorting org entries by TODO state, deadline and priority level"
   (interactive))
+
+
+(defun my/org-goto-today-node (&optional DTFORMAT)
+  "go to the node with the time string of today in DTFORMAT as heading"
+  (let* ((dtformat (if DTFORMAT DTFORMAT "%Y-%m-%d %a"))
+         (headline (format-time-string dtformat (current-time))))
+    ;;; following code copied from org-capture.el L983
+    (widen)
+    (goto-char (point-min)) ;;; get to the very beginning in the file
+    (if (re-search-forward (format org-complex-heading-regexp-format
+                                   (regexp-quote headline))
+                           nil t)
+        ()
+      (goto-char (point-max))
+      (unless (bolp) (insert "\n"))
+      (insert "* " headline "\n"))))
 
 (map!
   :nv "SPC m u" #'outline-up-heading)
@@ -775,16 +789,19 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
           ("g" "German vocaburary" entry
                (file "drills/german_vocabulary.org")
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
-          ("t"  "Quick TODO item in todos.org")
-          ("ti" "Inbox" entry
-                (file+headline ,org-default-notes-file "Inbox")
-                "* TODO %u %?\n%i\n%a" :prepend t)
-          ("tw" "Work" entry
-                (file+headline ,org-default-notes-file "工作 Work")
-                "* TODO %u %?\nDEADLINE: %t" :prepend t)
-          ("tl" "Life" entry
-                (file+headline ,org-default-notes-file "生活 Life")
-                "* TODO %u %?\nDEADLINE: %t" :prepend t)
+          ("j" "Journal Log" plain
+               (file+function "journal/log.org" my/org-goto-today-node)
+               "%<%H:%M> %?" :prepend nil)
+          ; ("t"  "Quick TODO item in todos.org")
+          ; ("ti" "Inbox" entry
+          ;       (file+headline ,org-default-notes-file "Inbox")
+          ;       "* TODO %u %?\n%i\n%a" :prepend t)
+          ; ("tw" "Work" entry
+          ;       (file+headline ,org-default-notes-file "工作 Work")
+          ;       "* TODO %u %?\nDEADLINE: %t" :prepend t)
+          ; ("tl" "Life" entry
+          ;       (file+headline ,org-default-notes-file "生活 Life")
+          ;       "* TODO %u %?\nDEADLINE: %t" :prepend t)
           )
         )
   ;; org-table related.
