@@ -41,7 +41,8 @@ Input method
 #+name: doom-init-input
 #+begin_src emacs-lisp
 ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
-(chinese +rime)
+(chinese +rime
+         +childframe)
 ;;japanese
 layout            ; auie,ctsrnm is the superior home row
 #+end_src
@@ -519,9 +520,18 @@ Add keybindings for quick change between input methods
 )))
 #+end_src
 
+Use Pyim for Chinese input.
+Use the latest pyim version
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(unpin! pyim)
+(unpin! posframe)
+#+end_src
 Pyim configuration.
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
 (use-package! pyim
+  :custom
+  ;; Disable word search in current buffer.
+  (pyim-candidates-search-buffer-p nil)
   :config
   (global-set-key (kbd "M-\\") 'pyim-convert-string-at-point)
   (setq pyim-page-tooltip '(posframe popup))
@@ -541,11 +551,11 @@ Pyim configuration.
   ;; 具体可用 describe-function 查看 docstring 来了解
   ;; 在 latex 块和源码块中全部为英文输入
   (setq-default pyim-english-input-switch-functions
-              '(pyim-probe-auto-english
-                pyim-probe-org-latex-mode
-                my/pyim-probe-org-src-block
-                ;pyim-probe-org-structure-template
-                pyim-probe-program-mode))
+                '(pyim-probe-auto-english
+                  pyim-probe-org-latex-mode
+                  my/pyim-probe-org-src-block
+                  ; pyim-probe-org-structure-template
+                  pyim-probe-program-mode))
   ;; 半角标点。主要情形是在行首使用 yasnippet 时有用
   (setq-default pyim-punctuation-half-width-functions
               '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
