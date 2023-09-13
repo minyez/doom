@@ -536,12 +536,12 @@ Pyim configuration.
   (global-set-key (kbd "M-\\") 'pyim-convert-string-at-point)
   (setq pyim-page-tooltip '(posframe popup))
   (setq pyim-dcache-auto-update t)
-  ;;; pyim-shuangping is derived from xiaohe-shuangpin
+  ;; pyim-shuangping is derived from xiaohe-shuangpin
   (pyim-default-scheme 'pyim-shuangpin)
   (setq pyim-page-length 9)
-  ;;; 中文使用全角标点，英文使用半角标点。
+  ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
-  ;;; painless CN/EN switch by probe
+  ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
     (when (eq major-mode 'org-mode)
@@ -562,12 +562,12 @@ Pyim configuration.
 )
 #+end_src
 
-
+Finish the configuration
 #+begin_src emacs-lisp :tangle lisp/config-cjk.el :mkdirp yes
 (provide 'config-cjk)
 ;;; config-cjk.el ends here
 #+end_src
-
+and add the main file
 #+begin_src emacs-lisp :tangle config.el
 (require 'config-cjk)
 #+end_src
@@ -689,17 +689,18 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (interactive))
 
 
-(defun my/org-goto-today-node (&optional DTFORMAT)
+(defun my/org-goto-today-node (&optional PREPEND DTFORMAT)
   "go to the node with the time string of today in DTFORMAT as heading"
-  (let* ((dtformat (if DTFORMAT DTFORMAT "%Y-%m-%d %a"))
+  (let* ((prepend  PREPEND)
+         (dtformat (if DTFORMAT DTFORMAT "%Y-%m-%d %a"))
          (headline (format-time-string dtformat (current-time))))
-    ;;; following code copied from org-capture.el L983
+    ;; following code copied from org-capture.el L983
     (widen)
     (goto-char (point-min)) ;;; get to the very beginning in the file
     (if (re-search-forward (format org-complex-heading-regexp-format
                                    (regexp-quote headline))
                            nil t)
-        ()
+        (unless prepend (org-end-of-subtree))
       (goto-char (point-max))
       (unless (bolp) (insert "\n"))
       (insert "* " headline "\n"))))
@@ -791,7 +792,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
           ("j" "Journal Log" plain
                (file+function "journal/log.org" my/org-goto-today-node)
-               "%<%H:%M> %?" :prepend nil)
+               "%<%H:%M> %?")
           ; ("t"  "Quick TODO item in todos.org")
           ; ("ti" "Inbox" entry
           ;       (file+headline ,org-default-notes-file "Inbox")
@@ -1404,7 +1405,10 @@ Use the new maintained repository
 (when (modulep! :lang org +noter)
   (package! org-noter :recipe
     (:host github :repo "org-noter/org-noter"
-     :files ("*.el" "modules/*.el"))))
+     :files ("*.el" "modules/*.el")))
+  ;; djvu/nov package required by org-noter-djvu/nov
+  (package! djvu)
+  (package! nov))
 #+end_src
 
 #+begin_src emacs-lisp :tangle lisp/config-org-noter.el :mkdirp yes
