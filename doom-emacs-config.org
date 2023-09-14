@@ -700,7 +700,10 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
     (if (re-search-forward (format org-complex-heading-regexp-format
                                    (regexp-quote headline))
                            nil t)
-        (unless prepend (org-end-of-subtree))
+        (progn
+          (unless prepend (org-end-of-subtree) (insert "\n"))
+          (insert "\n"))
+      ;; head not found, create a new headline after the buffer if it is not empty
       (goto-char (point-max))
       (unless (bolp) (insert "\n"))
       (insert "* " headline "\n"))))
