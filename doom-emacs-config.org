@@ -320,8 +320,17 @@ Some global variables which are used in further per-package customization
 #+end_src
 
 ** Private keybindings
+Use key-chord for mapping simultaneously pressed keys to command
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! key-chord)
+#+end_src
+
 #+begin_src emacs-lisp :tangle lisp/my-keybindings.el :mkdirp yes
 ;;; my-keybindings.el -*- lexical-binding: t; -*-
+(use-package! key-chord
+  :config
+  (key-chord-mode 1)
+  (key-chord-define-global "jk" 'evil-escape))
 
 (map! :leader
       (:prefix-map ("e" . "extra-my")
@@ -515,8 +524,9 @@ Add keybindings for quick change between input methods
 (map! :leader
       (:prefix-map ("e" . "extra-my")
         (:prefix-map ("i" . "input")
-         :desc "Japanese"        "j"  '(lambda () (interactive) (set-input-method "japanese"))
          :desc "Chinese (Pyim)"  "c"  '(lambda () (interactive) (set-input-method "pyim"))
+         :desc "Japanese"        "j"  '(lambda () (interactive) (set-input-method "japanese"))
+         :desc "Tex"             "c"  '(lambda () (interactive) (set-input-method "TeX"))
 )))
 #+end_src
 
@@ -538,9 +548,16 @@ Pyim configuration.
   (setq pyim-dcache-auto-update t)
   ;; pyim-shuangping is derived from xiaohe-shuangpin
   (pyim-default-scheme 'pyim-shuangpin)
+  ;; disable pyim-outcome-trigger for pyim-shuangpin otherwise cannot type o for 欧
+  (setq pyim-outcome-trigger nil)
   (setq pyim-page-length 9)
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
+  ;;; 加入个人词库和自定义词库。这里是把 pyim 导出的文件也作为一个词典导入，避免以后丢失。
+  (add-to-list 'pyim-dicts
+      `(:name "个人导出"
+        :file ,(concat doom-private-dir "dict/export.pyim"))
+  )
   ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
@@ -559,6 +576,18 @@ Pyim configuration.
   ;; 半角标点。主要情形是在行首使用 yasnippet 时有用
   (setq-default pyim-punctuation-half-width-functions
               '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
+  ;; Enable key-cord when pyim input is switched on,
+  ;; This is very useful in evil-insert-mode, if 
+  ;; from https://emacs-china.org/t/pyim-key-chord-pyim/20633/12
+  ;; 这比之前用的 pyim-self-insert-command 延迟更长一点，但泛用性更高
+  (defun pyim--enable-key-chord-fun (orig key)
+    (if (key-chord-lookup-key (vector 'key-chord key))
+        (let ((result (key-chord-input-method key)))
+          (if (eq (car result) 'key-chord)
+              result
+            (funcall orig key)))
+      (funcall orig key)))
+  (advice-add 'pyim-input-method :around #'pyim--enable-key-chord-fun)
 )
 #+end_src
 
