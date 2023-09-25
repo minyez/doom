@@ -330,7 +330,9 @@ Use key-chord for mapping simultaneously pressed keys to command
 (use-package! key-chord
   :config
   (key-chord-mode 1)
-  (key-chord-define-global "jk" 'evil-escape))
+  ;; https://discourse.doomemacs.org/t/typing-jk-deletes-j-and-returns-to-normal-mode/59
+  (with-eval-after-load 'evil-escape
+    (key-chord-define-global "jk" 'evil-escape)))
 
 (map! :leader
       (:prefix-map ("e" . "extra-my")
@@ -372,7 +374,8 @@ Use Nerd-Font-patched Sarasa font
       (size 16))
   (setq doom-font (font-spec :family font :size size)
         doom-variable-pitch-font (font-spec :family font :size size)
-        doom-unicode-font (font-spec :family font :size size)
+        ;; disable unicode font size set to resolve too large icon in dashboard/treemacs
+        ;;doom-unicode-font (font-spec :family font :size size)
         doom-big-font (font-spec :family font :size (+ size 4))))
 #+end_src
 
@@ -412,7 +415,7 @@ Use modus theme by Prot
   ;; add a new button
   (add-to-list '+doom-dashboard-menu-sections
                '("Browse roam nodes"
-                 :icon (all-the-icons-fileicon "org" :face 'doom-dashboard-menu-title)
+                 :icon (nerd-icons-sucicon "nf-custom-orgmode" :face 'doom-dashboard-menu-title)
                  :when (featurep! :lang org +roam2)
                  :face (:inherit (doom-dashboard-menu-title))
                  :action org-roam-node-find))
@@ -422,7 +425,107 @@ Use modus theme by Prot
 )
 #+end_src
 
+*** Icons
+
+Since [[https://github.com/doomemacs/doomemacs/pull/7411][PR#7411]], Doom Emacs is using nerd-icons instead of all-the-icons.
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(use-package! nerd-icons
+  :config
+  (setq nerd-icons-scale-factor 1.0)
+)
+#+end_src
+
 *** Treemacs
+The configuration, adapted from the [[https://github.com/Alexander-Miller/treemacs#installation][official repository]]
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(use-package! treemacs
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "s-0") #'treemacs-select-window))
+  :bind
+  (:map global-map
+        ("s-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag))
+  :config
+  (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+        treemacs-deferred-git-apply-delay        0.5
+        treemacs-directory-name-transformer      #'identity
+        treemacs-display-in-side-window          t
+        treemacs-eldoc-display                   'simple
+        treemacs-file-event-delay                2000
+        treemacs-file-extension-regex            treemacs-last-period-regex-value
+        treemacs-file-follow-delay               0.2
+        treemacs-file-name-transformer           #'identity
+        treemacs-follow-after-init               t
+        treemacs-expand-after-init               t
+        treemacs-find-workspace-method           'find-for-file-or-pick-first
+        treemacs-git-command-pipe                ""
+        treemacs-goto-tag-strategy               'refetch-index
+        treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+        treemacs-hide-dot-git-directory          t
+        treemacs-indentation                     2
+        treemacs-indentation-string              " "
+        treemacs-is-never-other-window           nil
+        treemacs-max-git-entries                 5000
+        treemacs-missing-project-action          'ask
+        treemacs-move-forward-on-expand          nil
+        treemacs-no-png-images                   nil
+        treemacs-no-delete-other-windows         t
+        treemacs-project-follow-cleanup          nil
+        treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+        treemacs-position                        'left
+        treemacs-read-string-input               'from-child-frame
+        treemacs-recenter-distance               0.1
+        treemacs-recenter-after-file-follow      nil
+        treemacs-recenter-after-tag-follow       nil
+        treemacs-recenter-after-project-jump     'always
+        treemacs-recenter-after-project-expand   'on-distance
+        treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+        treemacs-project-follow-into-home        nil
+        treemacs-show-cursor                     nil
+        treemacs-show-hidden-files               t
+        treemacs-silent-filewatch                nil
+        treemacs-silent-refresh                  nil
+        treemacs-sorting                         'alphabetic-asc
+        treemacs-select-when-already-in-treemacs 'move-back
+        treemacs-space-between-root-nodes        t
+        treemacs-tag-follow-cleanup              t
+        treemacs-tag-follow-delay                1.5
+        treemacs-text-scale                      nil
+        treemacs-user-mode-line-format           nil
+        treemacs-user-header-line-format         nil
+        treemacs-wide-toggle-width               70
+        treemacs-width                           35
+        treemacs-width-increment                 1
+        treemacs-width-is-initially-locked       t
+        treemacs-workspace-switch-cleanup        nil)
+
+  ;; The default width and height of the icons is 22 pixels. If you are
+  ;; using a Hi-DPI display, uncomment this to double the icon size.
+  ;;(treemacs-resize-icons 44)
+
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode 'always)
+  (when treemacs-python-executable
+    (treemacs-git-commit-diff-mode t))
+
+  (pcase (cons (not (null (executable-find "git")))
+               (not (null treemacs-python-executable)))
+    (`(t . t)
+     (treemacs-git-mode 'deferred))
+    (`(t . _)
+     (treemacs-git-mode 'simple)))
+
+  (treemacs-hide-gitignored-files-mode nil)
+)
+#+end_src
+Add key binding to doom map
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (map! :leader
       (:prefix-map ("t" . "toggle")
@@ -438,7 +541,7 @@ Map window selection to simpler key combination.
 
   :bind
   (:map global-map
-        ("s-0" . winum-select-window-0-or-10)
+        ("s-0" . treemacs-select-window)
         ("s-1" . winum-select-window-1)
         ("s-2" . winum-select-window-2)
         ("s-3" . winum-select-window-3)
@@ -449,7 +552,7 @@ Map window selection to simpler key combination.
         ("s-8" . winum-select-window-8)
         ("s-9" . winum-select-window-9))
   (:map evil-normal-state-map
-        ("s-0" . winum-select-window-0-or-10)
+        ("s-0" . treemacs-select-window)
         ("s-1" . winum-select-window-1)
         ("s-2" . winum-select-window-2)
         ("s-3" . winum-select-window-3)
