@@ -509,7 +509,7 @@ The configuration, adapted from the [[https://github.com/Alexander-Miller/treema
   ;; using a Hi-DPI display, uncomment this to double the icon size.
   ;;(treemacs-resize-icons 44)
 
-  (treemacs-follow-mode t)
+  ;;(treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode 'always)
   (when treemacs-python-executable
@@ -1149,7 +1149,7 @@ Configure the ~bibtex-completion~ package, for notes searching and bibliography 
   (setq bibtex-completion-notes-path (expand-file-name "ref" my/org-dir)
         bibtex-completion-bibliography (list my/bibtex-file)
         bibtex-completion-pdf-field "file"
-        bibtex-completion-additional-search-fields '(keywords, journaltitle)
+        bibtex-completion-additional-search-fields '(keywords journaltitle)
   )
 )
 #+end_src
