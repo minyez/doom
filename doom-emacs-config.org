@@ -664,7 +664,7 @@ Pyim configuration.
     (add-to-list 'pyim-dicts
         `(:name "个人导出"
           :file ,(concat doom-private-dir pdict)))
-    (pyim-import-words-and-counts pcount))
+    (pyim-import-words-and-counts (concat doom-private-dir pcount) #'max t))
   ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
@@ -922,26 +922,20 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;;; capture templates
   (setq org-capture-templates
         `(
-          ("d" "Add items to drills/")
+          ("d" "Drills")
           ("e" "English vocaburary" entry
                (file "drills/english_vocabulary.org")
                "* %? :drill:\n** Examples :ignore:\n** Origin :ignore:")
           ("g" "German vocaburary" entry
                (file "drills/german_vocabulary.org")
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
-          ("j" "Journal Log" plain
-               (file+function "journal/log.org" my/org-goto-today-node)
-               "%<%H:%M> %?")
-          ; ("t"  "Quick TODO item in todos.org")
-          ; ("ti" "Inbox" entry
-          ;       (file+headline ,org-default-notes-file "Inbox")
-          ;       "* TODO %u %?\n%i\n%a" :prepend t)
-          ; ("tw" "Work" entry
-          ;       (file+headline ,org-default-notes-file "工作 Work")
-          ;       "* TODO %u %?\nDEADLINE: %t" :prepend t)
-          ; ("tl" "Life" entry
-          ;       (file+headline ,org-default-notes-file "生活 Life")
-          ;       "* TODO %u %?\nDEADLINE: %t" :prepend t)
+          ("l"  "Log")
+          ("lj" "Journal" plain
+                (file+function "log/journal.org" my/org-goto-today-node)
+                "%<%H:%M> %?")
+          ("lw" "Work" plain
+                (file+function "log/work.org" my/org-goto-today-node)
+                "%<%H:%M> %?")
           )
         )
   ;; org-table related.
