@@ -650,17 +650,21 @@ Pyim configuration.
   (setq pyim-page-tooltip '(posframe popup))
   (setq pyim-dcache-auto-update t)
   ;; pyim-shuangping is derived from xiaohe-shuangpin
-  (pyim-default-scheme 'pyim-shuangpin)
+  ;;(pyim-default-scheme 'pyim-shuangpin)
   ;; disable pyim-outcome-trigger for pyim-shuangpin otherwise cannot type o for 欧
-  (setq pyim-outcome-trigger nil)
+  ;;(setq pyim-outcome-trigger nil)
+  (pyim-default-scheme 'xiaohe-shuangpin)
   (setq pyim-page-length 9)
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
-  ;;; 加入个人词库和自定义词库。这里是把 pyim 导出的文件也作为一个词典导入，避免以后丢失。
-  (add-to-list 'pyim-dicts
-      `(:name "个人导出"
-        :file ,(concat doom-private-dir "dict/export.pyim"))
-  )
+  ;; 加入个人词库，包括发音和词频。
+  ;; export.pyim 和 count-export.pyim 是从 pyim 导出的文件，避免重装系统或重置 emacs.d 后丢失。
+  (let ((pdict  "dict/export.pyim")
+        (pcount "dict/count-export.pyim"))
+    (add-to-list 'pyim-dicts
+        `(:name "个人导出"
+          :file ,(concat doom-private-dir pdict)))
+    (pyim-import-words-and-counts pcount))
   ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
@@ -1748,6 +1752,6 @@ Use the new maintained repository
    '((org-latex-and-related-regexp)
      (org-highlight-latex-and-related)
      (org-drill-hide-item-headings-p . t)
-     (org-latex-hyperref-template)))
+     (org-latex-hyperref-template . nil)))
 )
 #+end_src
