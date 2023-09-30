@@ -420,7 +420,7 @@ Use modus theme by Prot
                  :face (:inherit (doom-dashboard-menu-title))
                  :action org-roam-node-find))
   ;; remove some of the buttons
-  (dolist (btname '("Open project" "Open org-agenda" "Reload last session"))
+  (dolist (btname '("Open project" "Open org-agenda"))
     (assoc-delete-all btname +doom-dashboard-menu-sections))
 )
 #+end_src
@@ -629,7 +629,7 @@ Add keybindings for quick change between input methods
         (:prefix-map ("i" . "input")
          :desc "Chinese (Pyim)"  "c"  '(lambda () (interactive) (set-input-method "pyim"))
          :desc "Japanese"        "j"  '(lambda () (interactive) (set-input-method "japanese"))
-         :desc "Tex"             "c"  '(lambda () (interactive) (set-input-method "TeX"))
+         :desc "Tex"             "t"  '(lambda () (interactive) (set-input-method "TeX"))
 )))
 #+end_src
 
@@ -658,13 +658,13 @@ Pyim configuration.
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
   ;; 加入个人词库，包括发音和词频。
-  ;; export.pyim 和 count-export.pyim 是从 pyim 导出的文件，避免重装系统或重置 emacs.d 后丢失。
-  (let ((pdict  "dict/export.pyim")
-        (pcount "dict/count-export.pyim"))
+  (setq my/personal-dicts
+        '(("手动记录" . "manual_personal.pyim")
+          ("搜狗导出 (2022-02-19)" . "sougou_out_2022_02_19.pyim")))
+  (dolist (elem my/personal-dicts)
     (add-to-list 'pyim-dicts
-        `(:name "个人导出"
-          :file ,(concat doom-private-dir pdict)))
-    (pyim-import-words-and-counts (concat doom-private-dir pcount) #'max t))
+        `(:name ,(car elem)
+          :file ,(concat doom-private-dir "dict/" (cdr elem)))))
   ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
@@ -923,10 +923,10 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq org-capture-templates
         `(
           ("d" "Drills")
-          ("e" "English vocaburary" entry
+          ("de" "English vocaburary" entry
                (file "drills/english_vocabulary.org")
                "* %? :drill:\n** Examples :ignore:\n** Origin :ignore:")
-          ("g" "German vocaburary" entry
+          ("dg" "German vocaburary" entry
                (file "drills/german_vocabulary.org")
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
           ("l"  "Log")
@@ -1238,7 +1238,7 @@ First define two variables for handling headers for latex export
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (defvar my/org-latex-classes-common-header-passoptions
   (s-join "\n"
-    '("\\PassOptionsToPackage{usenames,dvipsnames}{xcolor}"
+    '("\\PassOptionsToPackage{usenames,dvipsnames,x11names,table}{xcolor}"
       "\\PassOptionsToPackage{colorlinks=true,linkcolor=,filecolor=Red,citecolor=Green,urlcolor=Rhodamine,pdfborder={0 0 0},breaklinks=true,linktoc=all}{hyperref}"))
   "PassOptions setting before document class, included in org-latex-classes for exporting org to latex")
 
@@ -1632,23 +1632,24 @@ Use the new maintained repository
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! rg)
+(package! color-rg)
 #+end_src
 
 #+begin_src emacs-lisp :tangle lisp/config-rg.el :mkdirp yes
 ;;; config-rg.el -*- lexical-binding: t; -*-
 
 (use-package! rg
-  :bind
-  (:map global-map
-        ("C-c r g r" . rg)
-        ("C-c r g m" . rg-menu)
-        ("C-c r g d" . rg-dwim)
-        ("C-c r g f" . rg-dwim-current-file)
-      )
   :config
   (setq rg-keymap-prefix "\C-cg")
   (setq rg-ignore-case 'smart)
   (rg-enable-default-bindings)
+  (map! :leader
+        (:prefix-map "s"
+          (:prefix-map ("g" . "ripgrep")
+           :desc "rg"                  "g"  #'rg
+           :desc "rg-menu"             "m"  #'rg-menu
+           :desc "Cursor word"         "w"  #'rg-dwim
+           :desc "Cursor Word (file)"  "f"  #'rg-dwim-current-file)))
 )
 
 (provide 'config-rg)
@@ -1734,6 +1735,35 @@ Use the new maintained repository
 (require 'config-git)
 #+end_src
 
+*** Blog writing
+Add packages
+#+begin_src emacs-lisp :tangle packages.el
+(package! easy-hugo)
+(package! easy-jekyll)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-blog.el :mkdirp yes
+;;; config-blog.el -*- lexical-binding: t; -*-
+#+end_src
+
+~easy-hugo~
+#+begin_src emacs-lisp :tangle lisp/config-blog.el :mkdirp yes
+(use-package! easy-hugo
+  :config
+  (easy-hugo-enable-menu)
+)
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-blog.el :mkdirp yes
+(provide 'config-blog)
+;;; config-blog.el ends here
+#+end_src
+
+#+begin_src emacs-lisp :tangle config.el
+(require 'config-blog)
+#+end_src
+
+
 * Customizations
 
 #+begin_src emacs-lisp :tangle custom.el
@@ -1746,6 +1776,6 @@ Use the new maintained repository
    '((org-latex-and-related-regexp)
      (org-highlight-latex-and-related)
      (org-drill-hide-item-headings-p . t)
-     (org-latex-hyperref-template . nil)))
+     (org-latex-hyperref-template)))
 )
 #+end_src
