@@ -601,6 +601,7 @@ Map window selection to simpler key combination.
                   easy-hugo-mode
                   eshell-mode
                   git-rebase-mode
+                  pyim-dicts-manager-mode
                   vterm-mode
                   term-mode
                   calc-mode))
