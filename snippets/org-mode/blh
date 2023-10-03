@@ -7,7 +7,7 @@
 # --
 #+latex_compiler: ${1:xelatex}
 #+latex_class: ${2:article}
-#+latex_header: \\usepackage[hmargin=1.0in, vmargin=0.95cm]\{geometry\}
+#+latex_header: \\usepackage[hmargin=1.0in,top=1.0in,bottom=0.7in]\{geometry\}
 #+setupfile: lh_symbols.org
 #+options: toc:nil tags:nil title:t email:nil author:nil date:nil
 

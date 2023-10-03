@@ -1437,7 +1437,7 @@ For Zettelkasten note taking.
 #+created: %U\n
 #+latex_compiler: pdflatex
 #+latex_class: article
-#+latex_header: \\usepackage[margin=1in]{geometry}
+#+latex_header: \\usepackage[hmargin=1.0in, top=1.0in, bottom=0.7in]{geometry}
 #+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]{biblatex}
 #+latex_header: \\addbibresource{~/database/bibliography.bib}
 # include commands preset
