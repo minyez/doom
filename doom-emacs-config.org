@@ -575,6 +575,16 @@ Map window selection to simpler key combination.
           doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))))
 #+end_src
 
+*** hl-todo
+Switch on ~hl-todo-mode~ for selected modes
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
+(use-package! hl-todo
+  :hook
+  ((org-mode . hl-todo-mode)
+   (markdown-mode . hl-todo-mode)
+   (prog-mode . hl-todo-mode)))
+#+end_src
+
 *** Epilogue
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (provide 'config-ui)
