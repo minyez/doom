@@ -891,7 +891,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         )
   (setq org-src-tab-acts-natively nil)
   ;; hide emphasis markers, display when move to the line (enabled by org-appear)
-  (setq org-hide-emphasis-markers t)
+  (setq org-hide-emphasis-markers nil)
   (setq org-archive-location (concat org-directory "/archive.org::* From %s"))
   (setq org-default-notes-file "todos.org")
   (setq org-footnote-auto-adjust t)
