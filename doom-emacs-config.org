@@ -308,7 +308,7 @@ Some global variables which are used in further per-package customization
   "org directory")
 
 (defvar my/bibtex-file
-  (expand-file-name "bibliography.bib" "~/database")
+  (expand-file-name "etc/bibliography.bib" my/org-dir)
   "all-in-one bibtex file for referecnes")
 
 (provide 'my-variables)
