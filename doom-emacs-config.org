@@ -311,6 +311,10 @@ Some global variables which are used in further per-package customization
   (expand-file-name "etc/bibliography.bib" my/org-dir)
   "all-in-one bibtex file for referecnes")
 
+(defvar my/literature-note-dir
+  (expand-file-name "3_Resource/Paper" my/org-dir)
+  "Directory to store the notes of literature")
+
 (provide 'my-variables)
 ;;; my-variables.el ends here
 #+end_src
@@ -611,7 +615,7 @@ Switch on ~hl-todo-mode~ for selected modes
                   easy-hugo-mode
                   eshell-mode
                   git-rebase-mode
-                  pyim-dicts-manager-mode
+                  pyim-dict-manager-mode
                   vterm-mode
                   term-mode
                   calc-mode))
@@ -933,22 +937,23 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;;; capture templates
   (setq org-capture-templates
         `(
-          ("d" "Drills")
-          ("de" "English vocaburary" entry
-               (file "drills/english_vocabulary.org")
+          ("L"   "Language")
+          ("Le"  "English")
+          ("Lev" "English vocaburary" entry
+               (file "3_Resources/English/english_vocabulary.org")
                "* %? :drill:\n** Examples :ignore:\n** Origin :ignore:")
-          ("dg" "German vocaburary" entry
-               (file "drills/german_vocabulary.org")
+          ("Lg"  "German" entry)
+          ("Lgv" "German vocaburary" entry
+               (file "3_Resources/German/german_vocabulary.org")
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
           ("l"  "Log")
           ("lj" "Journal" plain
-                (file+function "log/journal.org" my/org-goto-today-node)
+                (file+function "2_Area/Log/journal.org" my/org-goto-today-node)
                 "%<%H:%M> %?")
           ("lw" "Work" plain
-                (file+function "log/work.org" my/org-goto-today-node)
+                (file+function "2_Area/Log/work.org" my/org-goto-today-node)
                 "%<%H:%M> %?")
-          )
-        )
+         ))
   ;; org-table related.
   ;; commonly used constants for formulas
   (setq org-table-formula-constants
@@ -991,6 +996,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
   ;; more link abbreviaiton
   (let ((link-abbrev-l '(("ytb" . "https://www.youtube.com/watch?v=%s")
+                         ("mp" . "https://next-gen.materialsproject.org/materials/mp-%s")
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
@@ -1071,8 +1077,15 @@ Unpin the org-appear version to resolve not-working problem of ~org-appear-autol
 
 **** Set ~org-download~ image directory
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
-(after! org-download
-  (setq-default org-download-image-dir (concat org-directory "/images/downloads"))
+(use-package! org-download
+  :config
+  (setq org-download-method 'directory)
+  ; from https://emacs.stackexchange.com/questions/75983/how-to-format-org-downloads-image-saving-directorys
+  (defun my-org-download-set-dir ()
+    "Set `org-download-image-dir` to the directory of the current buffer's file."
+    (setq-local org-download-image-dir (concat "./assets/" (file-name-base buffer-file-name))))
+  (add-hook 'org-mode-hook 'my-org-download-set-dir)
+  (add-hook 'dired-mode-hook 'org-download-enable)
 )
 #+end_src
 
@@ -1155,7 +1168,7 @@ Configure the ~bibtex-completion~ package, for notes searching and bibliography 
 ;;; config-org-ref.el -*- lexical-binding: t; -*-
 (use-package! bibtex-completion
   :config
-  (setq bibtex-completion-notes-path (expand-file-name "ref" my/org-dir)
+  (setq bibtex-completion-notes-path my/literature-note-dir
         bibtex-completion-bibliography (list my/bibtex-file)
         bibtex-completion-pdf-field "file"
         bibtex-completion-additional-search-fields '(keywords journaltitle)
@@ -1176,7 +1189,12 @@ Configure the ~org-ref~ package. Simply add a shortcut to insert a citation link
 (use-package citar
   :custom
   (citar-bibliography (list my/bibtex-file))
-  (citar-notes-paths (list (expand-file-name "ref" my/org-dir)))
+  (citar-notes-paths (list my/literature-note-dir))
+  :config
+  ;; use citeproc to generate in-text reference
+  (setq citar-format-reference-function 'citar-citeproc-format-reference
+        citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
+        citar-citeproc-csl-style "aps-modified.csl")
 )
 #+end_src
 

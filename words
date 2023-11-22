@@ -123,3 +123,5 @@ VASP
 ENCUT
 discretize
 FHI
+renormalization
+Bernardi
