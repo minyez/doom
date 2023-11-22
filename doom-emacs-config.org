@@ -1267,7 +1267,7 @@ First define two variables for handling headers for latex export
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (defvar my/org-latex-classes-common-header-passoptions
   (s-join "\n"
-    '("\\PassOptionsToPackage{usenames,dvipsnames,x11names,table}{xcolor}"
+    '("\\PassOptionsToPackage{dvipsnames,x11names,table}{xcolor}"
       "\\PassOptionsToPackage{colorlinks=true,linkcolor=,filecolor=Red,citecolor=Green,urlcolor=Rhodamine,pdfborder={0 0 0},breaklinks=true,linktoc=all}{hyperref}"))
   "PassOptions setting before document class, included in org-latex-classes for exporting org to latex")
 
