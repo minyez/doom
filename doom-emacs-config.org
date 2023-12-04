@@ -710,6 +710,12 @@ Pyim configuration.
             (funcall orig key)))
       (funcall orig key)))
   (advice-add 'pyim-input-method :around #'pyim--enable-key-chord-fun)
+
+  ;; orderless 支持拼音搜索候选项功能
+  (defun my-orderless-regexp (orig-func component)
+    (let ((result (funcall orig-func component)))
+      (pyim-cregexp-build result)))
+  (advice-add 'orderless-regexp :around #'my-orderless-regexp)
 )
 #+end_src
 
