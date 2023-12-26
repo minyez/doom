@@ -307,6 +307,10 @@ Some global variables which are used in further per-package customization
   (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
   "org directory")
 
+(defvar my/read-note-dir
+  (expand-file-name "2_Area/Reading" (concat my/org-dir))
+  "directory for reading notes")
+
 (defvar my/bibtex-file
   (expand-file-name "etc/bibliography.bib" my/org-dir)
   "all-in-one bibtex file for referecnes")
@@ -1001,11 +1005,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                              (?D . (:foreground "#4B7A47"))))
 
   ;; more link abbreviaiton
-  (let ((link-abbrev-l '(("ytb" . "https://www.youtube.com/watch?v=%s")
+  (let ((link-abbrev-l `(("ytb" . "https://www.youtube.com/watch?v=%s")
                          ("mp" . "https://next-gen.materialsproject.org/materials/mp-%s")
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
+                         ("rnote" . ,(concat my/read-note-dir "/%s.org"))
                          ("arxiv" . "https://arxiv.org/abs/%s"))))
     (dolist (elem link-abbrev-l) (add-to-list 'org-link-abbrev-alist elem)))
 
