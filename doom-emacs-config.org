@@ -884,6 +884,8 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ((org-mode . org-indent-mode)
    (org-mode . visual-line-mode)
    (before-save . org-update-all-dblocks))
+  :custom
+  (org-link-descriptive nil)    ;; so show the full link
   :bind
   (:map org-mode-map
         ("C-c l" . org-insert-link)
@@ -917,7 +919,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; hide emphasis markers, display when move to the line (enabled by org-appear)
   (setq org-hide-emphasis-markers nil)
   (setq org-archive-location (concat org-directory "/archive.org::* From %s"))
-  (setq org-default-notes-file "todos.org")
+  ;; make org-archive-location a safe local variable whenever it is a string
+  (put 'org-archive-location 'safe-local-variable #'stringp)
+  (setq org-default-notes-file "inbox.org")
   (setq org-footnote-auto-adjust t)
   (setq org-tags-column -80)
   (setq org-extend-today-until 4)    ;; end of each day
@@ -1075,7 +1079,6 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (org-mode . org-appear-mode)
   :config
   (setq org-appear-autolinks t      ;; not working right now in Doom, which is a bit annoying
-        org-link-descriptive nil    ;; so show the full link
         org-appear-autoentities t 
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
@@ -1464,9 +1467,11 @@ For Zettelkasten note taking.
   (setq org-roam-extract-new-file-path "${slug}.org")
   (org-roam-db-autosync-mode)
   (setq org-roam-node-display-template
-        (format "${doom-hierarchy:*} %s %s"
-                (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)
-                (propertize "${doom-tags:32}" 'face 'org-tag)))
+        ; (format "${doom-hierarchy:*} %s %s"
+        ;         (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)
+        ;         (propertize "${doom-tags:32}" 'face 'org-tag)))
+        (format "${doom-hierarchy:*} %s"
+                (propertize "${doom-tags:50}" 'face 'org-tag)))
   (setq org-roam-capture-templates
         '(
           ("d" "default quick note" plain "%?"
@@ -1761,11 +1766,11 @@ Use the new maintained repository
 #+begin_src emacs-lisp :tangle lisp/config-git.el :mkdirp yes
 ;;; config-git.el -*- lexical-binding: t; -*-
 
-;; use "SPC g a" for add hunk, aside from the default "SPC g s"
+;; "SPC g a" for stage file, just as "git add"
 (map! :leader
       (:prefix-map ("g" . "git")
-       (:when (modulep! :ui vc-gutter)
-        :desc "stage hunk at point"       "a"   #'+vc-gutter/stage-hunk)))
+       (:when (modulep! :tools magit)
+        :desc "stage current buffer file"    "a"    #'magit-stage-buffer-file)))
 
 ;; do not ask confirm for stage/revert
 (after! git-gutter
@@ -1820,6 +1825,6 @@ Add packages
    '((org-latex-and-related-regexp)
      (org-highlight-latex-and-related)
      (org-drill-hide-item-headings-p . t)
-     (org-latex-hyperref-template)))
+     (org-latex-hyperref-template . nil)))
 )
 #+end_src
