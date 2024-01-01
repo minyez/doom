@@ -656,11 +656,12 @@ Add keyword mapping, taken from the example-2.
 ;                                        (svg-progress-count (substring tag 1 -1)))))
       
       ;; TODO / DONE
-      (" \\(TODO\\) " . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo :inverse t :margin 0))))
-      (" \\(WAIT\\) " . ((lambda (tag) (svg-tag-make "WAIT" :face '+org-todo-on-hold :inverse t :margin 0))))
-      (" \\(HOLD\\) " . ((lambda (tag) (svg-tag-make "HOLD" :face '+org-todo-on-hold :inverse t :margin 0))))
-      (" \\(CANCELLED\\) " . ((lambda (tag) (svg-tag-make "CANCELLED" :face '+org-todo-cancel :inverse t :margin 0))))
-      (" \\(DONE\\) " . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :margin 0))))
+      ("[ :]\\(TODO\\)[ :]" . ((lambda (tag) (svg-tag-make "TODO" :padding 0 :face 'org-todo :inverse t :margin 0))))
+      ("[ :]\\(WIP\\)[ :]" . ((lambda (tag) (svg-tag-make "WIP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
+      ("[ :]\\(WAIT\\)[ :]" . ((lambda (tag) (svg-tag-make "WAIT" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
+      ("[ :]\\(HOLD\\)[ :]" . ((lambda (tag) (svg-tag-make "HOLD" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
+      ("[ :]\\(CANCELLED\\)[ :]" . ((lambda (tag) (svg-tag-make "CANCELLED" :padding 0 :face '+org-todo-cancel :inverse t :margin 0))))
+      ("[ :]\\(DONE\\)[ :]" . ((lambda (tag) (svg-tag-make "DONE" :padding 0 :face 'org-done :margin 0))))
 
 
       ;; Citation of the form [cite:@Knuth:1984] 
@@ -677,10 +678,10 @@ Add keyword mapping, taken from the example-2.
       ;; Active date (with or without day name, with or without time)
       (,(format "\\(<%s>\\)" date-re) .
        ((lambda (tag)
-          (svg-tag-make tag :beg 1 :end -1 :margin 1))))
+          (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2))))
       (,(format "\\(<%s \\)%s>" date-re day-time-re) .
        ((lambda (tag)
-          (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 1))))
+          (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2))))
       (,(format "<%s \\(%s>\\)" date-re day-time-re) .
        ((lambda (tag)
           (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
@@ -688,13 +689,23 @@ Add keyword mapping, taken from the example-2.
       ;; Inactive date  (with or without day name, with or without time)
        (,(format "\\(\\[%s\\]\\)" date-re) .
         ((lambda (tag)
-           (svg-tag-make tag :beg 1 :end -1 :margin 1 :face 'org-date))))
+           (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2 :face 'org-date))))
        (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
         ((lambda (tag)
-           (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 1 :face 'org-date))))
+           (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2 :face 'org-date))))
        (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
         ((lambda (tag)
            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
+
+      ;; Date without parentheses or brackets, but need surrounding spaces
+      (,(format "[\t\n ]\\(%s\\)\\([\t\n ]\\|$\\)" date-re) .
+       ((lambda (tag) (svg-tag-make tag :margin 0 :padding 0 :face 'org-date))))
+       (,(format "[\t\n ]\\(%s \\)%s\\([\t\n ]\\|$\\)" date-re day-time-re) .
+        ((lambda (tag)
+           (svg-tag-make tag :inverse nil :crop-right t :margin 0 :padding 0 :face 'org-date))))
+       (,(format "[\t\n ]%s \\(%s\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
+        ((lambda (tag)
+           (svg-tag-make tag :inverse t :crop-left t :margin 0 :face 'org-date))))
                      ))
   :hook
   (org-mode . svg-tag-mode)
