@@ -1076,6 +1076,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;;; capture templates
   (setq org-capture-templates
         `(
+          ("n" "Quick inbox note" plain
+                (file+headline "inbox.org" "Inbox")
+                "** TODO %u %?" :prepent t) ; Inbox as heading 1
           ("L"   "Language")
           ("Le"  "English")
           ("Lev" "English vocaburary" entry
@@ -1089,10 +1092,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
           ("lj" "Journal" plain
                 (file+function "2_Area/Log/journal.org" my/org-goto-today-node)
                 "%<%H:%M> %?")
-          ("lw" "Work" plain
-                (file+function "2_Area/Log/work.org" my/org-goto-today-node)
-                "%<%H:%M> %?")
+;          ("lw" "Work" plain
+;                (file+function "2_Area/Log/work.org" my/org-goto-today-node)
+;                "%<%H:%M> %?")
          ))
+  ;; update TODO/checkbox count before finalizing the capture process
+  ;; after-finalize-hook won't work, because the update should be done within the captured buffer
+  (add-hook 'org-capture-before-finalize-hook '(lambda () (org-update-statistics-cookies t)))
   ;; org-table related.
   ;; commonly used constants for formulas
   (setq org-table-formula-constants
