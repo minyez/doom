@@ -380,9 +380,11 @@ Use key-chord for mapping simultaneously pressed keys to command
 #+end_src
 
 *** Font
-Use Nerd-Font-patched Sarasa font
+Use [[https://github.com/jonz94/Sarasa-Gothic-Nerd-Fonts][Nerd-Font-patched]]
+[[https://github.com/be5invis/Sarasa-Gothic][Sarasa]] font.
+Slab variant is serif. No ligature, half-width dash as in =Fixed=.
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
-(let ((font "Sarasa Fixed SC Nerd Font")
+(let ((font "Sarasa Fixed Slab SC Nerd Font")
       (size 16))
   (setq doom-font (font-spec :family font :size size)
         doom-variable-pitch-font (font-spec :family font :size size)
