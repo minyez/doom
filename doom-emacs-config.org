@@ -348,9 +348,13 @@ Use key-chord for mapping simultaneously pressed keys to command
 
 (map! :leader
       (:prefix-map ("e" . "extra-my")
-        (:prefix-map ("d" . "drill")
+        (:prefix-map ("D" . "drill")
           :desc "org-drill"          "d"   #'org-drill
           :desc "org-drill-resume"   "r"   #'org-drill-resume)
+        (:prefix-map ("d" . "download")
+          :desc "rename"                    "r"   #'org-download-rename-at-point
+          :desc "image from clipboard"      "p"   #'org-download-clipboard
+          :desc "download from kill URL"    "d"   #'org-download-yank)
         :desc "org-roam-node-find"   "."   #'org-roam-node-find
         :desc "org-agenda-list"      "a"   #'org-agenda-list
         :desc "Sort entries by todo" "S"   '(lambda () (interactive) (org-sort-entries t ?o))
@@ -1148,6 +1152,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
                          ("rnote" . ,(concat my/read-note-dir "/%s.org"))
+                         ("SO" . "https://stackoverflow.com/questions/%s")
                          ("arxiv" . "https://arxiv.org/abs/%s"))))
     (dolist (elem link-abbrev-l) (add-to-list 'org-link-abbrev-alist elem)))
 
