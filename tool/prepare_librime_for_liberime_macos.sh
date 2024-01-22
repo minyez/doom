@@ -6,8 +6,8 @@ SUDO=sudo  # set to empty if librime_install_dir is accessible without sudo perm
 EMACSVER=$(emacs --version | awk 'FNR == 1 {print $3}')
 liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/build-$EMACSVER/liberime}
 
-librime_ver=1.8.5
-librime_name=rime-08dd95f-macOS.tar.bz2
+librime_ver=1.9.0
+librime_name=rime-a608767-macOS.tar.bz2
 
 SED=gsed
 

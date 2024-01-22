@@ -649,10 +649,10 @@ Add keyword mapping, taken from the example-2.
       ;; Org tags
 ;      (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
 ;      (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
-      
+
       ;; Task priority
 ;      ("\\[#[A-Z]\\]" . ( (lambda (tag)
-;                            (svg-tag-make tag :face 'org-priority 
+;                            (svg-tag-make tag :face 'org-priority
 ;                                          :beg 2 :end -1 :margin 0))))
 
       ;; Progress
@@ -660,7 +660,7 @@ Add keyword mapping, taken from the example-2.
 ;                                          (svg-progress-percent (substring tag 1 -2)))))
 ;      ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
 ;                                        (svg-progress-count (substring tag 1 -1)))))
-      
+
       ;; TODO / DONE
       ("[ :]\\(TODO\\)[ :]" . ((lambda (tag) (svg-tag-make "TODO" :padding 0 :face 'org-todo :inverse t :margin 0))))
       ("[ :]\\(WIP\\)[ :]" . ((lambda (tag) (svg-tag-make "WIP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
@@ -670,7 +670,7 @@ Add keyword mapping, taken from the example-2.
       ("[ :]\\(DONE\\)[ :]" . ((lambda (tag) (svg-tag-make "DONE" :padding 0 :face 'org-done :margin 0))))
 
 
-      ;; Citation of the form [cite:@Knuth:1984] 
+      ;; Citation of the form [cite:@Knuth:1984]
       ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
                                         (svg-tag-make tag
                                                       :inverse t
@@ -680,7 +680,7 @@ Add keyword mapping, taken from the example-2.
                                               (svg-tag-make tag
                                                             :end -1
                                                             :crop-left t))))
-      
+
       ;; Active date (with or without day name, with or without time)
       (,(format "\\(<%s>\\)" date-re) .
        ((lambda (tag)
@@ -834,7 +834,7 @@ Pyim configuration.
   (setq-default pyim-punctuation-half-width-functions
               '(pyim-probe-punctuation-line-beginning pyim-probe-punctuation-after-punctuation))
   ;; Enable key-cord when pyim input is switched on,
-  ;; This is very useful in evil-insert-mode, if 
+  ;; This is very useful in evil-insert-mode, if
   ;; from https://emacs-china.org/t/pyim-key-chord-pyim/20633/12
   ;; 这比之前用的 pyim-self-insert-command 延迟更长一点，但泛用性更高
   (defun pyim--enable-key-chord-fun (orig key)
@@ -1217,7 +1217,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (org-mode . org-appear-mode)
   :config
   (setq org-appear-autolinks t      ;; not working right now in Doom, which is a bit annoying
-        org-appear-autoentities t 
+        org-appear-autoentities t
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
 #+end_src
@@ -1242,6 +1242,26 @@ Unpin the org-appear version to resolve not-working problem of ~org-appear-autol
       (setq-local org-download-image-dir (concat "./assets/" (file-name-base buffer-file-name)))))
   (add-hook 'org-mode-hook 'my-org-download-set-dir)
   (add-hook 'dired-mode-hook 'org-download-enable)
+
+  ;; https://www.reddit.com/r/emacs/comments/145a3wk/orgdownload_doesnt_add_file_url_to_image_links
+  (setq org-download-link-format "[[file:%s]]\n" org-download-abbreviate-filename-function #'file-relative-name)
+  (setq org-download-link-format-function #'org-download-link-format-function-default)
+
+  ;; TODO advice the org-download-yank to check if current kill is a file name
+  (defadvice org-download-yank (around check-kill-filename activate)
+    ;; copy current kill
+    (let ((k (current-kill 0))
+          (is-kill-filename nil))
+      ;; check if current kill is a file path
+      ad-do-it
+      ;; restore the original kill-ring
+      (if is-kill-filename
+        ())
+    )
+  )
+
+  ;; TODO convert download link to file link
+  ;; see https://vxlabs.com/2020/07/25/emacs-lisp-function-convert-attachment-to-file/
 )
 #+end_src
 
@@ -1669,9 +1689,9 @@ whenever I tries to open note from org-ref link, notes will be searched by orb.
   (setq orb-autokey-format "%A*[1]%y*"
         orb-pdf-scrapper-export-fields '("author" "journal" "date" "volume" "pages" "title"))
   (add-to-list 'org-roam-capture-templates
-          '("r" "reference" plain "%?"
+          `("r" "reference" plain "%?"
            :if-new (file+head
-           "ref/note-${citekey}.org"
+           ,(expand-file-name "note-${citekey}.org" my/literature-note-dir)
            ":PROPERTIES:
 :TITLE: ${title}
 :AUTHOR: ${author-or-editor}

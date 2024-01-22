@@ -3,7 +3,7 @@ DOOM_PATH = ~/.config/emacs/bin/doom
 TANGLED_FILES = init.el config.el packages.el custom.el lisp
 BUILD_STAMP = .build_stamp.txt
 
-.phony: tangle clean sync veryclean
+.phony: rebuild tangle clean sync veryclean
 
 rebuild: $(BUILD_STAMP)
 
