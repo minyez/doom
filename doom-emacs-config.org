@@ -1237,10 +1237,14 @@ Unpin the org-appear version to resolve not-working problem of ~org-appear-autol
 **** Set ~org-download~ image directory
 #+begin_src emacs-lisp :tangle lisp/config-org.el :mkdirp yes
 (use-package! org-download
+  :init
+  (put 'org-download-image-dir 'safe-local-variable #'stringp)
   :custom
   ; do not use subdirectory of heading
   (org-download-heading-lvl nil)
   :config
+  ;; org-download-timestamp is changed in modules/lang/org/contrib/dragndrop.el, so :custom didn't work
+  (setq org-download-timestamp "%Y%m%d-%H%M%S_")
   (setq org-download-method 'directory)
   ; from https://emacs.stackexchange.com/questions/75983/how-to-format-org-downloads-image-saving-directorys
   (defun my-org-download-set-dir ()
