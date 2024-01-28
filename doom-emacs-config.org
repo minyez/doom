@@ -311,6 +311,10 @@ Some global variables which are used in further per-package customization
   (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
   "org directory")
 
+(defvar my/org-roam-inbox
+  (expand-file-name "0_Scratch" my/org-dir)
+  "location where usual org-roam-capture goes")
+
 (defvar my/read-note-dir
   (expand-file-name "2_Area/Reading" (concat my/org-dir))
   "directory for reading notes")
@@ -384,10 +388,15 @@ Use key-chord for mapping simultaneously pressed keys to command
 *** Prologue
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 ;;; config-ui.el -*- lexical-binding: t; -*-
+#+end_src
 
+*** Line numbers
+#+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (display-time-mode 1) ;; always show time
 ;; relative visual line, usually better than relative with folded blocks
 (setq display-line-numbers-type 'visual)
+;; calculate necessary width to correctly show all line numbers, since 28.1
+(setq display-line-numbers-width-start t)
 #+end_src
 
 *** Font
@@ -1395,7 +1404,38 @@ and add it to the main config file
 (require 'config-org-ref)
 #+end_src
 
-*** Drill
+*** org-bar to show better indenting
+
+[[https://github.com/tonyaldon/org-bars][tonyaldon/org-bars]] is not available on MELPA
+and needs to be cloned from GitHub.
+
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-bar
+  :recipe (:host github :repo "tonyaldon/org-bars"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle lisp/config-org-bars.el :mkdirp yes
+;;; config-org-bars.el -*- lexical-binding: t; -*-
+(use-package! org-bars
+  :after org
+  :commands org-bars-mode
+  ;; disabled due to blinking when using magit
+  ; :hook
+  ; (org-mode . org-bars-mode)
+)
+
+(provide 'config-org-bars)
+;;; config-org-bars.el ends here
+#+end_src
+
+TODO:
+- blinking when opening magit status and switching to modified buffer from there
+- lines containing CJK characters do not have continuous bar lines. Seems to related to the height of CJK line.
+#+begin_src emacs-lisp :tangle config.el :mkdirp yes
+(require 'config-org-bars)
+#+end_src
+
+*** Drill (deprecated in usage)
 The ~org-drill~ package is used as an alternative to Anki for spaced repetition to memorize things.
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! org-drill
@@ -1642,13 +1682,14 @@ For Zettelkasten note taking.
         (format "${doom-hierarchy:*} %s"
                 (propertize "${doom-tags:50}" 'face 'org-tag)))
   (setq org-roam-capture-templates
-        '(
+        `(
           ("d" "default quick note" plain "%?"
-           :if-new (file+head "${slug}.org"
+           :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
                               "#+title: ${title}\n#+startup: content\n#+created: %U\n")
            :unnarrowed t)
           ("l" "Note for latex export" plain "%?"
-           :if-new (file+head "${slug}.org" "#+title: ${title}
+           :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
+                               "#+title: ${title}
 #+startup: content
 #+created: %U\n
 #+latex_compiler: pdflatex
@@ -1666,7 +1707,7 @@ For Zettelkasten note taking.
 #+latex: \\clearpage\n\n* References\n#+latex: \\printbibliography[heading=none]")
            :unnarrowed t)
           ("b" "non-STEM book note" plain "%?"
-           :if-new (file+head "bookrev/${slug}.org"
+           :if-new (file+head ,(expand-file-name "${slug}.org" my/read-note-dir)
            "#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
            :unnarrowed t)
          ))

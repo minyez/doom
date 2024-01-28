@@ -133,3 +133,4 @@ preconditioner
 Kerker
 FHIaims
 scalapack
+pylsp
