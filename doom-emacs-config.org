@@ -1521,6 +1521,7 @@ First define two variables for handling headers for latex export
   "Headers after default packages setting, included in org-latex-classes for exporting org to latex")
 #+end_src
 
+For both LaTeX and beamer
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (use-package! ox-latex
   :bind
@@ -1583,6 +1584,16 @@ First define two variables for handling headers for latex export
      )
   )
 
+  ;; use minted as the default code block renderer
+  (setq org-latex-listings 'minted
+        org-latex-minted-options '(
+          ("bgcolor" "bg")
+          ("breaklines" "true")
+          ("autogobble" "true")
+          ;; ("fontsize" "\\small") ;; adjust by header \setminted{fontsize=\small}
+          )
+  )
+
   ; customized classes for latex export
   (setq org-latex-classes
                `(
@@ -1602,6 +1613,19 @@ First define two variables for handling headers for latex export
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
                 )
   )
+)
+#+end_src
+
+For beamer only
+#+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
+(use-package! ox-beamer
+  :bind
+  ("C-c x b" . org-beamer-export-to-latex)
+  ("C-c x O" . org-beamer-export-to-pdf)
+  :config
+  ; default 3rd level heading as frame.
+  ; 1st and 2nd are sec and subsec
+  (setq org-beamer-frame-level 3)
 )
 #+end_src
 
