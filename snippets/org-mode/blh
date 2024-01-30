@@ -12,7 +12,7 @@
 #+latex_header: %\\usepackage\{zxjatype\} % Japanese layout
 #+setupfile: ../../etc/lh_symbols.org
 # #+setupfile: ../../etc/lh_latex.org
-#+options: toc:nil tags:nil title:t email:t author:t date:t
+#+options: toc:nil tags:nil title:t email:t author:t date:t ^:{} broken-links:t
 
 # if you want a preface before toc,
 # write the preface below and uncomment the following latex line

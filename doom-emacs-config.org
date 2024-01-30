@@ -1476,7 +1476,10 @@ The ~org-drill~ package is used as an alternative to Anki for spaced repetition 
 
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (after! ox
-  (setq org-export-broken-links 'mark)
+  (setq org-export-with-broken-links t)  ; t/'mark/nil
+  ; 'mark leads to a marker in exported content with broken links
+  ; nil will abort export with broken links
+  ; t will continue anyway
 )
 #+end_src
 
