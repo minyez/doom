@@ -190,7 +190,7 @@ Syntax/grammaer checkers
 syntax              ; tasing you for every semicolon you forget
 (spell +flyspell
        +hunspell)   ; tasing you for misspelling mispelling
-grammar             ; tasing grammar mistake every you make
+; grammar             ; tasing grammar mistake every you make
 #+end_src
 
 Applications.
@@ -932,12 +932,25 @@ Copied from raxod502's configuration, see
 )
 #+end_src
 
-**** grammar
-Disable language-tool in grammar module
-#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
-(if (modulep! :checkers grammar)
-  (package! langtool :disable t))
-#+end_src
+# **** grammar
+# Disable language-tool in grammar module
+# #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+# (if (modulep! :checkers grammar)
+#   (package! langtool :disable t)
+#   (package! writegood-mode :disable t))
+# #+end_src
+
+# Disable writegood-mode when in org source code block.
+# Reference in [[https://emacs.stackexchange.com/questions/55944/disable-minor-mode-inside-source-blocks][this]] SO link
+# #+begin_src emacs-lisp :tangle lisp/config-checker.el :mkdirp yes
+# (use-package! writegood-mode
+#   :config
+#   (defun my/hook-disable-writegood-mode-in-org-source-blocks ()
+#     "Disable writegood-mode in source code blocks of org"
+#     (add-hook '(lambda () (interactive) (setq writegood-mode nil)) 'org-in-src-block-p nil :local))
+#   (add-hook 'org-mode-hook 'my/hook-disable-writegood-mode-in-org-source-blocks)
+# )
+# #+end_src
 
 **** Epilogue
 #+begin_src emacs-lisp :tangle lisp/config-checker.el :mkdirp yes

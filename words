@@ -138,3 +138,7 @@ setupfile
 micromamba
 conda
 MacBook
+STL
+valgrind
+GDB
+debuggability
