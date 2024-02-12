@@ -698,28 +698,28 @@ Add keyword mapping, adapted from the example-2.
                                                             :crop-left t))))
 
       ;; Active date (with or without day name, with or without time)
-      (,(format "\\(<%s>\\)" date-re) .
+      (,(format "[\t\n ]\\(<%s>\\)\\([\t\n ]\\|$\\)" date-re) .
        ((lambda (tag)
           (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2))))
-      (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+      (,(format "[\t\n ]\\(<%s \\)%s>\\([\t\n ]\\|$\\)" date-re day-time-re) .
        ((lambda (tag)
           (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2))))
-      (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+      (,(format "[\t\n ]<%s \\(%s>\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
        ((lambda (tag)
           (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
 
-      ;; Inactive date  (with or without day name, with or without time)
-       (,(format "\\(\\[%s\\]\\)" date-re) .
+      ;; Inactive date (with or without day name, with or without time) require surrounding spaces or at end of line
+       (,(format "[\t\n ]\\(\\[%s\\]\\)\\([\t\n ]\\|$\\)" date-re) .
         ((lambda (tag)
            (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2 :face 'org-date))))
-       (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+       (,(format "[\t\n ]\\(\\[%s \\)%s\\]\\([\t\n ]\\|$\\)" date-re day-time-re) .
         ((lambda (tag)
            (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2 :face 'org-date))))
-       (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+       (,(format "[\t\n ]\\[%s \\(%s\\]\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
         ((lambda (tag)
            (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
 
-      ;; Date without parentheses or brackets, but need surrounding spaces
+      ;; Date without parentheses or brackets, but need surrounding spaces or at end of line
       (,(format "[\t\n ]\\(%s\\)\\([\t\n ]\\|$\\)" date-re) .
        ((lambda (tag) (svg-tag-make tag :margin 0 :padding 0 :face 'org-date))))
        (,(format "[\t\n ]\\(%s \\)%s\\([\t\n ]\\|$\\)" date-re day-time-re) .
