@@ -110,7 +110,7 @@ Tools
 direnv
 ;;docker
 editorconfig        ; let someone else argue about tabs vs spaces
-;;ein               ; tame Jupyter notebooks with emacs
+ein                 ; tame Jupyter notebooks with emacs
 (eval +overlay)     ; run code, run (also, repls)
 (lookup +docsets)   ; navigate your code and its documentation
 (lsp +eglot)        ; M-x vscode
@@ -360,22 +360,21 @@ Use key-chord for mapping simultaneously pressed keys to command
           :desc "rename"                    "r"   #'org-download-rename-at-point
           :desc "image from clipboard"      "p"   #'org-download-clipboard
           :desc "download from kill URL"    "d"   #'org-download-yank)
-        :desc "org-roam-node-find"   "."   #'org-roam-node-find
-        :desc "org-agenda-list"      "a"   #'org-agenda-list
-        :desc "Sort entries by todo" "S"   '(lambda () (interactive) (org-sort-entries t ?o))
-        :desc "org-schedule"         "s"   #'org-schedule)
+        :desc "org-roam-node-find"      "."   #'org-roam-node-find
+        :desc "Find file Other Window"  "f"   #'find-file-other-window
+        :desc "org-agenda-list"         "a"   #'org-agenda-list
+        :desc "Sort entries by todo"    "S"   '(lambda () (interactive) (org-sort-entries t ?o))
+        :desc "org-schedule"            "s"   #'org-schedule)
 
-        ;; supplement existing map
-        (:prefix-map ("t" . "toggle")
-          :desc "truncate-lines"       "L"   #'toggle-truncate-lines)
-)
+      ;; supplement existing map
+      (:prefix-map ("t" . "toggle")
+        :desc "truncate-lines"       "L"   #'toggle-truncate-lines)
 
-;; "SPC g a" for stage file, just as "git add"
-(map! :leader
       (:prefix-map ("g" . "git")
        (:when (modulep! :tools magit)
-        :desc "stage current buffer file"    "a"    #'magit-stage-buffer-file)))
-
+        ; "SPC g a" for stage file, just as "git add"
+        :desc "stage current buffer file"    "a"    #'magit-stage-buffer-file))
+)
 
 (provide 'my-keybindings)
 ;;; my-keybindings.el ends here
@@ -634,7 +633,7 @@ Declare the dependency
   :recipe (:host github :repo "rougier/svg-lib"))
 #+end_src
 
-Add keyword mapping, taken from the example-2.
+Add keyword mapping, adapted from the example-2.
 #+begin_src emacs-lisp :tangle lisp/config-ui.el :mkdirp yes
 (use-package! svg-tag-mode
   :init
@@ -1046,7 +1045,8 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
    (org-mode . visual-line-mode)
    (before-save . org-update-all-dblocks))
   :custom
-  (org-link-descriptive nil)    ;; so show the full link
+  (org-link-descriptive nil)    ;; show the full link
+  (org-export-use-babel nil)    ;; never (re)evaluate code blocks during export
   :bind
   (:map org-mode-map
         ("C-c l" . org-insert-link)
@@ -1491,6 +1491,8 @@ The ~org-drill~ package is used as an alternative to Anki for spaced repetition 
 #+begin_src emacs-lisp :tangle lisp/config-ox.el :mkdirp yes
 (after! ox
   (setq org-export-with-broken-links t)  ; t/'mark/nil
+  ; don't ask if treat compile-command safe if it is a string
+  (put 'compile-command 'safe-local-variable #'stringp)
   ; 'mark leads to a marker in exported content with broken links
   ; nil will abort export with broken links
   ; t will continue anyway
@@ -1548,6 +1550,7 @@ For both LaTeX and beamer
 
   ;; prefer custom label
   (setq org-latex-prefer-user-labels t)
+  (put 'org-latex-compiler 'safe-local-variable #'stringp)
 
   ;; remove default hyperset with author names included
   ;; for local variable setup, use for each file

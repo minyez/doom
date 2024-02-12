@@ -18,6 +18,9 @@ tangle: $(CONFIG_ORG)
 sync: rebuild
 	$(DOOM_PATH) sync
 
+update: rebuild
+	$(DOOM_PATH) sync -u
+
 clean:
 	rm -f \#*\# *.el~
 

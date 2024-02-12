@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # key: nec
-# name: code block that will never be evaled
+# name: code block that will not be evaluated
 # uuid: nec
 # group: code
 # 
 # --
-#+begin_src ${1:f90} :eval never
+#+begin_src ${1:f90} :eval never :results verbatim :wrap src :exports both
 $0
 #+end_src
