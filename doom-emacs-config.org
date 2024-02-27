@@ -348,8 +348,10 @@ Use key-chord for mapping simultaneously pressed keys to command
   :config
   (key-chord-mode 1)
   ;; https://discourse.doomemacs.org/t/typing-jk-deletes-j-and-returns-to-normal-mode/59
-  (with-eval-after-load 'evil-escape
-    (key-chord-define-global "jk" 'evil-escape)))
+  ;; commented out for double pinyin
+  ;(with-eval-after-load 'evil-escape
+  ;  (key-chord-define-global "jk" 'evil-escape))
+)
 
 (map! :leader
       (:prefix-map ("e" . "extra-my")
