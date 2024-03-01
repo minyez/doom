@@ -185,3 +185,8 @@ Wannier
 EPC
 phonons
 ARPES
+quasiparticle
+BTE
+sendrecv
+nvfortran
+GPa

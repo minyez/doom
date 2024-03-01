@@ -2055,6 +2055,14 @@ Use the new maintained repository
 (require 'config-dictionary)
 #+end_src
 
+*** Gnuplot
+
+The gnuplot package pinned in the org module is a bit old, unpin it here.
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(unpin! gnuplot)
+(unpin! gnuplot-mode)
+#+end_src
+
 *** rg
 
 #+begin_src emacs-lisp :tangle packages.el
