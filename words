@@ -190,3 +190,15 @@ BTE
 sendrecv
 nvfortran
 GPa
+DPG
+polarizability
+renormalize
+LHS
+RHS
+hydrogenic
+Floquet
+EOM
+excitons
+Koopmans
+functionals
+EPFL
