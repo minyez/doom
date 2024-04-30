@@ -1593,7 +1593,7 @@ For both LaTeX and beamer
   :config
 
   ;; use latexmk to automate toolchain
-  (setq org-latex-pdf-process '("latexmk -latexoption=\"-interaction=nonstopmode -shell-escape\" -pdf -pdflatex=%latex -bibtex -f %f"))
+  (setq org-latex-pdf-process '("latexmk -latexoption=\"-interaction=nonstopmode -shell-escape -file-line-error -synctex=1\" -pdf -pdflatex=%latex -bibtex -f %f"))
 
   ;; prefer custom label
   (setq org-latex-prefer-user-labels t)
