@@ -1225,6 +1225,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
+                         ("zhihu" . "https://zhuanlan.zhihu.com/p/%s")
                          ("rnote" . ,(concat my/read-note-dir "/%s.org"))
                          ("SO" . "https://stackoverflow.com/questions/%s")
                          ("arxiv" . "https://arxiv.org/abs/%s"))))
@@ -1667,6 +1668,37 @@ For both LaTeX and beamer
                          ,my/org-latex-classes-common-header-passoptions
                          "\\documentclass[11pt,a4paper]{article}"
                          "[DEFAULT-PACKAGES]"
+                         ,my/org-latex-classes-common-header-after-default-pkgs
+                         "[EXTRA]"
+                         "[PACKAGES]"))
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+                ("beamer"
+                  ,(s-join "\n"
+                      `(
+                         ,my/org-latex-classes-common-header-passoptions
+                         "\\documentclass[ignorenonframetext,presentation]{beamer}"
+                         "\\usepackage{beamerseminar}"
+                         "[DEFAULT-PACKAGES]"
+                         "% space between caption and table"
+                         "\\captionsetup[table]{belowskip=-6pt}"
+                         ,my/org-latex-classes-common-header-after-default-pkgs
+                         "[EXTRA]"
+                         "[PACKAGES]"))
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}"))
+                ("beamerarticle"
+                  ,(s-join "\n"
+                      `(
+                         ,my/org-latex-classes-common-header-passoptions
+                         "\\documentclass[11pt,a4paper]{article}"
+                         "\\usepackage{beamerarticle}"
+                         "\\usepackage{beamerseminar}"
+                         "[DEFAULT-PACKAGES]"
+                         "\\usepackage{physics}"
                          ,my/org-latex-classes-common-header-after-default-pkgs
                          "[EXTRA]"
                          "[PACKAGES]"))
