@@ -294,5 +294,14 @@
   (plist-put svg-lib-style-default :font-size (font-get doom-font :size))
 )
 
+(use-package! dired-open
+  :after dired
+  :init
+  (if (featurep :system 'macos)
+    (setq-default dired-open-default-open-program "open"))
+  (if (featurep :system 'linux)
+    (setq-default dired-open-default-open-program "xdg-open"))
+)
+
 (provide 'config-ui)
 ;;; config-ui.el ends here

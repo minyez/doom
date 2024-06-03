@@ -13,6 +13,10 @@
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 
+(if (modulep! :emacs dired)
+    (package! dired-hacks
+      :recipe (:host github :repo "minyez/dired-hacks")))
+
 (package! org-recur
   :recipe (:host github :repo "mrcnski/org-recur"))
 
