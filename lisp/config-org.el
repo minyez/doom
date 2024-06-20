@@ -147,18 +147,18 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
           ("L"   "Language")
           ("Le"  "English")
           ("Lev" "English vocaburary" entry
-               (file "3_Resources/English/english_vocabulary.org")
+               (file "english_vocabulary.org")
                "* %? :drill:\n** Examples :ignore:\n** Origin :ignore:")
           ("Lg"  "German" entry)
           ("Lgv" "German vocaburary" entry
-               (file "3_Resources/German/german_vocabulary.org")
+               (file "german_vocabulary.org")
                "* %? :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: hide1_firstmore\n:END:[||GE]: [||EN,CN]")
           ("l"  "Log")
           ("lj" "Journal" plain
-                (file+function "2_Area/Log/journal.org" my/org-goto-today-node)
+                (file+function "Log/journal.org" my/org-goto-today-node)
                 "%<%H:%M> %?")
 ;          ("lw" "Work" plain
-;                (file+function "2_Area/Log/work.org" my/org-goto-today-node)
+;                (file+function "Log/work.org" my/org-goto-today-node)
 ;                "%<%H:%M> %?")
          ))
   ;; update TODO/checkbox count before finalizing the capture process

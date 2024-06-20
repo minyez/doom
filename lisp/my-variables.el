@@ -9,7 +9,7 @@
   "location where usual org-roam-capture goes")
 
 (defvar my/read-note-dir
-  (expand-file-name "2_Area/Reading" (concat my/org-dir))
+  (expand-file-name "Review" (concat my/org-dir))
   "directory for reading notes")
 
 (defvar my/bibtex-file
@@ -17,11 +17,11 @@
   "all-in-one bibtex file for referecnes")
 
 (defvar my/literature-note-dir
-  (expand-file-name "3_Resource/Paper" my/org-dir)
+  (expand-file-name "Paper" my/org-dir)
   "Directory to store the notes of literature")
 
 (defvar my/talk-note-dir
-  (expand-file-name "3_Resource/Talk" my/org-dir)
+  (expand-file-name "Talk" my/org-dir)
   "Directory to store the notes of talks, conferences")
 
 (provide 'my-variables)
