@@ -10,6 +10,9 @@
 
 (unpin! org-appear)
 
+(unpin! magit)
+(unpin! transient)
+
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 
