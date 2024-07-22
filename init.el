@@ -112,6 +112,7 @@
             +dragndrop
             +gnuplot
             +contacts
+            +hugo
             +ipython
             +jupyter
             +present

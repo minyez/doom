@@ -9,9 +9,13 @@
 (unpin! posframe)
 
 (unpin! org-appear)
+(unpin! org-roam)
+(unpin! ox-pandoc)
 
 (unpin! magit)
 (unpin! transient)
+
+(package! ox-gfm)
 
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
@@ -20,6 +24,10 @@
     (package! dired-hacks
       :recipe (:host github :repo "minyez/dired-hacks")))
 
+(package! consult-omni
+	:recipe (:host github :repo "armindarvish/consult-omni"
+           :files ("sources/*.el")))
+
 (package! org-recur
   :recipe (:host github :repo "mrcnski/org-recur"))
 
@@ -27,6 +35,7 @@
   :recipe (:host github :repo "jkitchin/org-ref"))
 (package! bibtex-completion)
 (package! citar)
+(package! citeproc)
 
 (package! org-bar
   :recipe (:host github :repo "tonyaldon/org-bars"))

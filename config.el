@@ -526,10 +526,13 @@
   (advice-add 'orderless-regexp :around #'my-orderless-regexp)
 )
 
+
 ;; ================================================
-;; Completion system
+;; Searching and completion
 ;;
 ;; - corfu
+;; - consult-omni
+;; - rg
 ;; ================================================
 (use-package! corfu
   :config
@@ -539,6 +542,28 @@
   (define-key corfu-map [tab] nil)
   (define-key corfu-map "\t" nil)
 )
+
+(use-package! consult-omni
+  :after consult
+  :config
+  ;; load all sources
+  (consult-omni-sources-load-modules)
+)
+
+(use-package! rg
+  :config
+  (setq rg-keymap-prefix "\C-cg")
+  (setq rg-ignore-case 'smart)
+  (rg-enable-default-bindings)
+  (map! :leader
+        (:prefix-map "s"
+          (:prefix-map ("g" . "ripgrep")
+           :desc "rg"                  "g"  #'rg
+           :desc "rg-menu"             "m"  #'rg-menu
+           :desc "Cursor word"         "w"  #'rg-dwim
+           :desc "Cursor Word (file)"  "f"  #'rg-dwim-current-file)))
+)
+
 
 ;; ================================================
 ;; undo-tree
@@ -557,14 +582,36 @@
   (advice-add #'undo-tree-load-history :around
               #'radian--undo-tree-suppress-buffer-modified-message))
 
+
 ;; ================================================
-;; checker
+;; command-log-mode
+;; ================================================
+(use-package! command-log-mode)
+
+
+;; ================================================
+;; spelling checker and dictionary
+;;
+;; - ispell
+;; - osx-dictionary
 ;; ================================================
 (when (modulep! :checkers spell)
   (after! ispell
     (setq ispell-personal-dictionary (concat doom-private-dir "words"))
   )
 )
+
+(if IS-MAC
+  (progn
+    (use-package! osx-dictionary
+      :bind
+      (:map global-map
+            ("C-c d" . osx-dictionary-search-word-at-point))
+      :config
+    )
+  )
+)
+
 
 ;; ================================================
 ;; Org-mode and related
@@ -909,35 +956,6 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         org-recur-finish-archive t))
 
 
-;; for org-ref completion
-(use-package! bibtex-completion
-  :config
-  (setq bibtex-completion-notes-path my/literature-note-dir
-        bibtex-completion-bibliography (list my/bibtex-file)
-        bibtex-completion-pdf-field "file"
-        bibtex-completion-additional-search-fields '(keywords journaltitle)
-  )
-)
-
-(use-package! org-ref
-  :config
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-)
-
-(use-package! citar
-  :custom
-  (citar-bibliography (list my/bibtex-file))
-  (citar-notes-paths (list my/literature-note-dir))
-  :hook
-  (LaTeX-mode . citar-capf-setup)
-  (org-mode . citar-capf-setup)
-  :config
-  ;; use citeproc to generate in-text reference
-  (setq citar-format-reference-function 'citar-citeproc-format-reference
-        citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
-        citar-citeproc-csl-style "aps-modified.csl")
-)
-
 (use-package! org-bars
   :after org
   :commands org-bars-mode
@@ -1115,7 +1133,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
    ;; I want to see the whole file
    org-noter-hide-other nil
    ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list my/org-dir)
+   org-noter-notes-search-path (list org-directory)
    ;org-noter-set-notes-window-behavior 'scroll
    ;; split fraction. default (0.5 . 0.5). slightly larger on vertical
    ;; TODO: may adapt according to the size of display
@@ -1237,6 +1255,48 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 )
 
 
+;; ================================================
+;; References and bibliography
+;;
+;; In my case there are used in combination with org and org-roam
+;;
+;; - bibtex-completion
+;; - org-ref
+;; - citar
+;; - citeproc
+;; ================================================
+
+;; for org-ref completion
+(use-package! bibtex-completion
+  :config
+  (setq bibtex-completion-notes-path my/literature-note-dir
+        bibtex-completion-bibliography (list my/bibtex-file)
+        bibtex-completion-pdf-field "file"
+        bibtex-completion-additional-search-fields '(keywords journaltitle)
+  )
+)
+
+(use-package! org-ref
+  :config
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+)
+
+(use-package! citar
+  :custom
+  (citar-bibliography (list my/bibtex-file))
+  (citar-notes-paths (list my/literature-note-dir))
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setup)
+  :config
+  ;; use citeproc to generate in-text reference
+  (setq citar-format-reference-function 'citar-citeproc-format-reference
+        citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
+        citar-citeproc-csl-style "aps-modified.csl")
+)
+
+(use-package! citeproc)
+
 
 ;; ================================================
 ;; org export setup
@@ -1244,6 +1304,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 ;; - ox-extra
 ;; - ox-latex
 ;; - ox-beamer
+;; - ox-gfm
+;; - ox-hugo
+;; - ox-icalendar
 ;; ================================================
 
 (after! ox
@@ -1259,6 +1322,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :after ox
   :config
   (ox-extras-activate '(ignore-headlines)))
+
+;; (use-package! ox-gfm
+;;   :after ox)
+
+;; (use-package! ox-hugo
+;;   :after ox)
 
 (use-package! ox-latex
   :bind
@@ -1424,42 +1493,16 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq org-beamer-frame-level 3)
 )
 
-(use-package! projectile
+(use-package! ox-icalendar
   :custom
-  (projectile-project-search-path (list "~/projects"))
-  ;; :config
-  ;; (map! :leader
-  ;;       (:prefix-map "p"
-  ;;        :desc "Switch to project"  "p"  'projectile-switch-project))
-)
-
-(use-package! command-log-mode)
-
-(if IS-MAC
-  (progn
-    (use-package! osx-dictionary
-      :bind
-      (:map global-map
-            ("C-c d" . osx-dictionary-search-word-at-point))
-      :config
-    )
+  ; calendar name of org-agenda combined export
+  (org-icalendar-combined-name "zmysmile0929@gmail.com")
+  (org-icalendar-combined-description "Calendar entries from Emacs org-mode")
+  ; before finding the way to set alarm per entry, use a global alarm time
+  (org-icalendar-alarm-time 5)
+  ; NOTE: Timestamp is also added to the summary, which is redundant in icalendar
+  ;       A hook might be useful to remove before the export.
   )
-)
-
-(use-package! rg
-  :config
-  (setq rg-keymap-prefix "\C-cg")
-  (setq rg-ignore-case 'smart)
-  (rg-enable-default-bindings)
-  (map! :leader
-        (:prefix-map "s"
-          (:prefix-map ("g" . "ripgrep")
-           :desc "rg"                  "g"  #'rg
-           :desc "rg-menu"             "m"  #'rg-menu
-           :desc "Cursor word"         "w"  #'rg-dwim
-           :desc "Cursor Word (file)"  "f"  #'rg-dwim-current-file)))
-)
-
 
 ;; ================================================
 ;; PDF tools configuration
@@ -1502,10 +1545,11 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
 
 ;; ================================================
-;; Version control
+;; Project management and version control
 ;;
 ;; - magit
 ;; - git-gutter
+;; - projectile
 ;; ================================================
 (use-package! magit
   :config
@@ -1528,13 +1572,22 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 (after! git-gutter
   (setq git-gutter:ask-p nil))
 
+(use-package! projectile
+  :custom
+  (projectile-project-search-path (list "~/projects"))
+  ;; :config
+  ;; (map! :leader
+  ;;       (:prefix-map "p"
+  ;;        :desc "Switch to project"  "p"  'projectile-switch-project))
+)
+
 
 ;; ================================================
 ;; Blogging
 ;;
 ;; - easy-hugo
 ;; ================================================
-(use-package! easy-hugo
-  :config
-  (easy-hugo-enable-menu)
-)
+;; (use-package! easy-hugo
+;;   :config
+;;   (easy-hugo-enable-menu)
+;; )
