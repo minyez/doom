@@ -10,12 +10,18 @@
 
 (unpin! org-appear)
 (unpin! org-roam)
+
+(package! ox-pandoc
+      :recipe (:host github :repo "minyez/ox-pandoc"))
 (unpin! ox-pandoc)
 
 (unpin! magit)
 (unpin! transient)
 
 (package! ox-gfm)
+
+(package! crux
+  :recipe (:host github :repo "bbatsov/crux"))
 
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))

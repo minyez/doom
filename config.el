@@ -18,7 +18,7 @@
 ;; Personal variables
 ;; ================================================
 (defvar my/org-dir
-  (expand-file-name "org-roam" "~/Library/CloudStorage/Dropbox")
+  (expand-file-name "org-roam/" "~/Library/CloudStorage/Dropbox")
   "org directory")
 
 (defvar my/org-roam-inbox
@@ -26,7 +26,7 @@
   "location where usual org-roam-capture goes")
 
 (defvar my/read-note-dir
-  (expand-file-name "Review" (concat my/org-dir))
+  (expand-file-name "Review/" (concat my/org-dir))
   "directory for reading notes")
 
 (defvar my/bibtex-file
@@ -34,11 +34,11 @@
   "all-in-one bibtex file for referecnes")
 
 (defvar my/literature-note-dir
-  (expand-file-name "Paper" my/org-dir)
+  (expand-file-name "Paper/" my/org-dir)
   "Directory to store the notes of literature")
 
 (defvar my/talk-note-dir
-  (expand-file-name "Talk" my/org-dir)
+  (expand-file-name "Talk/" my/org-dir)
   "Directory to store the notes of talks, conferences")
 
 (require 's) ;; for joining strings
@@ -543,7 +543,7 @@
   (define-key corfu-map "\t" nil)
 )
 
-(use-package! consult-omni
+(use-package! consult-omni-sources
   :after consult
   :config
   ;; load all sources
@@ -1262,6 +1262,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 ;;
 ;; - bibtex-completion
 ;; - org-ref
+;; - org-cite (oc)
 ;; - citar
 ;; - citeproc
 ;; ================================================
@@ -1275,6 +1276,11 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         bibtex-completion-additional-search-fields '(keywords journaltitle)
   )
 )
+
+(use-package! oc
+  :after org
+  :custom
+  (org-cite-global-bibliography (list my/bibtex-file)))
 
 (use-package! org-ref
   :config
@@ -1316,6 +1322,28 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ; 'mark leads to a marker in exported content with broken links
   ; nil will abort export with broken links
   ; t will continue anyway
+
+
+  (defun my/org-pandoc-convert-org-ref-link-to-org-cite (BACKEND &optional subtreep)
+    "Hook function to convert org-ref cite link to org-cite cite link.
+Only works with pandoc backend.
+
+Currently it uses a naive implementation by `re-search-forward' for the conversion.
+Caveats:
+- also remove the possible '[]' around org-ref link
+- only work with single entry
+- will replace cite link in a code block"
+    (if (not (equal BACKEND 'pandoc)) ()
+      (goto-char (point-min))
+      (while (re-search-forward
+               "\\([=\~]\\)?\\[?\\(cite\\):&?\\([^] @\t\r\n]+\\)\\]?\\([=\~]\\)?"
+               nil t)
+        (unless (or (string= (match-string 1) "=") (string= (match-string 1) "~")
+                    (string= (match-string 4) "=") (string= (match-string 4) "~")
+                    )
+          (replace-match "[\\2:@\\3]")))))
+
+  (add-to-list 'org-export-before-parsing-functions 'my/org-pandoc-convert-org-ref-link-to-org-cite)
 )
 
 (use-package! ox-extra
@@ -1494,12 +1522,16 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 )
 
 (use-package! ox-icalendar
+  :after ox
   :custom
   ; calendar name of org-agenda combined export
-  (org-icalendar-combined-name "zmysmile0929@gmail.com")
+  (org-icalendar-combined-name        "MYZ org agenda")
+  (org-icalendar-combined-agenda-file (expand-file-name "org.ics" org-directory))
   (org-icalendar-combined-description "Calendar entries from Emacs org-mode")
   ; before finding the way to set alarm per entry, use a global alarm time
   (org-icalendar-alarm-time 5)
+  ; honor noexport tag when exporting
+  (org-icalendar-exclude-tags (list "noexport"))
   ; NOTE: Timestamp is also added to the summary, which is redundant in icalendar
   ;       A hook might be useful to remove before the export.
   )
@@ -1540,7 +1572,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 (use-package! elfeed-org
   :after org
   :preface
-  (setq rmh-elfeed-org-files `(,(expand-file-name "elfeed.org" org-directory)))
+  (setq rmh-elfeed-org-files `(,(expand-file-name "etc/elfeed.org" org-directory)))
 )
 
 
