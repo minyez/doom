@@ -1,0 +1,18 @@
+# -*- mode: snippet; coding: utf-8 -*-
+# key: oxjp
+# name: Template for export to Jekyll post by pandoc
+# uuid: oxjp
+# group: export
+# 
+# --
+#+author: Min-Ye Zhang
+#+date: `(format-time-string "%Y-%m-%d %T %z")`
+#+export_file_name: ~/blogs/minyez.github.io_chirpy/_posts/`(format-time-string "%Y-%m-%d")`-`(file-name-sans-extension (buffer-name))`
+#+options: toc:nil tags:t title:t email:nil author:t date:t ^:{} broken-links:t prop:t
+#+pandoc_options: shift-heading-level-by:1
+#+pandoc_options: lua-filter:etc/pandoc_filter_jekyll.lua
+#+pandoc_metadata: categories:${1:cate} "tags:${2:tag}"
+#+pandoc_metadata: math:true comments:true
+#+description: ${3:hello}
+# #+bibliography: etc/bibliography.bib
+# #+cite_export: csl etc/american-physics-society-without-titles.csl

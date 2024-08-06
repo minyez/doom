@@ -10,11 +10,11 @@
 #+latex_header: \\usepackage[hmargin=1.0in,top=1.0in,bottom=0.7in]\{geometry\}
 #+latex_header: %\\usepackage\{ctex\} % Chinese layout
 #+latex_header: %\\usepackage\{zxjatype\} % Japanese layout
-#+setupfile: ../../etc/lh_symbols.org
-# #+setupfile: ../../etc/lh_latex.org
-#+options: toc:nil tags:nil title:t email:t author:t date:t ^:{} broken-links:t
+#+setupfile: etc/lh_symbols.org
+# #+setupfile: etc/lh_latex.org
+#+options: toc:nil tags:nil title:t email:t author:t date:t ^:{} broken-links:t prop:t
 
-# if you want a preface before toc,
+# if you want a preface before toc, ensure toc:nil in options,
 # write the preface below and uncomment the following latex line
 $0
 # a link-colored toc

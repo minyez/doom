@@ -222,3 +222,13 @@ noninteracting
 readme
 pandoc
 iCalendar
+gfortran
+ifort
+ifx
+uncomment
+PMI
+SLURM
+MPICH
+OpenMPI
+OpenRTE
+TALOS

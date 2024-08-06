@@ -20,6 +20,8 @@
 
 (package! ox-gfm)
 
+(package! eldoc-box)
+
 (package! crux
   :recipe (:host github :repo "bbatsov/crux"))
 
@@ -32,7 +34,7 @@
 
 (package! consult-omni
 	:recipe (:host github :repo "armindarvish/consult-omni"
-           :files ("sources/*.el")))
+           :files ("*.el" "sources/*.el")))
 
 (package! org-recur
   :recipe (:host github :repo "mrcnski/org-recur"))
@@ -53,6 +55,7 @@
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 (unpin! org-roam)
 (package! citar-org-roam)
+(package! org-roam-ui)
 
 (when (modulep! :lang org +noter)
   (package! org-noter :recipe

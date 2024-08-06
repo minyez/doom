@@ -123,7 +123,7 @@
 )
 
 ;; ================================================
-;; Doom UI setup
+;; UI setup
 ;;
 ;; - font
 ;; - theme
@@ -134,6 +134,7 @@
 ;; - modeline
 ;; - svg-tag-mode
 ;; - hl-todo
+;; - eldoc-box
 ;;
 ;; ================================================
 (display-time-mode 1) ;; always show time
@@ -440,6 +441,7 @@
     (setq-default dired-open-default-open-program "xdg-open"))
 )
 
+
 ;; ================================================
 ;; Evil related
 ;; ================================================
@@ -543,9 +545,10 @@
   (define-key corfu-map "\t" nil)
 )
 
-(use-package! consult-omni-sources
+(use-package! consult-omni
   :after consult
   :config
+  (require 'consult-omni-sources)
   ;; load all sources
   (consult-omni-sources-load-modules)
 )
@@ -1254,6 +1257,21 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
      (t (user-error "This command is only supported on PDF Tools.")))))
 )
 
+;;; org-roam-ui
+;; (use-package! websocket
+;;     :after org-roam)
+;; (use-package! org-roam-ui
+;;     :after org-roam ;; or :after org
+;; ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;; ;;         a hookable mode anymore, you're advised to pick something yourself
+;; ;;         if you don't care about startup time, use
+;; ;;  :hook (after-init . org-roam-ui-mode)
+;;     :config
+;;     (setq org-roam-ui-sync-theme t
+;;           org-roam-ui-follow t
+;;           org-roam-ui-update-on-save t
+;;           org-roam-ui-open-on-start t)
+;;     (setq org-roam-ui-ref-title-template "%^{citekey} %^{title}"))
 
 ;; ================================================
 ;; References and bibliography
@@ -1307,6 +1325,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 ;; ================================================
 ;; org export setup
 ;; - ox
+;; - ox-pandoc
 ;; - ox-extra
 ;; - ox-latex
 ;; - ox-beamer
@@ -1326,33 +1345,44 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
   (defun my/org-pandoc-convert-org-ref-link-to-org-cite (BACKEND &optional subtreep)
     "Hook function to convert org-ref cite link to org-cite cite link.
-Only works with pandoc backend.
 
 Currently it uses a naive implementation by `re-search-forward' for the conversion.
 Caveats:
-- also remove the possible '[]' around org-ref link
-- only work with single entry
-- will replace cite link in a code block"
+- only work with pandoc backend
+- only handle cite and fullcite
+- cannot handle notes"
     (if (not (equal BACKEND 'pandoc)) ()
       (goto-char (point-min))
       (while (re-search-forward
-               "\\([=\~]\\)?\\[?\\(cite\\):&?\\([^] @\t\r\n]+\\)\\]?\\([=\~]\\)?"
+               "\\([=\~]\\)?\\[?\\[?\\(cite\\|fullcite\\):&?\\([^] @\t\r\n]+\\)\\]?\\]?\\([=\~]\\)?"
                nil t)
-        (unless (or (string= (match-string 1) "=") (string= (match-string 1) "~")
-                    (string= (match-string 4) "=") (string= (match-string 4) "~")
-                    )
-          (replace-match "[\\2:@\\3]")))))
+        ; do not convert those in a source code block or inline code
+        (unless (or (org-in-src-block-p)
+                    (string= (match-string 1) "=") (string= (match-string 1) "~")
+                    (string= (match-string 4) "=") (string= (match-string 4) "~"))
+          (let ((keys  ; handle multiple keys
+                  (replace-regexp-in-string "[,;]&?" ";@" (match-string 3))))
+            (cl-case (intern (match-string 2))
+                     (fullcite
+                       (format "[cite/bibentry:@%s]" keys))
+                     (t
+                       (replace-match (format "[\\2:@%s]" keys)))))))))
 
   (add-to-list 'org-export-before-parsing-functions 'my/org-pandoc-convert-org-ref-link-to-org-cite)
 )
+
+(use-package! ox-pandoc
+  :init
+  (setq org-pandoc-format-extensions
+        '(markdown-link_attributes-bracketed_spans-simple_tables-raw_tex-raw_attribute)))
 
 (use-package! ox-extra
   :after ox
   :config
   (ox-extras-activate '(ignore-headlines)))
 
-;; (use-package! ox-gfm
-;;   :after ox)
+(use-package! ox-gfm
+  :after ox)
 
 ;; (use-package! ox-hugo
 ;;   :after ox)
