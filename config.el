@@ -41,6 +41,9 @@
   (expand-file-name "Talk/" my/org-dir)
   "Directory to store the notes of talks, conferences")
 
+(defvar my/jekyll-root-directory "~/blogs/minyez.github.io_chirpy/"
+  "Jekyll root directory")
+
 (require 's) ;; for joining strings
 
 (defvar my/org-latex-classes-common-header-passoptions
@@ -999,6 +1002,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :after org-roam
   :init
   (setq org-roam-directory org-directory
+        org-roam-db-location (expand-file-name "org-roam.db" org-directory)
         org-roam-index-file "index.org"
         org-roam-graph-extra-config '(("overlap" . "false")) ; man dot for attributes setup
         )
@@ -1047,7 +1051,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 #+latex_class: article
 #+latex_header: \\usepackage[hmargin=1.0in, top=1.0in, bottom=0.7in]{geometry}
 #+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]{biblatex}
-#+latex_header: \\addbibresource{~/database/bibliography.bib}
+#+latex_header: \\addbibresource{etc/bibliography.bib}
 # include commands preset
 #+setupfile: lh_symbols.org
 #+setupfile: lh_biblatex.org
@@ -1105,8 +1109,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 :PROPERTIES:
 :NOTER_DOCUMENT: ${file}
 :END:
-"
-           )
+")
            :unnarrowed t))
   ;;; connect to citar by citar-org-roam
   (require 'citar-org-roam)
@@ -1364,10 +1367,92 @@ Caveats:
                   (replace-regexp-in-string "[,;]&?" ";@" (match-string 3))))
             (cl-case (intern (match-string 2))
                      (fullcite
-                       (format "[cite/bibentry:@%s]" keys))
+                       ; bare to remove the bracket
+                       ; https://www.miskatonic.org/2024/01/08/org-citations-basic
+                       (replace-match (format "[cite/bibentry/bare:@%s]" keys)))
                      (t
                        (replace-match (format "[\\2:@%s]" keys)))))))))
 
+  (defun my/expand-org-id-link-to-relative-path (BACKEND &optional subtreep)
+    "Expand all org-id links and replace with relative file path"
+    (goto-char (point-min))
+    (while (re-search-forward org-link-bracket-re nil t)
+      (unless (org-in-src-block-p)
+        (let* ((link (match-string-no-properties 1))
+               (desc (match-string-no-properties 2))
+               (prefix (downcase (substring link 0 3)))
+               (id (substring link 3))
+               )
+          (when (and (equal prefix "id:"))
+            (let* ((fn-loc
+                     ; required to use save-match-data macro, since
+                     ; org-id-find-id-in-file will use string-match;
+                     ; also split-string.
+                     (save-match-data
+                       (org-id-find-id-in-file id (org-id-find-id-file id))))
+                   (rela-fn (if fn-loc
+                                (file-relative-name
+                                  (car fn-loc)
+                                  (file-name-directory (buffer-file-name)))
+                              nil)))
+              (if rela-fn
+                  (replace-match (org-link-make-string (format "file:%s" rela-fn) desc))
+                (warn "fail to find id %s" id)
+                (if desc
+                    (replace-match desc)
+                  (replace-match (format "=broken-id:%s=" id))))))))))
+
+  (defun my/replace-org-file-org-with-export-output (BACKEND &optional subtreep)
+    "Replace org-mode link to org-mode file by export file name
+
+  For exampel, [[file:filename.org][description]] becomes [[file:filename.EXPORT_BACKEND][description]]"
+    (let ((output-ext
+            (if (equal BACKEND 'pandoc)
+                (symbol-name (or (assoc-default org-pandoc-format org-pandoc-extensions)
+                                 org-pandoc-format))
+              (symbol-name BACKEND))))
+      (goto-char (point-min))
+      (while (re-search-forward org-link-bracket-re nil t)
+        (unless (org-in-src-block-p)
+          (let* ((link (match-string-no-properties 1))
+                 (desc (match-string-no-properties 2))
+                 (prefix (downcase (substring link 0 5)))
+                 (target (substring link 5))
+                 (ext (file-name-extension target))
+                 )
+            (when (and (equal prefix "file:") (if ext (equal (downcase ext) "org")))
+              (let ((output-path
+                      (save-match-data
+                        (if (find-file-noselect target)
+                            (with-current-buffer (find-file-noselect target)
+                              (org-export-output-file-name (format ".%s" output-ext) subtreep))
+                            ))))
+              ;; (message (match-string-no-properties 0))
+                (if output-path
+                  (replace-match (org-link-make-string (format "file:%s" output-path) desc))))))))))
+
+  (defun my/trim-jekyll-root-in-file-link (BACKEND &optional subtreep)
+    "trim Jekyll root directory in file link"
+    (when (and (equal BACKEND 'pandoc) my/jekyll-root-directory)
+      (let ((root (expand-file-name my/jekyll-root-directory)))
+        (goto-char (point-min))
+        (while (re-search-forward org-link-bracket-re nil t)
+          (unless (org-in-src-block-p)
+            (let* ((link (match-string-no-properties 1))
+                   (prefix (downcase (substring link 0 5))))
+              (when (equal prefix "file:")
+                (let* ((target (substring link 5))
+                       (desc (match-string-no-properties 2))
+                       (full (expand-file-name target))
+                       (trimed (save-match-data
+                                 (if (string-match root full)
+                                     (replace-match "" t t full)
+                                   full))))
+                  (replace-match (org-link-make-string (format "file:%s" trimed) desc))))))))))
+
+  (add-to-list 'org-export-before-parsing-functions 'my/trim-jekyll-root-in-file-link)
+  (add-to-list 'org-export-before-parsing-functions 'my/replace-org-file-org-with-export-output)
+  (add-to-list 'org-export-before-parsing-functions 'my/expand-org-id-link-to-relative-path)
   (add-to-list 'org-export-before-parsing-functions 'my/org-pandoc-convert-org-ref-link-to-org-cite)
 )
 
