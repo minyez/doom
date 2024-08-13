@@ -145,6 +145,10 @@
 (setq display-line-numbers-type 'visual)
 ;; calculate necessary width to correctly show all line numbers, since 28.1
 (setq display-line-numbers-width-start t)
+;; Disable prettify-symbols-mode, which makes hard to recognize keywords in code
+;; Somehow not work, maybe it is hooked somewhere, not found in the Doom repo by grep.
+;; Switching off the ligature module helps.
+;; (prettify-symbols-mode -1)
 
 (let ((font "Sarasa Fixed Slab SC Nerd Font")
       (size 16))
@@ -153,6 +157,11 @@
         ;; disable unicode font size set to resolve too large icon in dashboard/treemacs
         ;;doom-unicode-font (font-spec :family font :size size)
         doom-big-font (font-spec :family font :size (+ size 4))))
+
+;; Faces with whitespace-mode can have impact for large files
+;; See https://list.orgmode.org/orgmode/Zqjm0hyy5DjFNrgm@swain.home.arpa/
+;;     https://www.reddit.com/r/orgmode/comments/1eovrxa/russell_adams_mlorg_mode_2024_speedup_on_large
+(setq whitespace-style '(space-mark tab-mark))
 
 ;; Theme setup
 (use-package! emacs
@@ -1458,6 +1467,7 @@ Caveats:
 
 (use-package! ox-pandoc
   :init
+  (setq org-pandoc-options-for-markdown '((standalone . t) (preserve-tabs . t)))
   (setq org-pandoc-format-extensions
         '(markdown-link_attributes-bracketed_spans-simple_tables-raw_tex-raw_attribute)))
 
