@@ -1476,8 +1476,8 @@ Caveats:
   :config
   (ox-extras-activate '(ignore-headlines)))
 
-(use-package! ox-gfm
-  :after ox)
+;; (use-package! ox-gfm
+;;   :after ox)
 
 ;; (use-package! ox-hugo
 ;;   :after ox)
