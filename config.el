@@ -547,6 +547,7 @@
 ;; - corfu
 ;; - consult-omni
 ;; - rg
+;; - corg
 ;; ================================================
 (use-package! corfu
   :config
@@ -556,6 +557,12 @@
   (define-key corfu-map [tab] nil)
   (define-key corfu-map "\t" nil)
 )
+
+;; corg for source block completion
+;; https://github.com/isamert/corg.el
+(use-package! corg
+  :hook
+  ((org-mode . corg-setup)))
 
 (use-package! consult-omni
   :after consult

@@ -76,5 +76,8 @@
 (package! rg)
 (package! color-rg)
 
+(package! corg
+  :recipe (:host github :repo "isamert/corg.el"))
+
 (package! easy-hugo)
 (package! easy-jekyll)
