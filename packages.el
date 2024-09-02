@@ -25,6 +25,9 @@
 (package! crux
   :recipe (:host github :repo "bbatsov/crux"))
 
+(package! cm-mode
+  :recipe (:host github :repo "joostkremers/criticmarkup-emacs"))
+
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 

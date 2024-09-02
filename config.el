@@ -138,6 +138,7 @@
 ;; - svg-tag-mode
 ;; - hl-todo
 ;; - eldoc-box
+;; - cm-mode
 ;;
 ;; ================================================
 (display-time-mode 1) ;; always show time
@@ -435,8 +436,8 @@
         ((lambda (tag)
            (svg-tag-make tag :inverse t :crop-left t :margin 0 :face 'org-date))))
                      ))
-  :hook
-  (org-mode . svg-tag-mode)
+  ;; :hook
+  ;; (org-mode . svg-tag-mode)
   :config
   ;; Fix of font issue, https://github.com/rougier/svg-tag-mode/issues/38
   ;; for font-get, https://emacs.stackexchange.com/questions/62046/how-to-get-size-from-font-spec
@@ -452,6 +453,18 @@
   (if (featurep :system 'linux)
     (setq-default dired-open-default-open-program "xdg-open"))
 )
+
+;; minor mode that provides support for CriticMarkup in Emacs
+;; https://github.com/joostkremers/criticmarkup-emacs/
+;;
+;;  Addition {++ ++}
+;;  Deletion {-- --}
+;;  Substitution {~~ ~> ~~}
+;;  Comment {>> <<}
+;;  Highlight {== ==}{>> <<}
+(use-package! cm-mode
+  :hook
+  (org-mode . cm-mode))
 
 
 ;; ================================================
@@ -921,44 +934,45 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
 
-(use-package! org-download
-  :init
-  (put 'org-download-image-dir 'safe-local-variable #'stringp)
-  :custom
-  ; do not use subdirectory of heading
-  (org-download-heading-lvl nil)
-  :config
-  ;; org-download-timestamp is changed in modules/lang/org/contrib/dragndrop.el, so :custom didn't work
-  (setq org-download-timestamp "%Y%m%d-%H%M%S_")
-  (setq org-download-method 'directory)
-  ; from https://emacs.stackexchange.com/questions/75983/how-to-format-org-downloads-image-saving-directorys
-  (defun my-org-download-set-dir ()
-    "Set `org-download-image-dir` to the directory of the current buffer's file."
-    (if buffer-file-name
-      (setq-local org-download-image-dir (concat "./assets/" (file-name-base buffer-file-name)))))
-  (add-hook 'org-mode-hook 'my-org-download-set-dir)
-  (add-hook 'dired-mode-hook 'org-download-enable)
-
-  ;; https://www.reddit.com/r/emacs/comments/145a3wk/orgdownload_doesnt_add_file_url_to_image_links
-  (setq org-download-link-format "[[file:%s]]\n" org-download-abbreviate-filename-function #'file-relative-name)
-  (setq org-download-link-format-function #'org-download-link-format-function-default)
-
-  ;; TODO advice the org-download-yank to check if current kill is a file name
-  (defadvice org-download-yank (around check-kill-filename activate)
-    ;; copy current kill
-    (let ((k (current-kill 0))
-          (is-kill-filename nil))
-      ;; check if current kill is a file path
-      ad-do-it
-      ;; restore the original kill-ring
-      (if is-kill-filename
-        ())
-    )
-  )
-
-  ;; TODO convert download link to file link
-  ;; see https://vxlabs.com/2020/07/25/emacs-lisp-function-convert-attachment-to-file/
-)
+;; 2024-09-02: org-download is making editing slightly large org-mode file slower, comment out for better performance
+;; (use-package! org-download
+;;   :init
+;;   (put 'org-download-image-dir 'safe-local-variable #'stringp)
+;;   :custom
+;;   ; do not use subdirectory of heading
+;;   (org-download-heading-lvl nil)
+;;   :config
+;;   ;; org-download-timestamp is changed in modules/lang/org/contrib/dragndrop.el, so :custom didn't work
+;;   (setq org-download-timestamp "%Y%m%d-%H%M%S_")
+;;   (setq org-download-method 'directory)
+;;   ; from https://emacs.stackexchange.com/questions/75983/how-to-format-org-downloads-image-saving-directorys
+;;   (defun my-org-download-set-dir ()
+;;     "Set `org-download-image-dir` to the directory of the current buffer's file."
+;;     (if buffer-file-name
+;;       (setq-local org-download-image-dir (concat "./assets/" (file-name-base buffer-file-name)))))
+;;   (add-hook 'org-mode-hook 'my-org-download-set-dir)
+;;   (add-hook 'dired-mode-hook 'org-download-enable)
+;;
+;;   ;; https://www.reddit.com/r/emacs/comments/145a3wk/orgdownload_doesnt_add_file_url_to_image_links
+;;   (setq org-download-link-format "[[file:%s]]\n" org-download-abbreviate-filename-function #'file-relative-name)
+;;   (setq org-download-link-format-function #'org-download-link-format-function-default)
+;;
+;;   ;; TODO advice the org-download-yank to check if current kill is a file name
+;;   (defadvice org-download-yank (around check-kill-filename activate)
+;;     ;; copy current kill
+;;     (let ((k (current-kill 0))
+;;           (is-kill-filename nil))
+;;       ;; check if current kill is a file path
+;;       ad-do-it
+;;       ;; restore the original kill-ring
+;;       (if is-kill-filename
+;;         ())
+;;     )
+;;   )
+;;
+;;   ;; TODO convert download link to file link
+;;   ;; see https://vxlabs.com/2020/07/25/emacs-lisp-function-convert-attachment-to-file/
+;; )
 
 (after! org-archive
   (setq org-archive-mark-done t) ; change subtree state to DONE when archived
