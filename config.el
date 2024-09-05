@@ -404,40 +404,40 @@
                                                             :end -1
                                                             :crop-left t))))
 
-      ;; Active date (with or without day name, with or without time)
-      (,(format "[\t\n ]\\(<%s>\\)\\([\t\n ]\\|$\\)" date-re) .
-       ((lambda (tag)
-          (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2))))
-      (,(format "[\t\n ]\\(<%s \\)%s>\\([\t\n ]\\|$\\)" date-re day-time-re) .
-       ((lambda (tag)
-          (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2))))
-      (,(format "[\t\n ]<%s \\(%s>\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
-       ((lambda (tag)
-          (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+      ;; ;; Active date (with or without day name, with or without time)
+      ;; (,(format "[\t\n ]\\(<%s>\\)\\([\t\n ]\\|$\\)" date-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2))))
+      ;; (,(format "[\t\n ]\\(<%s \\)%s>\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2))))
+      ;; (,(format "[\t\n ]<%s \\(%s>\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
 
-      ;; Inactive date (with or without day name, with or without time) require surrounding spaces or at end of line
-       (,(format "[\t\n ]\\(\\[%s\\]\\)\\([\t\n ]\\|$\\)" date-re) .
-        ((lambda (tag)
-           (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2 :face 'org-date))))
-       (,(format "[\t\n ]\\(\\[%s \\)%s\\]\\([\t\n ]\\|$\\)" date-re day-time-re) .
-        ((lambda (tag)
-           (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2 :face 'org-date))))
-       (,(format "[\t\n ]\\[%s \\(%s\\]\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
-        ((lambda (tag)
-           (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
+      ;; ;; Inactive date (with or without day name, with or without time) require surrounding spaces or at end of line
+      ;; (,(format "[\t\n ]\\(\\[%s\\]\\)\\([\t\n ]\\|$\\)" date-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :beg 1 :end -1 :margin 0 :padding 2 :face 'org-date))))
+      ;; (,(format "[\t\n ]\\(\\[%s \\)%s\\]\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :padding 2 :face 'org-date))))
+      ;; (,(format "[\t\n ]\\[%s \\(%s\\]\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))
 
-      ;; Date without parentheses or brackets, but need surrounding spaces or at end of line
-      (,(format "[\t\n ]\\(%s\\)\\([\t\n ]\\|$\\)" date-re) .
-       ((lambda (tag) (svg-tag-make tag :margin 0 :padding 0 :face 'org-date))))
-       (,(format "[\t\n ]\\(%s \\)%s\\([\t\n ]\\|$\\)" date-re day-time-re) .
-        ((lambda (tag)
-           (svg-tag-make tag :inverse nil :crop-right t :margin 0 :padding 0 :face 'org-date))))
-       (,(format "[\t\n ]%s \\(%s\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
-        ((lambda (tag)
-           (svg-tag-make tag :inverse t :crop-left t :margin 0 :face 'org-date))))
-                     ))
-  ;; :hook
-  ;; (org-mode . svg-tag-mode)
+      ;; ;; Date without parentheses or brackets, but need surrounding spaces or at end of line
+      ;; (,(format "[\t\n ]\\(%s\\)\\([\t\n ]\\|$\\)" date-re) .
+      ;;  ((lambda (tag) (svg-tag-make tag :margin 0 :padding 0 :face 'org-date))))
+      ;; (,(format "[\t\n ]\\(%s \\)%s\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :inverse nil :crop-right t :margin 0 :padding 0 :face 'org-date))))
+      ;; (,(format "[\t\n ]%s \\(%s\\)\\([\t\n ]\\|$\\)" date-re day-time-re) .
+      ;;  ((lambda (tag)
+      ;;     (svg-tag-make tag :inverse t :crop-left t :margin 0 :face 'org-date))))
+  ))
+  :hook
+  (org-mode . svg-tag-mode)
   :config
   ;; Fix of font issue, https://github.com/rougier/svg-tag-mode/issues/38
   ;; for font-get, https://emacs.stackexchange.com/questions/62046/how-to-get-size-from-font-spec
