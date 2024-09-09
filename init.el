@@ -109,14 +109,14 @@
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-            ;; +dragndrop
+            +dragndrop
             +gnuplot
             +contacts
             +hugo
             +ipython
             +jupyter
             +present
-            +pretty
+            ;; +pretty
             +pandoc
             +noter
             +roam2)        ; organize your plain life in plain text

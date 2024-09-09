@@ -64,6 +64,7 @@
   (package! org-noter :recipe
     (:host github :repo "org-noter/org-noter"
      :files ("*.el" "modules/*.el")))
+  (unpin! org-noter)
   ;; djvu/nov package required by org-noter-djvu/nov
   (package! djvu)
   (package! nov))
