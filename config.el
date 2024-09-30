@@ -1332,7 +1332,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 (use-package! oc
   :after org
   :custom
-  (org-cite-global-bibliography (list my/bibtex-file)))
+  (org-cite-global-bibliography (list my/bibtex-file))
+  :config
+  ;; which processor to use when exporting
+  (setq org-cite-export-processors '((beamer biblatex)
+                                     (latex biblatex)
+                                     (t csl)))
+  )
 
 (use-package! org-ref
   :config
