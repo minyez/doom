@@ -82,15 +82,17 @@
           :desc "org-drill"          "d"   #'org-drill
           :desc "org-drill-resume"   "r"   #'org-drill-resume)
         (:prefix-map ("d" . "download")
-          :desc "rename"                    "r"   #'org-download-rename-at-point
-          :desc "image from clipboard"      "p"   #'org-download-clipboard
-          :desc "download from kill URL"    "d"   #'org-download-yank)
+          :desc "Rename"                    "r"   #'org-download-rename-at-point
+          :desc "Image from clipboard"      "p"   #'org-download-clipboard
+          :desc "Download from kill URL"    "d"   #'org-download-yank)
         (:prefix-map ("i" . "input")
           :desc "Chinese (Pyim)"            "c"  '(lambda () (interactive) (set-input-method "pyim"))
           :desc "Japanese"                  "j"  '(lambda () (interactive) (set-input-method "japanese"))
           :desc "Tex"                       "t"  '(lambda () (interactive) (set-input-method "TeX")))
+        (:prefix-map ("f" . "file")
+        :desc "Find file other window"          "o"   #'find-file-other-window
+        :desc "Find project file other window"  "f"   #'projectile-find-file-other-window)
         :desc "org-roam-node-find"      "."   #'org-roam-node-find
-        :desc "Find file Other Window"  "f"   #'find-file-other-window
         :desc "org-agenda-list"         "a"   #'org-agenda-list
         :desc "Sort entries by todo"    "S"   '(lambda () (interactive) (org-sort-entries t ?o))
         :desc "org-schedule"            "s"   #'org-schedule)
@@ -389,7 +391,7 @@
       ("[ :]\\(WIP\\)[ :]" . ((lambda (tag) (svg-tag-make "WIP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
       ("[ :]\\(WAIT\\)[ :]" . ((lambda (tag) (svg-tag-make "WAIT" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
       ("[ :]\\(HOLD\\)[ :]" . ((lambda (tag) (svg-tag-make "HOLD" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
-      ("[ :]\\(CANCELLED\\)[ :]" . ((lambda (tag) (svg-tag-make "CANCELLED" :padding 0 :face '+org-todo-cancel :inverse t :margin 0))))
+      ("[ :]\\(CANCELLED\\)[ :]" . ((lambda (tag) (svg-tag-make "CANCELLED" :padding 0 :face '+org-todo-cancel :margin 0))))
       ("[ :]\\(DONE\\)[ :]" . ((lambda (tag) (svg-tag-make "DONE" :padding 0 :face 'org-done :margin 0))))
 
 
@@ -858,7 +860,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
             ("WIP" :foreground "#0098dd" :weight bold)
             ("TODO" :foreground "#8c1400" :weight bold)
             ("DONE" :foreground "#50a14f")
-            ("CANCELLED" :foreground "#ff6480" :strike-through t)
+            ("CANCELLED" :foreground "#ff6480")
              )
   )
   ;; faces for org priority, from https://emacs.stackexchange.com/a/17405
@@ -1033,7 +1035,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :after org-roam
   :init
   (setq org-roam-directory org-directory
-        org-roam-db-location (expand-file-name "org-roam.db" org-directory)
+        ;; org-roam-db-location (expand-file-name "org-roam.db" org-directory)
         org-roam-index-file "index.org"
         org-roam-graph-extra-config '(("overlap" . "false")) ; man dot for attributes setup
         )

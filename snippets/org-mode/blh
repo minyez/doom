@@ -7,7 +7,7 @@
 # --
 #+latex_compiler: ${1:xelatex}
 #+latex_class: ${2:article}
-#+latex_header: \\usepackage[hmargin=1.0in,top=1.0in,bottom=0.7in]\{geometry\}
+#+latex_header: \\usepackage[hmargin=2.0cm,top=1.0in,bottom=0.7in]\{geometry\}
 #+latex_header: %\\usepackage\{ctex\} % Chinese layout
 #+latex_header: %\\usepackage\{zxjatype\} % Japanese layout
 #+setupfile: etc/lh_symbols.org
