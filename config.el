@@ -388,7 +388,7 @@
 
       ;; TODO / DONE
       ("[ :]\\(TODO\\)[ :]" . ((lambda (tag) (svg-tag-make "TODO" :padding 0 :face 'org-todo :inverse t :margin 0))))
-      ("[ :]\\(WIP\\)[ :]" . ((lambda (tag) (svg-tag-make "WIP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
+      ("[ :]\\(WINP\\)[ :]" . ((lambda (tag) (svg-tag-make "WINP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
       ("[ :]\\(WAIT\\)[ :]" . ((lambda (tag) (svg-tag-make "WAIT" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
       ("[ :]\\(HOLD\\)[ :]" . ((lambda (tag) (svg-tag-make "HOLD" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
       ("[ :]\\(CANCELLED\\)[ :]" . ((lambda (tag) (svg-tag-make "CANCELLED" :padding 0 :face '+org-todo-cancel :margin 0))))
@@ -852,12 +852,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
   ;; TODO keywords
   ; each state with ! is recorded as state change, @ require note
-  (setq org-todo-keywords '((sequence "TODO(t)" "WIP(i)" "HOLD(h@)" "WAIT(w!)" "REV(r!)" "|" "DONE(d)" "CANCELLED(c!)"))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WINP(i)" "HOLD(h@)" "WAIT(w!)" "REVW(r!)" "|" "DONE(d)" "CANCELLED(c!)"))
         org-todo-keyword-faces
-          '(("REV" :foreground "#ff9933" :weight bold)
+          '(("REVW" :foreground "#ff9933" :weight bold)
             ("WAIT" :foreground  "#9f7efe" :underline t)
             ("HOLD" :foreground  "black" :box t)
-            ("WIP" :foreground "#0098dd" :weight bold)
+            ("WINP" :foreground "#0000c0" :weight bold)
             ("TODO" :foreground "#8c1400" :weight bold)
             ("DONE" :foreground "#50a14f")
             ("CANCELLED" :foreground "#ff6480")
