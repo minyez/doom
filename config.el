@@ -884,6 +884,14 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; org-babel related
   (setq org-babel-results-keyword "results")
   (setq org-confirm-babel-evaluate nil)  ;; do not need to confirm when evaluate
+  ;; set compiler
+  ;; (if (featurep :system 'macos) ;; use homebrew GNU C and C++ compilers on macOS
+  ;;   (progn
+  ;;     (setq-default org-babel-C-compiler "gcc-14")
+  ;;     (setq-default org-babel-C++-compiler "g++-14")
+  ;;   ))
+  ;; Force C++11 standard to avoid missing headers using compiler with old default (e.g. macOS clang)
+  (setq! org-babel-C++-compiler "g++ -std=c++11")
 
   ;; disable some tags from inheriting to descendants
   (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
