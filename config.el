@@ -877,6 +877,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
                          ("zhihu" . "https://zhuanlan.zhihu.com/p/%s")
                          ("rnote" . ,(concat my/read-note-dir "/%s.org"))
+                         ("douban" . "https://www.douban.com/subject/%s")
                          ("SO" . "https://stackoverflow.com/questions/%s")
                          ("arxiv" . "https://arxiv.org/abs/%s"))))
     (dolist (elem link-abbrev-l) (add-to-list 'org-link-abbrev-alist elem)))
