@@ -657,6 +657,7 @@
 ;; - org-cliplink
 ;; - org-download
 ;; - org-appear
+;; - org-inline-pdf
 ;; - org-archive
 ;; - org-recur
 ;; - org-ref
@@ -944,6 +945,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         org-appear-autoentities t
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
+
+(use-package! org-inline-pdf
+  :after org
+  :hook
+  (org-mode . org-inline-pdf-mode)
+  )
 
 ;; 2024-09-02: org-download is making editing slightly large org-mode file slower, comment out for better performance
 ;; 2024-09-09: uncomment, as the culprit is packages under +pretty of Doom org module
@@ -1508,7 +1515,8 @@ Caveats:
   :init
   (setq org-pandoc-options-for-markdown '((standalone . t) (preserve-tabs . t)))
   (setq org-pandoc-format-extensions
-        '(markdown-link_attributes-bracketed_spans-simple_tables-raw_tex-raw_attribute)))
+        '(markdown-link_attributes-bracketed_spans-simple_tables-raw_tex-raw_attribute-smart)))
+; -smart: to avoid escaping apostrophes (single quote)
 
 (use-package! ox-extra
   :after ox
@@ -1532,6 +1540,8 @@ Caveats:
 
   ;; prefer custom label
   (setq org-latex-prefer-user-labels t)
+  (setq org-latex-image-default-width ".6\\linewidth")
+  (setq org-latex-tables-booktabs t)
   (put 'org-latex-compiler 'safe-local-variable #'stringp)
 
   ;; remove default hyperset with author names included

@@ -28,6 +28,9 @@
 (package! cm-mode
   :recipe (:host github :repo "joostkremers/criticmarkup-emacs"))
 
+(package! org-inline-pdf
+  :recipe (:host github :repo "shg/org-inline-pdf.el"))
+
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 
