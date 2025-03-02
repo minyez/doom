@@ -28,6 +28,9 @@
 (package! cm-mode
   :recipe (:host github :repo "joostkremers/criticmarkup-emacs"))
 
+(package! org-anki
+  :recipe (:host github :repo "eyeinsky/org-anki"))
+
 (package! org-inline-pdf
   :recipe (:host github :repo "shg/org-inline-pdf.el"))
 

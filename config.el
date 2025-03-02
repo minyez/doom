@@ -663,6 +663,7 @@
 ;; - org-ref
 ;; - org-bars
 ;; - org-drill
+;; - org-anki
 ;; - org-present
 ;; - org-roam
 ;; - org-roam-bibtex
@@ -1030,6 +1031,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; reduce space, repeat more
   (setq org-drill-learn-fraction 0.30)
 )
+
+(use-package! org-anki
+  :after org)
 
 (use-package! org-tree-slide
   :after org
