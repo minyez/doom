@@ -5,8 +5,5 @@
 # group: latex
 # 
 # --
-* References
-:PROPERTIES:
-:UNNUMBERED: t
-:END:
-#+latex: \\printbibliography[heading=bibintoc]$0
+* ${1:References} :ignore:
+#+latex: \printbibliography[heading=bibintoc, title=$1]$0

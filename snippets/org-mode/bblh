@@ -5,5 +5,8 @@
 # group: latex
 # 
 # --
-#+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
-#+latex_header: \\addbibresource\{${1:bibliography.bib}\}$0
+# #+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
+# #+latex_header: \\addbibresource\{${1:bibliography.bib}\}$0
+#+latex_header: \\usepackage[maxnames=3,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
+#+setupfile: etc/lh_biblatex.org
+#+cite_export: biblatex nature
