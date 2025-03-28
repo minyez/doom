@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: local variables at the end of file
+# key: lve
+# condition: t
+# --
+# Local Variables:$0
+# End:

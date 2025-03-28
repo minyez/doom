@@ -154,7 +154,7 @@
 ;; (prettify-symbols-mode -1)
 
 (let ((font "Sarasa Fixed Slab SC Nerd Font")
-      (size 16))
+      (size 20))
   (setq doom-font (font-spec :family font :size size)
         doom-variable-pitch-font (font-spec :family font :size size)
         ;; disable unicode font size set to resolve too large icon in dashboard/treemacs
@@ -1356,6 +1356,8 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :custom
   (org-cite-global-bibliography (list my/bibtex-file))
   :config
+  ;; set the path to global bibliography as safe local variable
+  (put 'org-cite-global-bibliography 'safe-local-variable #'stringp)
   ;; which processor to use when exporting
   (setq org-cite-export-processors '((beamer biblatex)
                                      (latex biblatex)

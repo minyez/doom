@@ -15,8 +15,8 @@
       :recipe (:host github :repo "minyez/ox-pandoc"))
 (unpin! ox-pandoc)
 
-(unpin! magit)
-(unpin! transient)
+; (unpin! magit)
+; (unpin! transient)
 
 (package! ox-gfm)
 
