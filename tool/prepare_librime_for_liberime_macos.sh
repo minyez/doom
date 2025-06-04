@@ -8,8 +8,10 @@ liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/build-$EMACSVER
 
 # librime_ver=1.9.0
 # librime_name=rime-a608767-macOS.tar.bz2
-librime_ver=1.11.2
-librime_name=rime-5b09f35-macOS-universal.tar.bz2
+# librime_ver=1.11.2
+# librime_name=rime-5b09f35-macOS-universal.tar.bz2
+librime_ver=1.13.1
+librime_name=rime-1c23358-macOS-universal.tar.bz2
 
 SED=gsed
 
