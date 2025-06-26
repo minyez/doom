@@ -881,6 +881,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                          ("rnote" . ,(concat my/read-note-dir "/%s.org"))
                          ("douban" . "https://www.douban.com/subject/%s")
                          ("SO" . "https://stackoverflow.com/questions/%s")
+                         ("reddit" . "https://www.reddit.com/r/%s")
                          ("arxiv" . "https://arxiv.org/abs/%s"))))
     (dolist (elem link-abbrev-l) (add-to-list 'org-link-abbrev-alist elem)))
 
