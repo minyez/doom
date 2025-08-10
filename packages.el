@@ -18,6 +18,9 @@
 ; (unpin! magit)
 ; (unpin! transient)
 
+; https://github.com/countvajhula/mindstream
+(package! mindstream)
+
 (package! ox-gfm)
 
 (package! eldoc-box)

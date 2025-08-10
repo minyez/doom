@@ -166,6 +166,45 @@
 ;;     https://www.reddit.com/r/orgmode/comments/1eovrxa/russell_adams_mlorg_mode_2024_speedup_on_large
 (setq whitespace-style '(space-mark tab-mark))
 
+;; function to compute time difference ""
+(defun my/time-string->seconds (s)
+  "Convert S to total seconds.
+Accepts \"HH:MM:SS\", \"MM:SS\", or \"SS\" (seconds may be float).
+Allows hours > 24, and minute/second overflow (they’re just summed).
+Leading + or - and surrounding whitespace are allowed."
+  (unless (and s (stringp s))
+    (user-error "Expected a time string, got: %S" s))
+  (let* ((str (string-trim s))
+         (sign (if (and (> (length str) 0)
+                        (member (aref str 0) '(?- ?+)))
+                   (prog1 (if (eq (aref str 0) ?-) -1 1)
+                     (setq str (substring str 1)))
+                 1))
+         (parts (split-string str ":" t "[ \t]+"))
+         (nums  (mapcar #'string-to-number parts))
+         (h 0) (m 0) (sec 0.0))
+    (pcase (length nums)
+      (3 (setq h (nth 0 nums) m (nth 1 nums) sec (nth 2 nums)))
+      (2 (setq m (nth 0 nums) sec (nth 1 nums)))
+      (1 (setq sec (nth 0 nums)))
+      (_ (user-error "Bad time format: %S" s)))
+    (* sign (+ (* h 3600) (* m 60) sec))))
+
+(defun my/time-diff-hours (time1 time2 &optional absolute unit)
+  "Return (TIME1 - TIME2) in hours as a float.
+TIME1 and TIME2 can be \"HH:MM:SS\", \"MM:SS\", or \"SS\" (seconds may be float).
+If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
+  (let* ((s1 (my/time-string->seconds time1))
+         (s2 (my/time-string->seconds time2))
+         (diff (- s1 s2)))
+    (when absolute (setq diff (abs diff)))
+    (pcase (or unit 'hour)
+      ('day    (/ diff 86400.0))
+      ('hour   (/ diff 3600.0))
+      ('minute (/ diff 60.0))
+      ('second (float diff))
+      (_ (user-error "Unknown unit: %S" unit)))))
+
 ;; Theme setup
 (use-package! emacs
   :init
