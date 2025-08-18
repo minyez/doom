@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+# key: me
+# name: my information
+# uuid: me
+# group: attr
+# 
+# --
+#+author: `(format "%s" user-full-name)`
+#+email: `(format "%s" user-mail-address)`

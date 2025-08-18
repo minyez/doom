@@ -94,3 +94,17 @@
 
 (package! easy-hugo)
 (package! easy-jekyll)
+
+(package! org-modern-indent
+  :recipe (:host github :repo "jdtsmith/org-modern-indent"))
+
+(package! eglot-booster
+  :recipe (:host github :repo "jdtsmith/eglot-booster"))
+
+(package! highlight-doxygen
+  :recipe (:host github :repo "Lindydancer/highlight-doxygen"))
+
+(package! llm-tool-collection
+  :recipe (:host github :repo "skissue/llm-tool-collection"))
+
+(package! rainbow-delimiters)

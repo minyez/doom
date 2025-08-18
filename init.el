@@ -12,7 +12,7 @@
        ;;helm            ; the *other* search engine for love and life
        ;;ido             ; the other *other* search engine...
        ;;ivy             ; a search engine for love and life
-       (corfu +icons)
+       (corfu +icons +orderless)
        (vertico +icons
                 +childframe)  ; the search engine of the future
 
@@ -49,7 +49,7 @@
        word-wrap
 
        :emacs
-       (dired +icons)    ; making dired pretty [functional]
+       (dired +dirvish +icons)    ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        (ibuffer +icons)  ; interactive buffer management
        (undo +tree)      ; persistent, smarter undo for your inevitable mistakes
@@ -62,7 +62,7 @@
        vterm             ; the best terminal emulation in Emacs
 
        :checkers
-       syntax              ; tasing you for every semicolon you forget
+       (syntax +childframe +icons)  ; tasing you for every semicolon you forget
        (spell +flyspell
               +hunspell)   ; tasing you for misspelling mispelling
        ; grammar             ; tasing grammar mistake every you make
@@ -77,6 +77,7 @@
        ein                 ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        (lookup +docsets)   ; navigate your code and its documentation
+       llm
        (lsp +eglot)        ; M-x vscode
        (magit +forge)      ; a git porcelain for Emacs
        make                ; run make tasks from Emacs
@@ -89,23 +90,23 @@
        upload              ; map local to remote projects via ssh/ftp
 
        :os
-       (:if IS-MAC macos)  ; improve compatibility with macOS
+       (:if (featurep :system 'macos) macos)  ; improve compatibility with macOS
        ;;tty               ; improve the terminal Emacs experience
 
        :lang
-       ;;(cc +lsp)         ; C > C++ == 1
+       (cc +lsp +tree-sitter)  ; C > C++ == 1
        ;;clojure           ; java with a lisp
        data                ; config/data formats
        ;;elm               ; care for a cup of TEA?
-       (emacs-lisp +treesitter)       ; drown in parentheses
+       emacs-lisp       ; drown in parentheses
        fortran             ; in FORTRAN, GOD is REAL (unless declared INTEGER)
-       (json +treesitter)  ; At least it ain't XML
+       (json +tree-sitter)  ; At least it ain't XML
        javascript          ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
        (latex +latexmk
               +cdlatex)    ; writing papers in Emacs has never been so fun
        lua               ; one-based indices? one-based indices
-       markdown            ; writing docs for people to ignore
+       (markdown +grip)    ; writing docs for people to ignore
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
