@@ -23,19 +23,19 @@
 
 (defvar my/org-roam-inbox
   (expand-file-name my/org-dir)
-  "location where usual org-roam-capture goes")
+  "Location where usual org-roam-capture goes")
 
 (defvar my/read-note-dir
   (expand-file-name "Review/" (concat my/org-dir))
-  "directory for reading notes")
+  "Directory for reading notes")
 
 (defvar my/bibtex-file
   (expand-file-name "etc/bibliography.bib" my/org-dir)
-  "all-in-one bibtex file for referecnes")
+  "All-in-one bibtex file for referecnes")
 
 (defvar my/literature-note-dir
   (expand-file-name "Paper/" my/org-dir)
-  "Directory to store the notes of literature")
+  "Directory to store the notes of literature for my research")
 
 (defvar my/talk-note-dir
   (expand-file-name "Talk/" my/org-dir)
@@ -223,13 +223,18 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
 )
 (setq doom-theme 'modus-operandi)
 
-;; dashboard configuration
 ;; set custom splash image if it exists
-(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
- (if (file-exists-p img)
-   (setq fancy-splash-image img)))
+;(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
+; (if (file-exists-p img)
+;   (setq fancy-splash-image img)))
 
+;; dashboard configuration
 (when (modulep! :ui doom-dashboard)
+  ;; set custom splash image if it exists
+  (let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
+   (if (file-exists-p img)
+     (setq +doom-dashboard-banner-file img)))
+
   ;; remove the footer, i.e. the GitHub icon
   (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
   ;; remove short menu
@@ -1833,6 +1838,14 @@ Caveats:
   ;;        :desc "Switch to project"  "p"  'projectile-switch-project))
 )
 
+;(with-eval-after-load 'doom-modeline
+;  ;; Replace doom-modeline's 'media modeline with a simpler one
+;  (doom-modeline-def-modeline 'media
+;    '(bar window-number buffer-size buffer-info)   ;; left side (no media-info)
+;    '(misc-info major-mode process vcs))           ;; right side
+;  ;; Apply it to image-mode buffers
+;  (add-hook 'image-mode-hook
+;            (lambda () (doom-modeline-set-modeline 'media t))))
 
 ;; ================================================
 ;; Blogging
