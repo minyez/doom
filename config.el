@@ -1138,11 +1138,11 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         `(
           ("d" "default quick note" plain "%?"
            :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
-                              "#+title: ${title}\n#+startup: content\n#+created: %U\n")
+                              "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: content\n#+created: %U\n")
            :unnarrowed t)
           ("l" "Note for latex export" plain "%?"
            :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
-                               "#+title: ${title}
+                               "# -*- truncate-lines: t -*-\n#+title: ${title}
 #+startup: content
 #+created: %U\n
 #+latex_compiler: pdflatex
@@ -1161,11 +1161,11 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
            :unnarrowed t)
           ("b" "non-STEM book note" plain "%?"
            :if-new (file+head ,(expand-file-name "${slug}.org" my/read-note-dir)
-           "#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
+           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
            :unnarrowed t)
           ("t" "talk note" plain "%?"
            :if-new (file+head ,(expand-file-name "%<%Y%m%d>-${slug}.org" my/talk-note-dir)
-           "#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
+           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
            :unnarrowed t)
          ))
 )
