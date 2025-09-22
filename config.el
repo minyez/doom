@@ -1,6 +1,6 @@
 ;;; config.el -*- lexical-binding: t; -*-
 
-(setq user-full-name "Minye Zhang"
+(setq user-full-name "Min-Ye Zhang"
       user-mail-address "minyez.physchem@gmail.com")
 
 ; (add-to-list 'load-path (concat doom-private-dir "lisp"))
@@ -1140,32 +1140,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
            :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
                               "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: content\n#+created: %U\n")
            :unnarrowed t)
-          ("l" "Note for latex export" plain "%?"
-           :if-new (file+head ,(expand-file-name "${slug}.org" my/org-roam-inbox)
-                               "# -*- truncate-lines: t -*-\n#+title: ${title}
-#+startup: content
-#+created: %U\n
-#+latex_compiler: pdflatex
-#+latex_class: article
-#+latex_header: \\usepackage[hmargin=1.0in, top=1.0in, bottom=0.7in]{geometry}
-#+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]{biblatex}
-#+latex_header: \\addbibresource{etc/bibliography.bib}
-# include commands preset
-#+setupfile: lh_symbols.org
-#+setupfile: lh_biblatex.org
-#+options: toc:nil tags:nil title:t email:nil author:t date:t
-
-# a link-colored toc
-#+latex: {\\hypersetup{linkcolor=Blue}\\tableofcontents}
-#+latex: \\clearpage\n\n* References\n#+latex: \\printbibliography[heading=none]")
-           :unnarrowed t)
           ("b" "non-STEM book note" plain "%?"
            :if-new (file+head ,(expand-file-name "${slug}.org" my/read-note-dir)
-           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
+           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t email:t author:t date:t ^:{} broken-links:t prop:t\n")
            :unnarrowed t)
           ("t" "talk note" plain "%?"
            :if-new (file+head ,(expand-file-name "%<%Y%m%d>-${slug}.org" my/talk-note-dir)
-           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t\n")
+           "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t email:t author:t date:t ^:{} broken-links:t prop:t\n")
            :unnarrowed t)
          ))
 )
