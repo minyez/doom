@@ -1169,7 +1169,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
           `("r" "reference" plain "%?"
            :if-new (file+head
            ,(expand-file-name "note-${citekey}.org" my/literature-note-dir)
-           ":PROPERTIES:
+           "# -*- truncate-lines: t -*-\n:PROPERTIES:
 :TITLE: ${title}
 :AUTHOR: ${author-or-editor}
 :JOURNAL: ${journaltitle}
