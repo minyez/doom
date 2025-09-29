@@ -1006,6 +1006,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :custom
   ; do not use subdirectory of heading
   (org-download-heading-lvl nil)
+  (org-download-disable-id-create t)
   :config
   ;; org-download-timestamp is changed in modules/lang/org/contrib/dragndrop.el, so :custom didn't work
   (setq org-download-timestamp "%Y%m%d-%H%M%S_")

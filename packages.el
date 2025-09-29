@@ -37,6 +37,10 @@
 (package! org-inline-pdf
   :recipe (:host github :repo "shg/org-inline-pdf.el"))
 
+(unpin! org-download)
+(package! org-download
+  :recipe (:host github :repo "minyez/org-download"))
+
 (if (modulep! :lang org +pretty)
     (package! org-fancy-priorities :disable t))
 
