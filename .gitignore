@@ -26,5 +26,8 @@
 # custom.el
 # lisp/*.el
 
+tool/*
+!tool/*.sh
+
 # for make
 # .build_stamp.txt

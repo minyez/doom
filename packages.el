@@ -62,6 +62,9 @@
 (package! citeproc)
 (package! zotxt) ;; Emacs interface to zotxt of Zotero
 
+(package! qe-mode
+  :recipe (:local-repo "lisp/qe-modes"))
+
 (package! org-bar
   :recipe (:host github :repo "tonyaldon/org-bars"))
 

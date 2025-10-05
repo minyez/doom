@@ -1840,3 +1840,11 @@ Caveats:
 ;;   :config
 ;;   (easy-hugo-enable-menu)
 ;; )
+
+
+;; ================================================
+;; Local packages
+;;
+;; - qe-modes
+;; ================================================
+(use-package! qe-modes)
