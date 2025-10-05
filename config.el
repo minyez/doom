@@ -946,6 +946,49 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
     (add-to-list 'org-tags-exclude-from-inheritance elem))
 )
 
+(cl-defun my/org-babel-execute-by-name (block-name &key (silent t) (no-confirm t))
+  "Execute a named src block BLOCK-NAME in the current Org buffer.
+
+:silent      non-nil (default t), suppress minibuffer messages.
+:no-confirm  non-nil (default t), disable confirmation prompts."
+  ;; The following code to check available code block names by interactive
+  ;; is copied from org-babel-goto-named-src-block.
+  ;; Maybe is there a way to reuse its interactive code?
+  (interactive
+    (let ((completion-ignore-case t)
+          (case-fold-search t)
+          (all-block-names (org-babel-src-block-names)))
+      (list
+        (completing-read "source-block name: " all-block-names nil t
+          (let* ((context (org-element-context))
+                 (type (org-element-type context))
+                 (noweb-ref
+                   (and (memq type '(inline-src-block src-block))
+                     (org-in-regexp (org-babel-noweb-wrap)))))
+            (cond
+              (noweb-ref
+                (buffer-substring (+ (car noweb-ref) (length org-babel-noweb-wrap-start))
+                (- (cdr noweb-ref) (length org-babel-noweb-wrap-end))))
+              ((memq type '(babel-call inline-babel-call)) ;#+CALL:
+               (org-element-property :call context))
+              ((car (org-element-property :results context))) ;#+RESULTS:
+              ((let ((symbol (thing-at-point 'symbol))) ;Symbol.
+                 (and symbol (member-ignore-case symbol all-block-names) symbol)))
+              (t "")))))))
+  (org-with-wide-buffer
+    (save-excursion
+      (org-babel-goto-named-src-block block-name)
+      (let* ((el (org-element-at-point))
+             (etype (org-element-type el))
+             (ename (org-element-property :name el)))
+        (unless (and (eq etype 'src-block)
+                     (string= (or ename "") block-name))
+          (user-error "No src block named %s" block-name))
+        (let* ((inhibit-message silent)
+               (org-confirm-babel-evaluate (if no-confirm nil org-confirm-babel-evaluate)))
+          (org-babel-execute-src-block))))))
+
+
 (after! org
   ;; create ID if there is no CUSTOM_ID
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
