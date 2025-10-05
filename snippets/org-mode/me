@@ -6,4 +6,4 @@
 # 
 # --
 #+author: `(format "%s" user-full-name)`
-#+email: `(format "%s" user-mail-address)`
+#+email:  `(format "%s" user-mail-address)`

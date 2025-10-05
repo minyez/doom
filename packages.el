@@ -60,6 +60,7 @@
 (package! bibtex-completion)
 (package! citar)
 (package! citeproc)
+(package! zotxt) ;; Emacs interface to zotxt of Zotero
 
 (package! org-bar
   :recipe (:host github :repo "tonyaldon/org-bars"))

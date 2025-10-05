@@ -1366,6 +1366,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 ;; - org-cite (oc)
 ;; - citar
 ;; - citeproc
+;; - zotxt-emacs
 ;; ================================================
 
 ;; for org-ref completion
@@ -1412,6 +1413,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
 (use-package! citeproc)
 
+(use-package! zotxt)
 
 ;; ================================================
 ;; org export setup
