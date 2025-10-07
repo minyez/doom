@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+# key: _tlnote
+# name: Template of org-mode note for LaTeX export
+# uuid: _tlnote
+# group: latex
+# 
+# --
+#+latex_compiler: pdflatex
+#+latex_class: article
+#+options: toc:nil tags:nil title:t email:nil author:t date:t ^:{} broken-links:t prop:t
+#+latex_header: \\usepackage[hmargin=2.0cm,top=1.0in,bottom=0.7in]\{geometry\}
+# Language support
+# #+latex_header: \\usepackage\{ctex\} % Chinese layout
+# #+latex_header: \\usepackage\{zxjatype\} % Japanese layout
+# Bibliography support
+# #+latex_header: \\usepackage[maxnames=3,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
+# #+latex_header: \\addbibresource\{bibliography.bib}\}
+# #+cite_export: biblatex phys
+# Other personal configurations
+# #+latex_header: \\usepackage\{macros-minyez\} % Personal setups
+
+# Optional forewords right between title and toc
+
+# a link-colored toc
+#+latex: \{\\hypersetup\{linkcolor=Blue\}\\tableofcontents\}
+#+latex: \\clearpage
+
+* Section 1
+$0
+
+# * References     :ignore:
+# #+printbibliography: :heading bibintoc :title References
+
+# * Appendix       :ignore:
+# #+latex: \\clearpage\\appendix
+
+# * Sample appendix

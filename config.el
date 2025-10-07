@@ -49,8 +49,10 @@
 (defvar my/org-latex-classes-common-header-passoptions
   (s-join "\n"
     '("\\PassOptionsToPackage{dvipsnames,x11names,table}{xcolor}"
-      "\\PassOptionsToPackage{colorlinks=true,linkcolor=,filecolor=Red,citecolor=Green,urlcolor=Rhodamine,pdfborder={0 0 0},breaklinks=true,linktoc=all}{hyperref}"))
+      "\\PassOptionsToPackage{colorlinks=true,linkcolor=,filecolor=Red,citecolor=Green,urlcolor=Gray,pdfborder={0 0 0},breaklinks=true,linktoc=all}{hyperref}"))
   "PassOptions setting before document class, included in org-latex-classes for exporting org to latex")
+; urlcolor=Rhodamine too bright
+; urlcolor=Gray
 
 (defvar my/org-latex-classes-common-header-after-default-pkgs
   (s-join "\n"
@@ -944,6 +946,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; disable some tags from inheriting to descendants
   (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
     (add-to-list 'org-tags-exclude-from-inheritance elem))
+
+  ;; some safe eval forms for personal use
+  ;; sns plot update
+  (add-to-list 'safe-local-eval-forms
+               '(add-hook 'before-save-hook
+                          (lambda ()
+                            (my/org-babel-execute-by-name "run-plot-sns")) nil t))
 )
 
 (cl-defun my/org-babel-execute-by-name (block-name &key (silent t) (no-confirm t))
@@ -1452,6 +1461,8 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq citar-format-reference-function 'citar-citeproc-format-reference
         citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
         citar-citeproc-csl-style "aps-modified.csl")
+  ;; nil or string
+  (put 'citar-bibliography 'safe-local-variable '(lambda (x) (if x (stringp x) t)))
 )
 
 (use-package! citeproc)
@@ -1621,6 +1632,7 @@ Caveats:
   (setq org-latex-image-default-width ".6\\linewidth")
   (setq org-latex-tables-booktabs t)
   (put 'org-latex-compiler 'safe-local-variable #'stringp)
+  (put 'org-latex-hyperref-template 'safe-local-variable #'stringp)
 
   ;; remove default hyperset with author names included
   ;; for local variable setup, use for each file
@@ -1765,7 +1777,7 @@ Caveats:
 
 (use-package! ox-beamer
   :bind
-  ("C-c x b" . org-beamer-export-to-latex)
+  ("C-c x L" . org-beamer-export-to-latex)
   ("C-c x O" . org-beamer-export-to-pdf)
   :config
   ; default 3rd level heading as frame.
