@@ -28,10 +28,12 @@
 * Section 1
 $0
 
-# * References     :ignore:
-# #+printbibliography: :heading bibintoc :title References
+* References     :ignore:
+# Use either. The first may not work, second gauranteed
+#+printbibliography: :heading bibintoc :title References
+#+latex: \printbibliography[heading=bibintoc,title=References]
 
-# * Appendix       :ignore:
-# #+latex: \\clearpage\\appendix
+* Appendix       :ignore:
+#+latex: \\clearpage\\appendix
 
-# * Sample appendix
+* Sample appendix

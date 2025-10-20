@@ -25,6 +25,9 @@
 
 (package! eldoc-box)
 
+; https://github.com/astoff/devdocs.el
+(package! devdocs)
+
 (package! crux
   :recipe (:host github :repo "bbatsov/crux"))
 

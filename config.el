@@ -101,7 +101,9 @@
 
       ;; supplement existing map
       (:prefix-map ("t" . "toggle")
-        :desc "truncate-lines"       "L"   #'toggle-truncate-lines)
+        ;; :desc "truncate-lines"       "L"   #'toggle-truncate-lines
+        :desc "treemacs"             "t"   #'+treemacs/toggle
+      )
 
       ;; supplement existing map
       (:prefix-map ("r" . "reference")
@@ -920,6 +922,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; more link abbreviaiton
   (let ((link-abbrev-l `(("ytb" . "https://www.youtube.com/watch?v=%s")
                          ("mp" . "https://next-gen.materialsproject.org/materials/mp-%s")
+                         ("gist" . "https://gist.github.com/%s")
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
@@ -1442,6 +1445,8 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq org-cite-export-processors '((beamer biblatex)
                                      (latex biblatex)
                                      (t csl)))
+  ;; nil or string
+  (put 'org-cite-global-bibliography 'safe-local-variable '(lambda (x) (or (null x) (stringp x))))
   )
 
 (use-package! org-ref
@@ -1462,7 +1467,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
         citar-citeproc-csl-style "aps-modified.csl")
   ;; nil or string
-  (put 'citar-bibliography 'safe-local-variable '(lambda (x) (if x (stringp x) t)))
+  (put 'citar-bibliography 'safe-local-variable '(lambda (x) (or (null x) (stringp x))))
 )
 
 (use-package! citeproc)
@@ -1622,6 +1627,8 @@ Caveats:
   :bind
   ("C-c x l" . org-latex-export-to-latex)
   ("C-c x o" . org-latex-export-to-pdf)
+  :custom
+  (org-latex-default-figure-position "H") ;; require float package, but I have
   :config
 
   ;; use latexmk to automate toolchain
@@ -1641,6 +1648,7 @@ Caveats:
   ;; default packages to load right after documentclass at first
   (setq org-latex-default-packages-alist
     '(
+      ;; (option, package, include-in-equation-preview? compilers)
       ("" "amsmath" t) ; to avoid iint and iiint error
       ("" "amssymb" t)
       ("" "wasysym" t) ; last to avoid iint and iint error
@@ -1677,6 +1685,7 @@ Caveats:
   ; packages to load at last
   (setq org-latex-packages-alist
     '(
+      ;; (option, package, include-in-equation-preview? compilers)
       ; hyperref and cleverf should be the last packages to load
       ("" "hyperref"  nil)
       ("" "cleveref"  nil)
@@ -1896,6 +1905,12 @@ Caveats:
 ;;   (easy-hugo-enable-menu)
 ;; )
 
+;; ================================================
+;; Programming
+;;
+;; - devdocs : API documentation
+;; ================================================
+(use-package! devdocs)
 
 ;; ================================================
 ;; Local packages
