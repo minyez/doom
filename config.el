@@ -902,12 +902,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; commonly used constants for formulas
   (setq org-table-formula-constants
         '(("pi" . "3.14159265358")
-          ("RY" . "13.60569301")
+          ("RY" . "13.60569301") ; Ryderbg
           ("HBAR" . "1.0545718e-34")
           ("EPS0" . "8.8541878128e−12")
           ("FSCA" . "0.0072973525664")
-          ("KB" . "1.38064852e-23")
-          ("CLIGHT" . "2.99792458e8")
+          ("KB" . "1.38064852e-23") ; Boltzman constant
+          ("CLIGHT" . "2.99792458e8") ; light speed
           ("CE" . "1.6021766208e-19") ; electron charge
           ("BOHR2ANG" . "0.5291772")
           ("ANG2M" . "1e-10")
@@ -924,9 +924,9 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   (setq org-todo-keywords '((sequence "TODO(t)" "WINP(i)" "HOLD(h@)" "WAIT(w!)" "REVW(r!)" "|" "DONE(d)" "CANCELLED(c!)"))
         org-todo-keyword-faces
           '(("REVW" :foreground "#ff9933" :weight bold)
-            ("WAIT" :foreground  "#9f7efe" :underline t)
-            ("HOLD" :foreground  "black" :box t)
-            ("WINP" :foreground "#0000c0" :weight bold)
+            ("WAIT" :foreground "#9f7efe" :underline t)
+            ("HOLD" :foreground "black" :box t)
+            ("WINP" :foreground "#4a71b4" :weight bold)
             ("TODO" :foreground "#8c1400" :weight bold)
             ("DONE" :foreground "#50a14f")
             ("CANCELLED" :foreground "#ff6480")
