@@ -651,7 +651,11 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
 
 
 ;; ================================================
-;; undo-tree
+;; Editing and logging
+;;
+;; - undo-tree
+;; - mindstream : write scratch text
+;; - command-log-mode : command history
 ;; ================================================
 (after! undo-tree
   (defun radian--undo-tree-suppress-undo-history-saved-message
@@ -667,10 +671,24 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
   (advice-add #'undo-tree-load-history :around
               #'radian--undo-tree-suppress-buffer-modified-message))
 
+(use-package! mindstream
+  :custom
+  ;; only archive when instructed
+  (mindstream-persist t)
+  ;; allow multiple active sessions at a time for a certain template
+  (mindstream-unique nil)
+  ;; path to find templates
+  (mindstream-template-path (concat doom-private-dir "templates/mindstream"))
+  ;; path to save the thought for further editing
+  (setq mindstream-save-session-path my/org-dir)
+  :config
+  ;; active and archive thoughts under cloud
+  (let ((root (concat (file-name-as-directory (getenv "HOME")) "Library/CloudStorage/Dropbox/mindstream")))
+    (setq mindstream-path (expand-file-name "anon/" root)
+          mindstream-archive-path (expand-file-name "archive/" root)))
+  (mindstream-mode)
+)
 
-;; ================================================
-;; command-log-mode
-;; ================================================
 (use-package! command-log-mode)
 
 
