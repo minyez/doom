@@ -437,6 +437,7 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
       ;; TODO / DONE
       ("[ :]\\(TODO\\)[ :]" . ((lambda (tag) (svg-tag-make "TODO" :padding 0 :face 'org-todo :inverse t :margin 0))))
       ("[ :]\\(WINP\\)[ :]" . ((lambda (tag) (svg-tag-make "WINP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
+      ("[ :]\\(WIP\\)[ :]" . ((lambda (tag) (svg-tag-make  "WIP" :padding 0 :face '+org-todo-active :inverse t :margin 0))))
       ("[ :]\\(WAIT\\)[ :]" . ((lambda (tag) (svg-tag-make "WAIT" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
       ("[ :]\\(HOLD\\)[ :]" . ((lambda (tag) (svg-tag-make "HOLD" :padding 0 :face '+org-todo-onhold :inverse t :margin 0))))
       ("[ :]\\(CANCELLED\\)[ :]" . ((lambda (tag) (svg-tag-make "CANCELLED" :padding 0 :face '+org-todo-cancel :margin 0))))
