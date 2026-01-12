@@ -944,6 +944,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                          ("gist" . "https://gist.github.com/%s")
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
                          ("issn" . "http://books.google.com/books?vid=ISSN%s")
+                         ("doi" . "https://dx.doi.org/%s")
                          ("cnwiki" . "https://zh.wikipedia.org/zh-cn/%s")
                          ("zhihu" . "https://zhuanlan.zhihu.com/p/%s")
                          ("rnote" . ,(concat my/read-note-dir "/%s.org"))
@@ -975,6 +976,12 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
                '(add-hook 'before-save-hook
                           (lambda ()
                             (my/org-babel-execute-by-name "run-plot-sns")) nil t))
+  ;; automatic latex export
+  (add-to-list 'safe-local-eval-forms
+               '(add-hook 'after-save-hook 'org-latex-export-to-latex nil t))
+  ;; automatic beamer export
+  (add-to-list 'safe-local-eval-forms
+               '(add-hook 'after-save-hook 'org-beamer-export-to-latex nil t))
 )
 
 (cl-defun my/org-babel-execute-by-name (block-name &key (silent t) (no-confirm t))
@@ -1231,7 +1238,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   :hook
   (org-mode . org-roam-bibtex-mode)
   :config
-  (require 'org-ref)
+  ; (require 'org-ref)
   ; (setq org-ref-notes-function 'orb-edit-notes)
   (setq orb-preformat-keywords
     '("citekey"  "title" "author-or-editor" "date" "doi" "file" "journaltitle" "volume" "pages"))

@@ -5,8 +5,10 @@
 # group: latex
 # 
 # --
-# #+latex_header: \\usepackage[maxnames=3,style=nature,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
-# #+latex_header: \\addbibresource\{${1:bibliography.bib}\}$0
-#+latex_header: \\usepackage[maxnames=3,date=year,url=false,isbn=false,articletitle=false]\{biblatex\}
-#+setupfile: etc/lh_biblatex.org
+#+latex_header: \\usepackage[maxnames=99,date=year,url=false,isbn=false,articletitle=false,sorting=none,backref=false]\{biblatex\}
 #+cite_export: biblatex nature
+# # For Beamer slides
+# #+latex_header: \\usepackage[maxnames=99,maxcitenames=1,date=year,url=false,isbn=false,articletitle=true,sorting=none,backref=false]{biblatex}
+# #+cite_export: biblatex bibstyle=nature,citestyle=authoryear
+# #+latex_header: \\addbibresource\{${1:bibliography.bib}\}$0
+#+setupfile: etc/lh_biblatex.org
