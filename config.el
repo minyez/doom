@@ -121,6 +121,9 @@
 (map!
   :nv "SPC m u" #'outline-up-heading)
 
+;; treat _ as part of a word
+(add-hook 'prog-mode-hook (lambda () (modify-syntax-entry ?_ "w")))
+(add-hook 'org-mode-hook (lambda () (modify-syntax-entry ?_ "w")))
 
 (use-package! key-chord
   :config
@@ -208,6 +211,69 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
       ('minute (/ diff 60.0))
       ('second (float diff))
       (_ (user-error "Unknown unit: %S" unit)))))
+
+(defun my/toggle-wrap-at-point-or-region (pre post &optional thing)
+  "Toggle wrapping region or THING at point with PRE and POST.
+
+If region is active, operate on it.
+Otherwise operate on THING at point (default: 'symbol).
+
+Toggles both cases:
+- PRE ... POST are just outside the target
+- target itself already begins with PRE and ends with POST
+
+Keeps point in a sensible place."
+  (interactive
+   (let ((pre  (read-string "pre: "))
+         (post (read-string "post: ")))
+     (list pre post)))
+  (let* ((thing (or thing 'symbol))
+         (orig-pt (point))
+         (bds (if (use-region-p)
+                  (cons (region-beginning) (region-end))
+                (or (bounds-of-thing-at-point thing)
+                    (user-error "No %S at point" thing))))
+         (beg (car bds))
+         (end (cdr bds))
+         (pre-len (length pre))
+         (post-len (length post)))
+
+    ;; Helper predicates
+    (cl-labels
+        ((inside-wrapped-p ()
+           (and (>= (- end beg) (+ pre-len post-len))
+                (string= (buffer-substring-no-properties beg (+ beg pre-len)) pre)
+                (string= (buffer-substring-no-properties (- end post-len) end) post)))
+         (outside-wrapped-p ()
+           (let ((pre-beg (- beg pre-len))
+                 (post-end (+ end post-len)))
+             (and (<= (point-min) pre-beg)
+                  (<= post-end (point-max))
+                  (string= (buffer-substring-no-properties pre-beg beg) pre)
+                  (string= (buffer-substring-no-properties end post-end) post)))))
+
+      (save-excursion
+        (cond
+         ;; Case A: the thing itself is already PRE...POST
+         ((inside-wrapped-p)
+          (delete-region (- end post-len) end)
+          (delete-region beg (+ beg pre-len))
+          ;; restore point roughly
+          (goto-char (max (point-min) (- orig-pt pre-len))))
+
+         ;; Case B: PRE/POST are just outside the thing
+         ((outside-wrapped-p)
+          (let ((pre-beg (- beg pre-len))
+                (post-end (+ end post-len)))
+            (delete-region end post-end)
+            (delete-region pre-beg beg)
+            (goto-char (max (point-min) (- orig-pt pre-len)))))
+
+         ;; Otherwise wrap it
+         (t
+          (goto-char end) (insert post)
+          (goto-char beg) (insert pre)
+          (goto-char (+ orig-pt pre-len))))))))
 
 ;; Theme setup
 (use-package! emacs
@@ -820,11 +886,13 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
         ("C-c i" . my/org-insert-image)
         ("C-c C-i" . org-time-stamp-inactive)
         ("C-c e v" . (lambda () "make verbatim"       (interactive) (org-emphasize 61)))  ; =
-        ("C-c e b" . (lambda () "make bold"           (interactive) (org-emphasize 42)))  ; *
         ("C-c e s" . (lambda () "make strike-through" (interactive) (org-emphasize 43)))  ; +
-        ("C-c e i" . (lambda () "make italic"         (interactive) (org-emphasize 47)))  ; /
-        ("C-c e u" . (lambda () "make underline"      (interactive) (org-emphasize 95)))  ; _
-        ("C-c e c" . (lambda () "make code"           (interactive) (org-emphasize 126))) ; ~
+        ("s-b" . (lambda () "toggle current word/region bold" (interactive) (my/toggle-wrap-at-point-or-region "*" "*")))
+        ("s-i" . (lambda () "toggle current word/region italic" (interactive) (my/toggle-wrap-at-point-or-region "/" "/")))
+        ;; will overwrite evil-yank
+        ("s-c" . (lambda () "toggle current word/region code" (interactive) (my/toggle-wrap-at-point-or-region "~" "~")))
+        ;; ("s-v" . (lambda () "toggle current word/region verbatim" (interactive) (my/toggle-wrap-at-point-or-region "=" "=")))
+        ("s-u" . (lambda () "toggle current word/region underline" (interactive) (my/toggle-wrap-at-point-or-region "_" "_")))
       )
   :config
   (map! :map org-mode-map

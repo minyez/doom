@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+# key: bcols
+# name: beamer columns environment
+# uuid: bcols
+# group: latex
+# 
+# --
+#+beamer: \begin{columns}[T,onlytextwidth] % T,c,b
+#+beamer: \begin{column}{0.495\textwidth}
+$0
+#+beamer: \end{column}
+#+beamer: \begin{column}{0.495\textwidth}
+#+beamer: \end{column}
+#+beamer: \end{columns}
