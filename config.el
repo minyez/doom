@@ -31,7 +31,7 @@
 
 (defvar my/bibtex-file
   (expand-file-name "etc/bibliography.bib" my/org-dir)
-  "All-in-one bibtex file for referecnes")
+  "All-in-one bibtex file for references")
 
 (defvar my/literature-note-dir
   (expand-file-name "Paper/" my/org-dir)
@@ -212,23 +212,27 @@ If ABSOLUTE is non-nil, return |TIME1 - TIME2|."
       ('second (float diff))
       (_ (user-error "Unknown unit: %S" unit)))))
 
-(defun my/toggle-wrap-at-point-or-region (pre post &optional thing)
+(defvar my/toggle-wrap-move-to-end t
+  "If non-nil, `my/toggle-wrap-at-point-or-region' moves point to end after toggling.")
+
+(defun my/toggle-wrap-at-point-or-region (pre post &optional thing move-to-end)
   "Toggle wrapping region or THING at point with PRE and POST.
 
-If region is active, operate on it.
-Otherwise operate on THING at point (default: 'symbol).
+- If region is active: operate on the region.
+- Otherwise: operate on bounds of THING at point (default: 'symbol).
 
 Toggles both cases:
-- PRE ... POST are just outside the target
-- target itself already begins with PRE and ends with POST
+1) PRE/POST are just outside the target
+2) target itself already begins with PRE and ends with POST
 
-Keeps point in a sensible place."
+If MOVE-TO-END is non-nil (or `my/toggle-wrap-move-to-end' is non-nil),
+move point to the end of the (un)wrapped text."
   (interactive
    (let ((pre  (read-string "pre: "))
          (post (read-string "post: ")))
      (list pre post)))
   (let* ((thing (or thing 'symbol))
-         (orig-pt (point))
+         (move-to-end (if (null move-to-end) my/toggle-wrap-move-to-end move-to-end))
          (bds (if (use-region-p)
                   (cons (region-beginning) (region-end))
                 (or (bounds-of-thing-at-point thing)
@@ -237,8 +241,6 @@ Keeps point in a sensible place."
          (end (cdr bds))
          (pre-len (length pre))
          (post-len (length post)))
-
-    ;; Helper predicates
     (cl-labels
         ((inside-wrapped-p ()
            (and (>= (- end beg) (+ pre-len post-len))
@@ -251,29 +253,38 @@ Keeps point in a sensible place."
                   (<= post-end (point-max))
                   (string= (buffer-substring-no-properties pre-beg beg) pre)
                   (string= (buffer-substring-no-properties end post-end) post)))))
+      (let ((end-mkr nil))
+        (unwind-protect
+            (progn
+              (cond
+               ;; Case A: target itself is PRE...POST -> unwrap inside
+               ((inside-wrapped-p)
+                (when move-to-end
+                  (setq end-mkr (copy-marker (- end post-len) t)))
+                (save-excursion
+                  (delete-region (- end post-len) end)
+                  (delete-region beg (+ beg pre-len))))
 
-      (save-excursion
-        (cond
-         ;; Case A: the thing itself is already PRE...POST
-         ((inside-wrapped-p)
-          (delete-region (- end post-len) end)
-          (delete-region beg (+ beg pre-len))
-          ;; restore point roughly
-          (goto-char (max (point-min) (- orig-pt pre-len))))
+               ;; Case B: PRE/POST outside the target -> unwrap outside
+               ((outside-wrapped-p)
+                (when move-to-end
+                  (setq end-mkr (copy-marker end t)))
+                (save-excursion
+                  (delete-region end (+ end post-len))
+                  (delete-region (- beg pre-len) beg)))
 
-         ;; Case B: PRE/POST are just outside the thing
-         ((outside-wrapped-p)
-          (let ((pre-beg (- beg pre-len))
-                (post-end (+ end post-len)))
-            (delete-region end post-end)
-            (delete-region pre-beg beg)
-            (goto-char (max (point-min) (- orig-pt pre-len)))))
+               ;; Otherwise wrap
+               (t
+                (when move-to-end
+                  (setq end-mkr (copy-marker end t)))
+                (save-excursion
+                  (goto-char end) (insert post)
+                  (goto-char beg) (insert pre)))))
 
-         ;; Otherwise wrap it
-         (t
-          (goto-char end) (insert post)
-          (goto-char beg) (insert pre)
-          (goto-char (+ orig-pt pre-len))))))))
+          (when (and move-to-end (markerp end-mkr))
+            (goto-char end-mkr)
+            (set-marker end-mkr nil)))))))
+
 
 ;; Theme setup
 (use-package! emacs
@@ -1319,7 +1330,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
           `("r" "reference" plain "%?"
            :if-new (file+head
            ,(expand-file-name "note-${citekey}.org" my/literature-note-dir)
-           "# -*- truncate-lines: t -*-; ; org-download-image-dir: \"assets/\"\n:PROPERTIES:
+           "# -*- truncate-lines: t; org-download-image-dir: \"assets/\" -*-\n:PROPERTIES:
 :TITLE: ${title}
 :AUTHOR: ${author-or-editor}
 :JOURNAL: ${journaltitle}
