@@ -2,7 +2,7 @@
 # Install librime from the release package and build liberime
 # Tested for Doom Emacs, liberime version 0.0.6
 librime_install_dir=/opt/librime
-SUDO=sudo  # set to empty if librime_install_dir is accessible without sudo permission
+SUDO=sudo # set to empty if librime_install_dir is accessible without sudo permission
 EMACSVER=$(emacs --version | awk 'FNR == 1 {print $3}')
 liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/build-$EMACSVER/liberime}
 
@@ -10,21 +10,23 @@ liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/build-$EMACSVER
 # librime_name=rime-a608767-macOS.tar.bz2
 # librime_ver=1.11.2
 # librime_name=rime-5b09f35-macOS-universal.tar.bz2
-librime_ver=1.13.1
-librime_name=rime-1c23358-macOS-universal.tar.bz2
+# librime_ver=1.13.1
+# librime_name=rime-1c23358-macOS-universal.tar.bz2
+librime_ver=1.16.1
+librime_name=rime-de4700e-macOS-universal.tar.bz2
 
 SED=gsed
 
 # download the liberime package, install and symlink directories to comply liberime makefile
 if [ ! -d "$librime_install_dir" ]; then
   wget https://github.com/rime/librime/releases/download/$librime_ver/$librime_name
-  $SUDO mkdir "$librime_install_dir" \
-    || { echo "fail to create $librime_install_dir" && exit 1; }
-  $SUDO tar -C "$librime_install_dir" -jxf $librime_name \
-    || { echo "fail to extract rime release tarball $librime_name to $librime_install_dir" && exit 1; }
+  $SUDO mkdir "$librime_install_dir" ||
+    { echo "fail to create $librime_install_dir" && exit 1; }
+  $SUDO tar -C "$librime_install_dir" -jxf $librime_name ||
+    { echo "fail to extract rime release tarball $librime_name to $librime_install_dir" && exit 1; }
   rm -f $librime_name
-  $SUDO mv "$librime_install_dir/dist" "$librime_install_dir/build" \
-    || { echo "failt to rename dist -> build under $librime_install_dir" && return 1; }
+  $SUDO mv "$librime_install_dir/dist" "$librime_install_dir/build" ||
+    { echo "failt to rename dist -> build under $librime_install_dir" && return 1; }
   cd "$librime_install_dir" || return
   for d in lib share bin include; do
     $SUDO ln -s build/$d

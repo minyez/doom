@@ -5,6 +5,7 @@
 
 ; (add-to-list 'load-path (concat doom-private-dir "lisp"))
 
+; debug and profiling with environment variable EMACS_PROF non-nil
 (if (getenv "EMACS_PROF")
     (setq use-package-verbose t
           use-package-expand-minimally nil
@@ -942,6 +943,7 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
 
   ;; agenda
   (setq org-agenda-files (concat org-directory "/org-agenda.org")
+        org-agenda-span 14
         org-agenda-skip-scheduled-if-done 't
         org-agenda-dim-blocked-tasks nil
         org-agenda-inhibit-startup 't
@@ -981,17 +983,17 @@ Note that =pngpaste=/=xclip= should be installed outside Emacs"
   ;; commonly used constants for formulas
   (setq org-table-formula-constants
         '(("pi" . "3.14159265358")
-          ("RY" . "13.60569301") ; Ryderbg
-          ("HBAR" . "1.0545718e-34")
+          ("RY" . "13.60569301") ; Rydberg
+          ("HBAR" . "1.0545718e-34") ; h / 2pi
           ("EPS0" . "8.8541878128e−12")
-          ("FSCA" . "0.0072973525664")
+          ("FSCA" . "0.0072973525664") ; 1 / fine structure constatnt
           ("KB" . "1.38064852e-23") ; Boltzman constant
           ("CLIGHT" . "2.99792458e8") ; light speed
           ("CE" . "1.6021766208e-19") ; electron charge
-          ("BOHR2ANG" . "0.5291772")
+          ("BOHR2ANG" . "0.5291772") ; bohr radius * 1e10
           ("ANG2M" . "1e-10")
-          ("EV2J" . "1.6021766208e-19")
-          ("HA2EV" . "27.21138602")
+          ("EV2J" . "1.6021766208e-19") ; elemental charge
+          ("HA2EV" . "27.21138602") ; Hartree
           ("THZ2HA" . "1.519829846e-4") ; 10^12 h in Ha unit
           ))
   ;; default precision of formula results
