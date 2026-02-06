@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # key: afig
-# name: figure attribute
+# name: figure with attributes
 # uuid: afig
 # group: attr
 # 
 # --
-#+attr_org: :width 1.0
-#+attr_latex: :width 0.7\\linewidth :options clip,trim=\{0 0 0 0\}$0
+#+name: fig:1
+#+attr_org: :width 500
+#+attr_latex: :width 0.7\\linewidth :options clip,trim=\{0 0 0 0\}
+[[file:$0]]

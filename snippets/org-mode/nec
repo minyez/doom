@@ -5,6 +5,7 @@
 # group: code
 # 
 # --
+#+attr_latex: :options fontsize=\tiny
 #+begin_src ${1:f90} :eval never :results verbatim output code :wrap src :exports both
 $0
 #+end_src
