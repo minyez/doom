@@ -5,6 +5,7 @@
 # group: code
 # 
 # --
+#+attr_latex: :options fontsize=\footnotesize
 #+begin_src cpp :results value code :wrap src :eval never :noweb yes
 $0
 #+end_src
