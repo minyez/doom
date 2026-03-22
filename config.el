@@ -882,7 +882,7 @@ Inserts:
                ;; strip surrounding quotes
                (when (and (>= (length x) 2)
                           (or (and (eq (aref x 0) ?\")
-                                   (eq (aref x (1- (length x))) ?\")) ;; " to fix nvim comment
+                                   (eq (aref x (1- (length x))) ?\")) ;; " to fix nvim rendering comment
                               (and (eq (aref x 0) ?\')
                                    (eq (aref x (1- (length x))) ?\'))))
                  (setq x (substring x 1 (1- (length x)))))
@@ -1637,17 +1637,20 @@ If called with a prefix argument, use that number of spaces for each tab."
 (use-package! bibtex-completion
   :config
   (setq bibtex-completion-notes-path my/literature-note-dir
-        bibtex-completion-bibliography (list my/bibtex-file)
         bibtex-completion-pdf-field "file"
         bibtex-completion-additional-search-fields '(keywords journaltitle)
   )
+  (when (file-exists-p my/bibtex-file)
+    (setq bibtex-completion-bibliography my/bibtex-file))
 )
 
 (use-package! oc
   :after org
-  :custom
-  (org-cite-global-bibliography (list my/bibtex-file))
   :config
+  ; check if the file exists
+  (if (file-exists-p my/bibtex-file)
+      (setq org-cite-global-bibliography my/bibtex-file)
+    (message "Bibliography file does not exist: %s" my/bibtex-file))
   ;; set the path to global bibliography as safe local variable
   (put 'org-cite-global-bibliography 'safe-local-variable #'stringp)
   ;; which processor to use when exporting
