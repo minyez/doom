@@ -12,7 +12,7 @@
 #+pandoc_options: shift-heading-level-by:1
 #+pandoc_options: lua-filter:etc/pandoc_filter_jekyll.lua
 #+pandoc_metadata: categories:${1:cate} "tags:${2:tag}"
-#+pandoc_metadata: math:true comments:true
+#+pandoc_metadata: math:true comments:true media_subpath:.
 #+description: ${3:hello}
 # #+bibliography: etc/bibliography.bib
 # #+cite_export: csl etc/american-physics-society-without-titles.csl

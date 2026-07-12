@@ -1159,6 +1159,11 @@ If called with a prefix argument, use that number of spaces for each tab."
                '(add-hook 'before-save-hook
                           (lambda ()
                             (my/org-babel-execute-by-name "run-plot-sns")) nil t))
+  ;; running plot update
+  (add-to-list 'safe-local-eval-forms
+               '(add-hook 'before-save-hook
+                          (lambda ()
+                            (my/org-babel-execute-by-name "run-plot-running")) nil t))
   ;; automatic latex export
   (add-to-list 'safe-local-eval-forms
                '(add-hook 'after-save-hook 'org-latex-export-to-latex nil t))
@@ -1649,16 +1654,18 @@ If called with a prefix argument, use that number of spaces for each tab."
   :config
   ; check if the file exists
   (if (file-exists-p my/bibtex-file)
-      (setq org-cite-global-bibliography my/bibtex-file)
+      (setq org-cite-global-bibliography (list my/bibtex-file))
     (message "Bibliography file does not exist: %s" my/bibtex-file))
   ;; set the path to global bibliography as safe local variable
-  (put 'org-cite-global-bibliography 'safe-local-variable #'stringp)
+  ;; (put 'org-cite-global-bibliography 'safe-local-variable #'stringp)
   ;; which processor to use when exporting
   (setq org-cite-export-processors '((beamer biblatex)
                                      (latex biblatex)
                                      (t csl)))
   ;; nil or string
-  (put 'org-cite-global-bibliography 'safe-local-variable '(lambda (x) (or (null x) (stringp x))))
+  ;; (put 'org-cite-global-bibliography 'safe-local-variable '(lambda (x) (or (null x) (stringp x))))
+  ;; nil
+  (put 'org-cite-global-bibliography 'safe-local-variable '(lambda (x) (null x)))
   )
 
 (use-package! org-ref
