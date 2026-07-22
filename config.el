@@ -988,6 +988,7 @@ If called with a prefix argument, use that number of spaces for each tab."
   :custom
   (org-link-descriptive nil)    ;; show the full link
   (org-export-use-babel nil)    ;; never (re)evaluate code blocks during export
+  (org-preview-latex-default-process 'dvisvgm)
   :bind
   (:map org-mode-map
         ("C-c l" . org-insert-link)
@@ -1854,7 +1855,7 @@ Caveats:
       ("" "wasysym" t) ; last to avoid iint and iint error
       ("AUTO" "inputenc"  t ("pdflatex"))
       ("T1"   "fontenc"   t ("pdflatex"))
-      (""     "CJKutf8"   t ("pdflatex"))
+      (""     "CJKutf8"   nil ("pdflatex"))
       (""     "ifxetex"   nil)
       (""     "xeCJK"     nil ("xelatex", "xetex"))
       (""     "fontspec"  nil ("xelatex", "xetex", "lualatex", "luatex"))
