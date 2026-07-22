@@ -5,6 +5,10 @@
  ;; If there is more than one, they won't work right.
  '(safe-local-variable-values
    '((org-latex-and-related-regexp)
+     (compile-command format
+                      "latexmk -bibtex -pdf -pvc -latexoption='-interaction=nonstopmode -shell-escape' -pdflatex='%s' -f %s"
+                      org-latex-compiler
+                      (org-export-output-file-name ".tex"))
      (org-highlight-latex-and-related)
      (org-drill-hide-item-headings-p . t)
      (org-latex-hyperref-template . nil)))

@@ -74,9 +74,6 @@
 (package! org-drill
   :recipe (:host gitlab :repo "phillord/org-drill"))
 
-(package! org-roam-bibtex
-  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
-(unpin! org-roam)
 (package! citar-org-roam)
 (package! org-roam-ui)
 
@@ -91,7 +88,7 @@
 
 (package! command-log-mode)
 
-(if IS-MAC
+(if (featurep :system 'macos)
   (package! osx-dictionary))
 
 (unpin! gnuplot)
@@ -108,9 +105,6 @@
 
 (package! org-modern-indent
   :recipe (:host github :repo "jdtsmith/org-modern-indent"))
-
-(package! eglot-booster
-  :recipe (:host github :repo "jdtsmith/eglot-booster"))
 
 (package! highlight-doxygen
   :recipe (:host github :repo "Lindydancer/highlight-doxygen"))

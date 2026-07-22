@@ -3,7 +3,7 @@
 (setq user-full-name "Min-Ye Zhang"
       user-mail-address "minyez.physchem@gmail.com")
 
-; (add-to-list 'load-path (concat doom-private-dir "lisp"))
+; (add-to-list 'load-path (concat doom-user-dir "lisp"))
 
 ; debug and profiling with environment variable EMACS_PROF non-nil
 (if (getenv "EMACS_PROF")
@@ -306,31 +306,29 @@ move point to the end of the (un)wrapped text."
 (setq doom-theme 'modus-operandi)
 
 ;; set custom splash image if it exists
-;(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
+;(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-user-dir)))
 ; (if (file-exists-p img)
 ;   (setq fancy-splash-image img)))
 
 ;; dashboard configuration
-(when (modulep! :ui doom-dashboard)
+(when (modulep! :ui dashboard)
   ;; set custom splash image if it exists
-  (let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-private-dir)))
+  (let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-user-dir)))
    (if (file-exists-p img)
-     (setq +doom-dashboard-banner-file img)))
+     (setq fancy-splash-image img)))
 
   ;; remove the footer, i.e. the GitHub icon
-  (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
+  (remove-hook '+dashboard-functions #'+dashboard-widget-footer)
   ;; remove short menu
-  ;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
   ;; add a new button
-  (add-to-list '+doom-dashboard-menu-sections
+  (add-to-list '+dashboard-menu-sections
                '("Browse roam nodes"
-                 :icon (nerd-icons-sucicon "nf-custom-orgmode" :face 'doom-dashboard-menu-title)
-                 :when (featurep! :lang org +roam2)
-                 :face (:inherit (doom-dashboard-menu-title))
+                 :icon (nerd-icons-sucicon "nf-custom-orgmode" :face '+dashboard-menu-title)
+                 :when (modulep! :lang org +roam)
                  :action org-roam-node-find))
   ;; remove some of the buttons
   (dolist (btname '("Open project" "Open org-agenda"))
-    (assoc-delete-all btname +doom-dashboard-menu-sections))
+    (assoc-delete-all btname +dashboard-menu-sections))
 )
 
 (use-package! nerd-icons
@@ -643,7 +641,7 @@ move point to the end of the (un)wrapped text."
   (dolist (elem my/personal-dicts)
     (add-to-list 'pyim-dicts
         `(:name ,(car elem)
-          :file ,(concat doom-private-dir "dict/" (cdr elem)))))
+          :file ,(concat doom-user-dir "dict/" (cdr elem)))))
   ;; painless CN/EN switch by probe
   (defun my/pyim-probe-org-src-block ()
     "自定义探针, 进入 org-mode source block 之后自动切换到英文输入"
@@ -710,7 +708,8 @@ move point to the end of the (un)wrapped text."
   :after consult
   :config
   (require 'consult-omni-sources)
-  ;; load all sources
+  (setq consult-omni-sources-modules-to-load
+        '(consult-omni-google consult-omni-wikipedia))
   (consult-omni-sources-load-modules)
 )
 
@@ -757,7 +756,7 @@ move point to the end of the (un)wrapped text."
   ;; allow multiple active sessions at a time for a certain template
   (mindstream-unique nil)
   ;; path to find templates
-  (mindstream-template-path (concat doom-private-dir "templates/mindstream"))
+  (mindstream-template-path (concat doom-user-dir "templates/mindstream"))
   ;; path to save the thought for further editing
   (setq mindstream-save-session-path my/org-dir)
   :config
@@ -779,11 +778,11 @@ move point to the end of the (un)wrapped text."
 ;; ================================================
 (when (modulep! :checkers spell)
   (after! ispell
-    (setq ispell-personal-dictionary (concat doom-private-dir "words"))
+    (setq ispell-personal-dictionary (concat doom-user-dir "words"))
   )
 )
 
-(if IS-MAC
+(if (featurep :system 'macos)
   (progn
     (use-package! osx-dictionary
       :bind
@@ -811,7 +810,7 @@ move point to the end of the (un)wrapped text."
 ;; - org-anki
 ;; - org-present
 ;; - org-roam
-;; - org-roam-bibtex
+;; - citar-org-roam
 ;; - org-noter
 ;; ================================================
 
@@ -1292,19 +1291,6 @@ If called with a prefix argument, use that number of spaces for each tab."
   (setq org-download-link-format "[[file:%s]]\n" org-download-abbreviate-filename-function #'file-relative-name)
   (setq org-download-link-format-function #'org-download-link-format-function-default)
 
-  ;; TODO advice the org-download-yank to check if current kill is a file name
-  (defadvice org-download-yank (around check-kill-filename activate)
-    ;; copy current kill
-    (let ((k (current-kill 0))
-          (is-kill-filename nil))
-      ;; check if current kill is a file path
-      ad-do-it
-      ;; restore the original kill-ring
-      (if is-kill-filename
-        ())
-    )
-  )
-
   ;; TODO convert download link to file link
   ;; see https://vxlabs.com/2020/07/25/emacs-lisp-function-convert-attachment-to-file/
 )
@@ -1366,30 +1352,38 @@ If called with a prefix argument, use that number of spaces for each tab."
   (setq org-tree-slide-skip-done nil)
 )
 
+(defun my/org-roam-find-directory ()
+  (interactive)
+  (dired org-roam-directory))
+
+(defun my/org-roam-jump-to-index ()
+  (interactive)
+  (find-file (expand-file-name "index.org" org-roam-directory)))
+
 (use-package! org-roam
   :after org-roam
   :init
   (setq org-roam-directory org-directory
         ;; org-roam-db-location (expand-file-name "org-roam.db" org-directory)
-        org-roam-index-file "index.org"
         org-roam-graph-extra-config '(("overlap" . "false")) ; man dot for attributes setup
         )
   :bind
   (:map org-mode-map
         (("C-c r R" . org-roam-buffer-toggle)
          ("C-c r ." . org-roam-node-find)
-         ("C-c r L" . org-roam-store-link)
+         ("C-c r L" . org-store-link)
          ("C-c r a" . org-roam-alias-add)
-         ("C-c r u" . org-roam-unlinked-references)
-         ("C-c r r" . org-roam-find-ref)
-         ("C-c r d" . org-roam-find-directory)
-         ("C-c r j" . org-roam-jump-to-index)
-         ("C-c r b" . org-roam-switch-to-buffer)
-         ("C-c r n" . orb-note-actions)
+         ("C-c r r" . org-roam-ref-find)
+         ("C-c r d" . my/org-roam-find-directory)
+         ("C-c r j" . my/org-roam-jump-to-index)
+         ("C-c r b" . org-roam-node-find)
+         ("C-c r n" . citar-open-notes)
          ("C-c r i" . org-roam-node-insert)
          )
   )
   :config
+  (add-to-list 'org-roam-mode-sections
+               #'org-roam-unlinked-references-section t)
   (add-to-list 'display-buffer-alist
                 '("\\*org-roam\\*"
                   (display-buffer-in-direction)
@@ -1419,59 +1413,6 @@ If called with a prefix argument, use that number of spaces for each tab."
            "# -*- truncate-lines: t -*-\n#+title: ${title}\n#+startup: overview\n#+created: %U\n#+options: toc:nil email:t f:t email:t author:t date:t ^:{} broken-links:t prop:t\n")
            :unnarrowed t)
          ))
-)
-
-(use-package! org-roam-bibtex
-  :after org
-  :hook
-  (org-mode . org-roam-bibtex-mode)
-  :config
-  ; (require 'org-ref)
-  ; (setq org-ref-notes-function 'orb-edit-notes)
-  (setq orb-preformat-keywords
-    '("citekey"  "title" "author-or-editor" "date" "doi" "file" "journaltitle" "volume" "pages"))
-  ; (setq orb-roam-ref-format "org-ref-v3")
-  (advice-add 'bibtex-completion-candidates :filter-return 'reverse)
-  ; anystyle-related
-  (setq orb-autokey-format "%A*[1]%y*"
-        orb-pdf-scrapper-export-fields '("author" "journal" "date" "volume" "pages" "title"))
-  (add-to-list 'org-roam-capture-templates
-          `("r" "reference" plain "%?"
-           :if-new (file+head
-           ,(expand-file-name "note-${citekey}.org" my/literature-note-dir)
-           "# -*- truncate-lines: t; org-download-image-dir: \"assets/\" -*-\n:PROPERTIES:
-:TITLE: ${title}
-:AUTHOR: ${author-or-editor}
-:JOURNAL: ${journaltitle}
-:DATE: ${date}
-:VOLUME: ${volume}
-:PAGES: ${pages}
-:DOI: [[doi:%(replace-regexp-in-string \" \" \"\" \"${doi}\")]]
-:END:
-#+title: ${citekey}: ${title}
-#+startup: content
-#+created: %U
-
-* Summary
-
-* Notes :noter:
-:PROPERTIES:
-:NOTER_DOCUMENT: ${file}
-:END:
-")
-           :unnarrowed t))
-  ;;; connect to citar by citar-org-roam
-  (require 'citar-org-roam)
-  (citar-register-notes-source
-   'orb-citar-source (list :name "Org-Roam Notes"
-          :category 'org-roam-node
-          :items #'citar-org-roam--get-candidates
-          :hasitems #'citar-org-roam-has-notes
-          :open #'citar-org-roam-open-note
-          :create #'orb-citar-edit-note
-          :annotate #'citar-org-roam--annotate))
-  (setq citar-notes-source 'orb-citar-source)
-  (setq citar-org-roam-capture-template-key "r")
 )
 
 (use-package! org-noter
@@ -1630,24 +1571,22 @@ If called with a prefix argument, use that number of spaces for each tab."
 ;;
 ;; In my case there are used in combination with org and org-roam
 ;;
-;; - bibtex-completion
+;; - bibtex-completion (optional org-ref backend)
 ;; - org-ref
 ;; - org-cite (oc)
 ;; - citar
+;; - citar-org-roam
 ;; - citeproc
 ;; - zotxt-emacs
 ;; ================================================
 
-;; for org-ref completion
-(use-package! bibtex-completion
-  :config
-  (setq bibtex-completion-notes-path my/literature-note-dir
-        bibtex-completion-pdf-field "file"
-        bibtex-completion-additional-search-fields '(keywords journaltitle)
-  )
-  (when (file-exists-p my/bibtex-file)
-    (setq bibtex-completion-bibliography my/bibtex-file))
-)
+;; Keep bibtex-completion configured for optional full org-ref use without
+;; making it part of the normal Citar/Org-roam loading path.
+(setq bibtex-completion-watch-bibliography nil
+      bibtex-completion-bibliography my/bibtex-file
+      bibtex-completion-notes-path my/literature-note-dir
+      bibtex-completion-pdf-field "file"
+      bibtex-completion-additional-search-fields '(keywords journaltitle))
 
 (use-package! oc
   :after org
@@ -1668,26 +1607,70 @@ If called with a prefix argument, use that number of spaces for each tab."
   (put 'org-cite-global-bibliography 'safe-local-variable '(lambda (x) (null x)))
   )
 
-(use-package! org-ref
-  :config
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-)
+(after! org
+  (require 'org-ref-ref-links)
+  (require 'org-ref-label-link)
+  (define-key org-mode-map (kbd "C-c ]") #'org-insert-link))
 
 (use-package! citar
   :custom
   (citar-bibliography (list my/bibtex-file))
   (citar-notes-paths (list my/literature-note-dir))
+  (citar-default-action #'citar-open-notes)
+  (citar-additional-fields '("volume" "pages" "doi"))
   :hook
   (LaTeX-mode . citar-capf-setup)
   (org-mode . citar-capf-setup)
   :config
   ;; use citeproc to generate in-text reference
   (setq citar-format-reference-function 'citar-citeproc-format-reference
-        citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-private-dir)
+        citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-user-dir)
         citar-citeproc-csl-style "aps-modified.csl")
   ;; nil or string
   (put 'citar-bibliography 'safe-local-variable '(lambda (x) (or (null x) (stringp x))))
 )
+
+(use-package! citar-org-roam
+  :after (citar org-roam)
+  :custom
+  (citar-org-roam-capture-template-key "r")
+  (citar-org-roam-note-title-template "${title}")
+  (citar-org-roam-template-fields
+   '((:citar-title . ("title"))
+     (:citar-author . ("author" "editor"))
+     (:citar-journal . ("journaltitle" "journal"))
+     (:citar-date . ("date" "year" "issued"))
+     (:citar-volume . ("volume"))
+     (:citar-pages . ("pages"))
+     (:citar-doi . ("doi"))
+     (:citar-file . ("file"))))
+  :config
+  (add-to-list 'org-roam-capture-templates
+          `("r" "reference" plain "%?"
+           :target (file+head
+           ,(expand-file-name "note-${citar-citekey}.org" my/literature-note-dir)
+           "# -*- truncate-lines: t; org-download-image-dir: \"assets/\" -*-\n:PROPERTIES:
+:TITLE: ${citar-title}
+:AUTHOR: ${citar-author}
+:JOURNAL: ${citar-journal}
+:DATE: ${citar-date}
+:VOLUME: ${citar-volume}
+:PAGES: ${citar-pages}
+:DOI: [[doi:%(replace-regexp-in-string \" \" \"\" \"${citar-doi}\")]]
+:END:
+#+title: ${citar-citekey}: ${citar-title}
+#+startup: content
+#+created: %U
+
+* Summary
+
+* Notes :noter:
+:PROPERTIES:
+:NOTER_DOCUMENT: ${citar-file}
+:END:
+")
+           :unnarrowed t))
+  (citar-org-roam-mode 1))
 
 (use-package! citeproc)
 
@@ -1707,8 +1690,6 @@ If called with a prefix argument, use that number of spaces for each tab."
 
 (after! ox
   (setq org-export-with-broken-links t)  ; t/'mark/nil
-  ; don't ask if treat compile-command safe if it is a string
-  (put 'compile-command 'safe-local-variable #'stringp)
   ; 'mark leads to a marker in exported content with broken links
   ; nil will abort export with broken links
   ; t will continue anyway
@@ -2072,7 +2053,7 @@ Caveats:
 ;; Project management and version control
 ;;
 ;; - magit
-;; - git-gutter
+;; - diff-hl
 ;; - projectile
 ;; ================================================
 (use-package! magit
@@ -2093,8 +2074,8 @@ Caveats:
 )
 
 ;; do not ask confirm for stage/revert
-(after! git-gutter
-  (setq git-gutter:ask-p nil))
+(after! diff-hl
+  (setq diff-hl-ask-before-revert-hunk nil))
 
 (use-package! projectile
   :custom
