@@ -311,6 +311,11 @@ move point to the end of the (un)wrapped text."
 ;   (setq fancy-splash-image img)))
 
 ;; dashboard configuration
+(defun my/dashboard-org-roam-node-find ()
+  "Find an Org-roam node from the dashboard."
+  (interactive)
+  (org-roam-node-find))
+
 (when (modulep! :ui dashboard)
   ;; set custom splash image if it exists
   (let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-user-dir)))
@@ -325,7 +330,7 @@ move point to the end of the (un)wrapped text."
                '("Browse roam nodes"
                  :icon (nerd-icons-sucicon "nf-custom-orgmode" :face '+dashboard-menu-title)
                  :when (modulep! :lang org +roam)
-                 :action org-roam-node-find))
+                 :action my/dashboard-org-roam-node-find))
   ;; remove some of the buttons
   (dolist (btname '("Open project" "Open org-agenda"))
     (assoc-delete-all btname +dashboard-menu-sections))
