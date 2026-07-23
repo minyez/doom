@@ -40,6 +40,8 @@
 (package! org-inline-pdf
   :recipe (:host github :repo "shg/org-inline-pdf.el"))
 
+(package! org-fragtog)
+
 (unpin! org-download)
 (package! org-download
   :recipe (:host github :repo "minyez/org-download"))

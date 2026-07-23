@@ -1261,6 +1261,10 @@ If called with a prefix argument, use that number of spaces for each tab."
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
 
+(use-package! org-fragtog
+  :hook
+  (org-mode . org-fragtog-mode))
+
 (use-package! org-inline-pdf
   :after org
   :hook
