@@ -1615,6 +1615,8 @@ If called with a prefix argument, use that number of spaces for each tab."
 
 (use-package! citar
   :custom
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
   (citar-bibliography (list my/bibtex-file))
   (citar-notes-paths (list my/literature-note-dir))
   (citar-default-action #'citar-open-notes)
@@ -1623,6 +1625,7 @@ If called with a prefix argument, use that number of spaces for each tab."
   (LaTeX-mode . citar-capf-setup)
   (org-mode . citar-capf-setup)
   :config
+  (add-to-list 'citar-open-prompt #'+org/dwim-at-point)
   ;; use citeproc to generate in-text reference
   (setq citar-format-reference-function 'citar-citeproc-format-reference
         citar-citeproc-csl-styles-dir (expand-file-name "csl" doom-user-dir)
