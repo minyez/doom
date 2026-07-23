@@ -42,6 +42,9 @@
 
 (package! org-fragtog)
 
+(package! org-habit-ng
+  :recipe (:host github :repo "emacsmirror/org-habit-ng"))
+
 (unpin! org-download)
 (package! org-download
   :recipe (:host github :repo "minyez/org-download"))

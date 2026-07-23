@@ -976,6 +976,13 @@ If called with a prefix argument, use that number of spaces for each tab."
       (unless (bolp) (insert "\n"))
       (insert "* " headline "\n"))))
 
+(use-package! org-habit-ng
+  :after org
+  :init
+  (add-to-list 'org-modules 'org-habit)
+  :config
+  (org-habit-ng-mode 1))
+
 (use-package! org
   :init
   (setq org-directory my/org-dir)
@@ -1049,7 +1056,7 @@ If called with a prefix argument, use that number of spaces for each tab."
         org-agenda-skip-scheduled-if-done 't
         org-agenda-dim-blocked-tasks nil
         org-agenda-inhibit-startup 't
-        ; org-log-into-drawer 't
+        org-log-into-drawer t
         org-log-done 'time
         org-agenda-use-tag-inheritance '(search timeline agenda)
         org-agenda-window-setup 'reorganize-frame
@@ -2062,6 +2069,7 @@ Caveats:
   (org-icalendar-combined-name        "MYZ org agenda")
   (org-icalendar-combined-agenda-file (expand-file-name "org.ics" org-directory))
   (org-icalendar-combined-description "Calendar entries from Emacs org-mode")
+  (org-icalendar-use-scheduled '(event-if-todo-not-done todo-start))
   ; before finding the way to set alarm per entry, use a global alarm time
   (org-icalendar-alarm-time 5)
   ; honor noexport tag when exporting
