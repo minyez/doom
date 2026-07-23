@@ -1389,7 +1389,6 @@ If called with a prefix argument, use that number of spaces for each tab."
          ("C-c r d" . my/org-roam-find-directory)
          ("C-c r j" . my/org-roam-jump-to-index)
          ("C-c r b" . org-roam-node-find)
-         ("C-c r n" . citar-open-notes)
          ("C-c r i" . org-roam-node-insert)
          )
   )
@@ -1643,6 +1642,26 @@ If called with a prefix argument, use that number of spaces for each tab."
                    (family-name first)
                    (family-name last)))))))
 
+(defun my/citar-open-files-at-point (&optional external)
+  "Open citation files at point, or prompt when none are present.
+When EXTERNAL is non-nil, use the system's default application."
+  (interactive)
+  (let ((keys (or (citar-key-at-point)
+                  (citar-citation-at-point)
+                  (citar-select-refs))))
+    (let ((citar-file-open-functions
+           (if external
+               '((t . citar-file-open-external))
+             citar-file-open-functions)))
+      (citar-open-files keys))))
+
+(defun my/citar-open-notes-at-point ()
+  "Open citation notes at point, or prompt when none are present."
+  (interactive)
+  (citar-open-notes (or (citar-key-at-point)
+                        (citar-citation-at-point)
+                        (citar-select-refs))))
+
 (defun my/citar-sort-by-year (candidates)
   "Sort Citar CANDIDATES by descending year, then ascending display text."
   (cl-labels
@@ -1669,13 +1688,23 @@ If called with a prefix argument, use that number of spaces for each tab."
   (org-cite-follow-processor 'citar)
   (citar-bibliography (list my/bibtex-file))
   (citar-notes-paths (list my/literature-note-dir))
-  (citar-default-action #'citar-open-notes)
+  (citar-default-action #'citar-open)
   (citar-additional-fields '("volume" "pages" "doi"))
   (citar-templates
    '((main . "${date year issued:4}  ${author editor:18%first-last}  ${title:*}  ${shortjournal journal-abbreviation container-title-short journaltitle journal container-title:22}  ${volume:6}")
      (suffix . "  ${=key= id:15}  ${tags keywords:28}")
      (preview . "${author editor:%etal} (${year issued date}) ${title}, ${shortjournal journal-abbreviation container-title-short journaltitle journal container-title}.\n")
      (note . "Notes on ${author editor:%etal}, ${title}")))
+  :bind
+  (:map org-mode-map
+        (
+         ("C-c r n" . my/citar-open-notes-at-point)
+         ("C-c r p" . my/citar-open-files-at-point)
+         ("C-c r P" . (lambda ()
+                        (interactive)
+                        (my/citar-open-files-at-point t)))
+         )
+  )
   :hook
   (LaTeX-mode . citar-capf-setup)
   (org-mode . citar-capf-setup)
