@@ -1617,6 +1617,45 @@ If called with a prefix argument, use that number of spaces for each tab."
   (require 'org-ref-label-link)
   (define-key org-mode-map (kbd "C-c ]") #'org-insert-link))
 
+(defun my/citar-first-last-names (names)
+  "Return a compact list of family names from NAMES."
+  (cl-labels ((family-name
+               (name)
+               (string-remove-prefix "family="
+                                     (citar--shorten-name name))))
+    (let* ((names (split-string (or names "") " and " t))
+           (first (car names))
+           (last (car (last names))))
+      (pcase (length names)
+        (0 "")
+        (1 (family-name first))
+        (2 (format "%s, %s"
+                   (family-name first)
+                   (family-name last)))
+        (_ (format "%s, ..., %s"
+                   (family-name first)
+                   (family-name last)))))))
+
+(defun my/citar-sort-by-year (candidates)
+  "Sort Citar CANDIDATES by descending year, then ascending display text."
+  (cl-labels
+      ((visible
+        (candidate)
+        (substring-no-properties
+         candidate
+         (if (get-text-property 0 'invisible candidate)
+             (or (next-single-property-change 0 'invisible candidate) 0)
+           0))))
+    (sort candidates
+          (lambda (a b)
+            (let* ((a (visible a))
+                   (b (visible b))
+                   (a-year (substring a 0 (min 4 (length a))))
+                   (b-year (substring b 0 (min 4 (length b)))))
+              (if (string= a-year b-year)
+                  (string-lessp a b)
+                (string> a-year b-year)))))))
+
 (use-package! citar
   :custom
   (org-cite-insert-processor 'citar)
@@ -1625,10 +1664,17 @@ If called with a prefix argument, use that number of spaces for each tab."
   (citar-notes-paths (list my/literature-note-dir))
   (citar-default-action #'citar-open-notes)
   (citar-additional-fields '("volume" "pages" "doi"))
+  (citar-templates
+   '((main . "${date year issued:4}  ${author editor:18%first-last}  ${title:*}  ${shortjournal journal-abbreviation container-title-short journaltitle journal container-title:22}  ${volume:6}")
+     (suffix . "  ${=key= id:15}  ${tags keywords:28}")
+     (preview . "${author editor:%etal} (${year issued date}) ${title}, ${shortjournal journal-abbreviation container-title-short journaltitle journal container-title}.\n")
+     (note . "Notes on ${author editor:%etal}, ${title}")))
   :hook
   (LaTeX-mode . citar-capf-setup)
   (org-mode . citar-capf-setup)
   :config
+  (add-to-list 'citar-display-transform-functions
+               '(first-last . (my/citar-first-last-names)))
   (add-to-list 'citar-open-prompt #'+org/dwim-at-point)
   ;; use citeproc to generate in-text reference
   (setq citar-format-reference-function 'citar-citeproc-format-reference
@@ -1646,7 +1692,9 @@ If called with a prefix argument, use that number of spaces for each tab."
   (citar-org-roam-template-fields
    '((:citar-title . ("title"))
      (:citar-author . ("author" "editor"))
-     (:citar-journal . ("journaltitle" "journal"))
+     (:citar-journal . ("shortjournal" "journal-abbreviation"
+                        "container-title-short" "journaltitle"
+                        "journal" "container-title"))
      (:citar-date . ("date" "year" "issued"))
      (:citar-volume . ("volume"))
      (:citar-pages . ("pages"))
@@ -1679,6 +1727,11 @@ If called with a prefix argument, use that number of spaces for each tab."
 ")
            :unnarrowed t))
   (citar-org-roam-mode 1))
+
+(after! vertico-multiform
+  (add-to-list 'vertico-multiform-categories
+               '(citar-candidate
+                 (vertico-sort-function . my/citar-sort-by-year))))
 
 (use-package! citeproc)
 
