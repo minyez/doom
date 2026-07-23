@@ -1277,6 +1277,21 @@ If called with a prefix argument, use that number of spaces for each tab."
   :hook
   (org-mode . org-fragtog-mode))
 
+(use-package! org-table-highlight
+  :hook
+  (org-mode . org-table-highlight-mode)
+  :config
+  ;; Restore named tables even when affiliated keywords follow #+name.
+  (defun my/org-table-highlight-table-position (position)
+    (when position
+      (save-excursion
+        (goto-char position)
+        (if-let ((table (org-element-lineage (org-element-context) 'table t)))
+            (org-element-property :post-affiliated table)
+          position))))
+  (advice-add 'org-table-highlight--table-position
+              :filter-return #'my/org-table-highlight-table-position))
+
 (use-package! org-inline-pdf
   :after org
   :hook

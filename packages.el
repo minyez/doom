@@ -42,6 +42,8 @@
 
 (package! org-fragtog)
 
+(package! org-table-highlight)
+
 (package! org-habit-ng
   :recipe (:host github :repo "emacsmirror/org-habit-ng"))
 
