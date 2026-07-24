@@ -1761,7 +1761,7 @@ When EXTERNAL is non-nil, use the system's default application."
           `("r" "reference" plain "%?"
            :target (file+head
            ,(expand-file-name "note-${citar-citekey}.org" my/literature-note-dir)
-           "# -*- truncate-lines: t; org-download-image-dir: \"assets/\" -*-\n:PROPERTIES:
+           "# -*- truncate-lines: t; org-download-image-dir: \"assets/${citar-citekey}/\" -*-\n:PROPERTIES:
 :TITLE: ${citar-title}
 :AUTHOR: ${citar-author}
 :JOURNAL: ${citar-journal}
