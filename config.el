@@ -1991,6 +1991,7 @@ Caveats:
       (""     "subfig"    nil)
       (""     "rotating"  nil)
       ("normalem" "ulem"  t)    ; strikeout
+      (""     "xeCJKfntef" nil ("xelatex", "xetex"))
       (""     "textcomp"  t)
       (""     "capt-of"   nil)
       ("font={small},skip=1pt"     "caption"   nil)
