@@ -623,6 +623,37 @@ move point to the end of the (un)wrapped text."
 ;;
 ;; - pyim
 ;; ================================================
+(setq liberime-current-schema "double_pinyin_flypy"
+      liberime-module-file
+      (expand-file-name
+       (concat "straight/repos/liberime/src/liberime-core" module-file-suffix)
+       doom-local-dir))
+
+;; pyim 5.3.6 expects `liberime-search' to keep its composition.  Liberime
+;; 0.0.11 searches in a disposable session unless one is supplied explicitly.
+(defun my/pyim-liberime-get-code-with-session (orig-fn word input &optional limit)
+  "Run ORIG-FN in a reusable liberime search session."
+  (if (not (fboundp 'liberime-session-create))
+      (funcall orig-fn word input limit)
+    (let* ((schema-id (alist-get 'schema_id (liberime-get-status)))
+           (session (liberime-session-create schema-id))
+           (search-fn (symbol-function 'liberime-search)))
+      (unwind-protect
+          (progn
+            (funcall search-fn input 1 nil nil nil session)
+            (cl-letf (((symbol-function 'liberime-search)
+                       (lambda (string &optional max-count index schema full-context _session)
+                         (funcall search-fn string max-count index schema
+                                  full-context session)))
+                      ((symbol-function 'liberime-get-preedit)
+                       (lambda ()
+                         (alist-get
+                          'preedit
+                          (alist-get 'composition
+                                     (liberime-get-context session))))))
+              (funcall orig-fn word input limit)))
+        (liberime-session-destroy session)))))
+
 (use-package! pyim
   :custom
   ;; Disable word search in current buffer.
@@ -635,7 +666,7 @@ move point to the end of the (un)wrapped text."
   ;;(pyim-default-scheme 'pyim-shuangpin)
   ;; disable pyim-outcome-trigger for pyim-shuangpin otherwise cannot type o for 欧
   ;;(setq pyim-outcome-trigger nil)
-  (pyim-default-scheme 'xiaohe-shuangpin)
+  (pyim-default-scheme 'rime)
   (setq pyim-page-length 9)
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
@@ -684,6 +715,10 @@ move point to the end of the (un)wrapped text."
       (pyim-cregexp-build result)))
   (advice-add 'orderless-regexp :around #'my-orderless-regexp)
 )
+
+(after! pyim-liberime
+  (advice-add 'pyim-liberime--get-code :around
+              #'my/pyim-liberime-get-code-with-session))
 
 
 ;; ================================================

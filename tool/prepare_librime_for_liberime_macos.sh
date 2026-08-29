@@ -1,52 +1,20 @@
 #!/bin/sh
-# Install librime from the release package and build liberime
-# Tested for Doom Emacs, liberime version 0.0.6
-librime_install_dir=/opt/librime
-SUDO=sudo # set to empty if librime_install_dir is accessible without sudo permission
-EMACSVER=$(emacs --version | awk 'FNR == 1 {print $3}')
-liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/build-$EMACSVER/liberime}
+# Install librime with Homebrew and build liberime
+set -eu
 
-# librime_ver=1.9.0
-# librime_name=rime-a608767-macOS.tar.bz2
-# librime_ver=1.11.2
-# librime_name=rime-5b09f35-macOS-universal.tar.bz2
-# librime_ver=1.13.1
-# librime_name=rime-1c23358-macOS-universal.tar.bz2
-librime_ver=1.16.1
-librime_name=rime-de4700e-macOS-universal.tar.bz2
+liberime_dir=${liberime_dir:=$HOME/.config/emacs/.local/straight/repos/liberime}
 
-SED=gsed
-
-# download the liberime package, install and symlink directories to comply liberime makefile
-if [ ! -d "$librime_install_dir" ]; then
-  wget https://github.com/rime/librime/releases/download/$librime_ver/$librime_name
-  $SUDO mkdir "$librime_install_dir" ||
-    { echo "fail to create $librime_install_dir" && exit 1; }
-  $SUDO tar -C "$librime_install_dir" -jxf $librime_name ||
-    { echo "fail to extract rime release tarball $librime_name to $librime_install_dir" && exit 1; }
-  rm -f $librime_name
-  $SUDO mv "$librime_install_dir/dist" "$librime_install_dir/build" ||
-    { echo "failt to rename dist -> build under $librime_install_dir" && return 1; }
-  cd "$librime_install_dir" || return
-  for d in lib share bin include; do
-    $SUDO ln -s build/$d
-  done
-  $SUDO ln -s build/include src
-  echo "librime initialized under $librime_install_dir"
-else
-  echo "found $librime_install_dir, skip"
-fi
+command -v brew >/dev/null 2>&1 || {
+  echo "Homebrew is required to install librime" >&2
+  exit 1
+}
+brew list --versions librime >/dev/null 2>&1 || brew install librime
+librime_install_dir=$(brew --prefix librime)
 
 cd "$liberime_dir" || { echo "fail to open $liberime_dir" && exit 1; }
-if [ -f src/liberime-core.dylib ]; then
-  echo "src/liberime-core.dylib is already built"
-else
-  RIME_PATH="$librime_install_dir" emacs -Q -batch -eval "(add-to-list 'load-path \"$(pwd)\")" -load liberime.el -f liberime-build
-  # remove the Release library dir in rpath to avoid run time error
-  # this might be redundant if one builds librime from source
-  $SED -i "s|:/opt/librime/build/lib/Release\(/\)\{0,1\}||g" Makefile-liberime-build
-  make -f Makefile-liberime-build
-fi
+make -B \
+  "RIME_CFLAGS=-I$librime_install_dir/include" \
+  "RIME_LDFLAGS=-L$librime_install_dir/lib -Wl,-rpath,$librime_install_dir/lib -lrime"
 
 # check if liberime is workable
 emacs -Q -batch -eval "(add-to-list 'load-path \"$(pwd)\")" -load liberime.el \
