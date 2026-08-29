@@ -1008,6 +1008,7 @@ If called with a prefix argument, use that number of spaces for each tab."
         ("C-c m i" . org-toggle-item)
         ("C-c m h" . org-toggle-heading)
         ("C-c m o" . org-set-property)
+        ("C-c m y" . my/org-yank-zotero-annotation)
         ("C-c i c" . my/org-insert-image-clipboard)
         ("C-c i f" . my/org-insert-image-file)
         ("C-c C-i" . org-time-stamp-inactive)
@@ -1021,6 +1022,9 @@ If called with a prefix argument, use that number of spaces for each tab."
         ("s-u" . (lambda () "toggle current word/region underline" (interactive) (my/toggle-wrap-at-point-or-region "_" "_")))
       )
   :config
+  (org-link-set-parameters
+   "zotero" :follow
+   (lambda (path arg) (browse-url (concat "zotero:" path) arg)))
   (map! :map org-mode-map
         :nv "SPC d"     #'+org/remove-link
         :nv "SPC f A"   #'org-save-all-org-buffers
@@ -1164,6 +1168,14 @@ If called with a prefix argument, use that number of spaces for each tab."
   ;; disable some tags from inheriting to descendants
   (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
     (add-to-list 'org-tags-exclude-from-inheritance elem))
+
+  ;; safe compilation commands used by Org file-local variables
+  (dolist (value
+           '((format "latexmk -bibtex -pdf -pvc -latexoption='-interaction=nonstopmode -shell-escape' -pdflatex='%s' -f %s"
+                     org-latex-compiler (org-export-output-file-name ".tex"))
+             (format "latexmk -bibtex -pdf -pvc -latexoption='-interaction=nonstopmode -shell-escape' -r '../../etc/latexmkrc' -pdflatex='%s' -f %s"
+                     org-latex-compiler (org-export-output-file-name ".tex"))))
+    (add-to-list 'safe-local-variable-values (cons 'compile-command value)))
 
   ;; some safe eval forms for personal use
   ;; sns plot update
@@ -1356,6 +1368,8 @@ If called with a prefix argument, use that number of spaces for each tab."
 (use-package! org-drill
   :after org
   :commands org-drill org-drill-resume
+  :init
+  (put 'org-drill-hide-item-headings-p 'safe-local-variable #'booleanp)
   :config
   (setq org-drill-scope 'directory)
   (setq org-drill-spaced-repetition-algorithm 'sm2)
@@ -1941,6 +1955,10 @@ Caveats:
 ;;   :after ox)
 
 (use-package! ox-latex
+  :init
+  (put 'org-latex-compiler 'safe-local-variable #'stringp)
+  (put 'org-latex-hyperref-template 'safe-local-variable
+       (lambda (value) (or (null value) (stringp value))))
   :bind
   ("C-c x l" . org-latex-export-to-latex)
   ("C-c x o" . org-latex-export-to-pdf)
@@ -1955,8 +1973,6 @@ Caveats:
   (setq org-latex-prefer-user-labels t)
   (setq org-latex-image-default-width ".6\\linewidth")
   (setq org-latex-tables-booktabs t)
-  (put 'org-latex-compiler 'safe-local-variable #'stringp)
-  (put 'org-latex-hyperref-template 'safe-local-variable #'stringp)
 
   ;; remove default hyperset with author names included
   ;; for local variable setup, use for each file
