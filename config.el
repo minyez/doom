@@ -667,6 +667,24 @@ move point to the end of the (un)wrapped text."
   ;; disable pyim-outcome-trigger for pyim-shuangpin otherwise cannot type o for 欧
   ;;(setq pyim-outcome-trigger nil)
   (pyim-default-scheme 'rime)
+  (defun my/pyim-commit-xiaohe-as-quanpin ()
+    "Commit the current Xiaohe double-pinyin input as full pinyin."
+    (interactive)
+    (let* ((entered (pyim-process-get-entered 'point-before))
+           (scheme (pyim-scheme-get 'pyim-shuangpin))
+           (imobj (car (pyim-imobjs-create entered scheme))))
+      (if imobj
+          (progn
+            (pyim-outcome-add
+             (string-join (pyim-codes-create imobj scheme) ""))
+            (pyim-process-terminate))
+        (user-error "Cannot parse %s as Xiaohe double pinyin" entered))))
+  (define-key pyim-mode-map (kbd "RET")
+              #'my/pyim-commit-xiaohe-as-quanpin)
+  (define-key pyim-mode-map (kbd "<return>")
+              #'my/pyim-commit-xiaohe-as-quanpin)
+  (define-key pyim-mode-map (kbd "C-<return>") #'pyim-quit-no-clear)
+  (define-key pyim-mode-map (kbd "C-RET") #'pyim-quit-no-clear)
   (setq pyim-page-length 9)
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
