@@ -28,7 +28,8 @@
 ; https://github.com/astoff/devdocs.el
 (package! devdocs)
 
-(package! org-relative-date)
+(package! org-relative-date
+  :recipe (:host github :repo "emacsmirror/org-relative-date"))
 
 (package! crux
   :recipe (:host github :repo "bbatsov/crux"))
