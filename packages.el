@@ -28,6 +28,8 @@
 ; https://github.com/astoff/devdocs.el
 (package! devdocs)
 
+(package! org-relative-date)
+
 (package! crux
   :recipe (:host github :repo "bbatsov/crux"))
 
@@ -80,6 +82,10 @@
 
 (package! org-drill
   :recipe (:host gitlab :repo "phillord/org-drill"))
+
+(package! org-draw
+  :recipe (:host github :repo "larrasket/org-draw"
+           :files ("*.el" ("web" "web/canvas.html"))))
 
 (package! citar-org-roam)
 (package! org-roam-ui)

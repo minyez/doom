@@ -44,6 +44,31 @@
       (buffer-string))))
 
 ;;;###autoload
+(defun my/org-convert-markdown-link-at-point ()
+  "Convert the Markdown link at point to an Org link."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "This command only works in Org buffers"))
+  (let ((origin (point))
+        found)
+    (save-excursion
+      (beginning-of-line)
+      (while (and (not found)
+                  (re-search-forward
+                   "\\[\\([^]\n]+\\)\\](\\([^ )\n]+\\))"
+                   (line-end-position) t))
+        (when (<= (match-beginning 0) origin (match-end 0))
+          (setq found (list (match-beginning 0) (match-end 0)
+                            (match-string-no-properties 1)
+                            (match-string-no-properties 2))))))
+    (unless found
+      (user-error "Point is not on a Markdown link"))
+    (pcase-let ((`(,beg ,end ,description ,url) found))
+      (delete-region beg end)
+      (goto-char beg)
+      (insert (format "[[%s][%s]]" url description)))))
+
+;;;###autoload
 (defun my/org-yank-zotero-annotation ()
   "Paste a Zotero PDF annotation as Org, preserving its source link."
   (interactive)

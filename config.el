@@ -676,15 +676,15 @@ move point to the end of the (un)wrapped text."
       (if imobj
           (progn
             (pyim-outcome-add
-             (string-join (pyim-codes-create imobj scheme) ""))
+             (string-join (pyim-codes-create imobj scheme) " "))
             (pyim-process-terminate))
         (user-error "Cannot parse %s as Xiaohe double pinyin" entered))))
-  (define-key pyim-mode-map (kbd "RET")
+  (define-key pyim-mode-map (kbd "RET") #'pyim-quit-no-clear)
+  (define-key pyim-mode-map (kbd "<return>") #'pyim-quit-no-clear)
+  (define-key pyim-mode-map (kbd "C-<return>")
               #'my/pyim-commit-xiaohe-as-quanpin)
-  (define-key pyim-mode-map (kbd "<return>")
+  (define-key pyim-mode-map (kbd "C-RET")
               #'my/pyim-commit-xiaohe-as-quanpin)
-  (define-key pyim-mode-map (kbd "C-<return>") #'pyim-quit-no-clear)
-  (define-key pyim-mode-map (kbd "C-RET") #'pyim-quit-no-clear)
   (setq pyim-page-length 9)
   ;; 中文使用全角标点，英文使用半角标点。
   (setq pyim-punctuation-translate-p '(auto yes no))
@@ -856,6 +856,7 @@ move point to the end of the (un)wrapped text."
 ;; Org-mode and related
 ;;
 ;; - org
+;; - org-relative-date-mode
 ;; - org-cliplink
 ;; - org-download
 ;; - org-appear
@@ -866,6 +867,7 @@ move point to the end of the (un)wrapped text."
 ;; - org-bars
 ;; - org-drill
 ;; - org-anki
+;; - org-draw
 ;; - org-present
 ;; - org-roam
 ;; - citar-org-roam
@@ -1323,6 +1325,10 @@ If called with a prefix argument, use that number of spaces for each tab."
            :desc "Custom ID"  "i"  '(lambda () (interactive) (my/org-custom-id-get nil 'create)))))
 )
 
+(use-package! org-relative-date
+  :hook
+  (org-mode . org-relative-date-mode))
+
 (use-package! org-cliplink
   :after org
   :bind
@@ -1434,6 +1440,9 @@ If called with a prefix argument, use that number of spaces for each tab."
 
 (use-package! org-anki
   :after org)
+
+(use-package! org-draw
+  :commands (org-draw org-draw-edit org-draw-setup))
 
 (use-package! org-tree-slide
   :after org
