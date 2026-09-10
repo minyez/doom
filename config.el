@@ -1056,6 +1056,7 @@ If called with a prefix argument, use that number of spaces for each tab."
   (org-link-descriptive nil)    ;; show the full link
   (org-export-use-babel nil)    ;; never (re)evaluate code blocks during export
   (org-preview-latex-default-process 'dvisvgm)
+  (org-priority-lowest 68)      ;; priority up to D
   :bind
   (:map org-mode-map
         ("C-c l" . org-insert-link)
