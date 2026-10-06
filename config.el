@@ -104,6 +104,7 @@
       (:prefix-map ("t" . "toggle")
         ;; :desc "truncate-lines"       "L"   #'toggle-truncate-lines
         :desc "treemacs"             "t"   #'+treemacs/toggle
+        :desc "Org relative dates"   "T"   #'global-org-relative-date-mode
       )
 
       ;; supplement existing map
@@ -1326,9 +1327,7 @@ If called with a prefix argument, use that number of spaces for each tab."
            :desc "Custom ID"  "i"  '(lambda () (interactive) (my/org-custom-id-get nil 'create)))))
 )
 
-(use-package! org-relative-date
-  :hook
-  (org-mode . org-relative-date-mode))
+(use-package! org-relative-date)
 
 (use-package! org-cliplink
   :after org
