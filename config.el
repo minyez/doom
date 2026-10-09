@@ -624,6 +624,16 @@ move point to the end of the (un)wrapped text."
 ;;
 ;; - pyim
 ;; ================================================
+(require 'kinsoku) ; Built-in: international/kinsoku.el under Emacs's lisp/ directory.
+(defun my/fill-chinese-nobreak-p ()
+  "Keep Han words intact and respect punctuation at line boundaries."
+  (and (not (bobp))
+       (save-excursion
+         (backward-char)
+         (looking-at "\\(?:\\cC\\sw\\|\\sw\\cC\\|\\c<.\\|.\\c>\\)"))))
+
+(add-hook 'fill-nobreak-predicate #'my/fill-chinese-nobreak-p)
+
 (setq liberime-current-schema "double_pinyin_flypy"
       liberime-module-file
       (expand-file-name
