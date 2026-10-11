@@ -1206,6 +1206,7 @@ If called with a prefix argument, use that number of spaces for each tab."
 
   ;; more link abbreviaiton
   (let ((link-abbrev-l `(("ytb" . "https://www.youtube.com/watch?v=%s")
+                         ("bili" . "https://https://www.bilibili.com/video/%s")
                          ("mp" . "https://next-gen.materialsproject.org/materials/mp-%s")
                          ("gist" . "https://gist.github.com/%s")
                          ("isbn" . "http://books.google.com/books?vid=ISBN%s")
