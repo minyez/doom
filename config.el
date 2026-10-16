@@ -97,7 +97,7 @@
         :desc "Find project file other window"  "f"   #'projectile-find-file-other-window)
         :desc "org-roam-node-find"      "."   #'org-roam-node-find
         :desc "org-agenda-list"         "a"   #'org-agenda-list
-        :desc "Sort entries by todo"    "S"   '(lambda () (interactive) (org-sort-entries t ?o))
+        :desc "Sort sibling tasks"      "S"   #'my/org-sort-entries-todo-deadline-level
         :desc "org-schedule"            "s"   #'org-schedule)
 
       ;; supplement existing map
@@ -1013,8 +1013,81 @@ Inserts:
 ;; removed
 
 (defun my/org-sort-entries-todo-deadline-level ()
-  "Key generation function for sorting org entries by TODO state, deadline and priority level"
-  (interactive))
+  "Sort the current heading and its siblings as complete subtrees.
+WINP precedes TODO; each sorts by earliest DEADLINE, then highest
+priority.  Other unfinished entries follow, then DONE,
+CANCELLED, and other done states.  Completed entries sort by newest
+CLOSED within each state.  Missing dates sort last in their group;
+missing priorities use `org-priority-default'.  Equal keys retain
+their original order.  Only accessible siblings are sorted, preserving
+their folding state."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "This command requires Org mode"))
+  (save-mark-and-excursion
+    (save-restriction
+      (org-back-to-heading t)
+      (while (org-goto-sibling t))
+      (let ((beg (point)))
+        (while (org-goto-sibling))
+        (org-end-of-subtree t t)
+        (narrow-to-region beg (point)))
+      (let ((fold-property (make-symbol "org-sort-folds")))
+        ;; Text properties travel with sorted subtrees; position markers do not.
+        (with-silent-modifications
+          (goto-char (point-min))
+          (while (< (point) (point-max))
+            (let* ((beg (point))
+                   (end (save-excursion (org-end-of-subtree t t)))
+                   (folds (org-fold-get-regions :from beg :to end)))
+              (put-text-property
+               beg (1+ beg) fold-property
+               (mapcar (lambda (fold)
+                         (list (- (max beg (nth 0 fold)) beg)
+                               (- (min end (nth 1 fold)) beg)
+                               (nth 2 fold)))
+                       folds))
+              (goto-char end))))
+        (unwind-protect
+            (progn
+              (org-fold-show-all '(headings))
+              (goto-char (point-min))
+              (set-mark (point-max))
+              (let ((transient-mark-mode t)
+                    (mark-active t)
+                    (org-ignore-region nil))
+                (atomic-change-group
+                  (org-sort-entries
+                   nil ?f
+                   (lambda ()
+                     (let* ((state (org-get-todo-state))
+                            (done (member state org-done-keywords))
+                            (group (cond ((equal state "WINP") 0)
+                                         ((equal state "TODO") 1)
+                                         ((equal state "DONE") 3)
+                                         ((equal state "CANCELLED") 4)
+                                         (done (+ 5 (cl-position state org-done-keywords)))
+                                         (t 2)))
+                            (date (org-entry-get nil (if done "CLOSED" "DEADLINE"))))
+                       (list group
+                             (if date
+                                 (* (if done -1 1) (org-time-string-to-seconds date))
+                               most-positive-fixnum)
+                             (if done 0 (- (org-get-priority (org-get-heading)))))))
+                   (lambda (a b)
+                     (while (and a (= (car a) (car b)))
+                       (setq a (cdr a) b (cdr b)))
+                     (and a (< (car a) (car b))))))))
+          (org-fold-region (point-min) (point-max) nil)
+          (goto-char (point-min))
+          (while (< (point) (point-max))
+            (org-fold-regions (get-text-property (point) fold-property)
+                              :relative (point))
+            (goto-char (next-single-property-change
+                        (point) fold-property nil (point-max))))
+          (with-silent-modifications
+            (remove-text-properties (point-min) (point-max)
+                                    (list fold-property nil))))))))
 
 (defun my/convert-tabs-to-spaces-in-region (start end)
   "Convert all tabs to a specified number of spaces in the current region.
