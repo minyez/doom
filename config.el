@@ -93,8 +93,10 @@
           :desc "Japanese"                  "j"  '(lambda () (interactive) (set-input-method "japanese"))
           :desc "Tex"                       "t"  '(lambda () (interactive) (set-input-method "TeX")))
         (:prefix-map ("f" . "file")
-        :desc "Find file other window"          "o"   #'find-file-other-window
-        :desc "Find project file other window"  "f"   #'projectile-find-file-other-window)
+          :desc "Find file other window"          "o"   #'find-file-other-window
+          :desc "Find project file other window"  "f"   #'projectile-find-file-other-window)
+        (:prefix-map ("o" . "open")
+          :desc "Open link directory"   "o"   #'my/org-open-link-directory)
         :desc "org-roam-node-find"      "."   #'org-roam-node-find
         :desc "org-agenda-list"         "a"   #'org-agenda-list
         :desc "Sort sibling tasks"      "S"   #'my/org-sort-entries-todo-deadline-level
@@ -586,6 +588,36 @@ move point to the end of the (un)wrapped text."
   (if (featurep :system 'linux)
     (setq-default dired-open-default-open-program "xdg-open"))
 )
+
+(defun my/org-open-link-directory ()
+  "Open the directory containing the Org file link at point."
+  (interactive)
+  (let* ((link (org-element-context))
+         (path (and (eq (org-element-type link) 'link)
+                    (equal (org-element-property :type link) "file")
+                    (org-element-property :path link)))
+         (target (and path
+                      (not (string-empty-p path))
+                      (expand-file-name (org-link-unescape path))))
+         (dir (cond ((null target) nil)
+                    ((file-directory-p target) target)
+                    (t (file-name-directory target)))))
+    (unless dir
+      (user-error "Point is not on a file link"))
+    (when (file-remote-p dir)
+      (user-error "Cannot open a remote directory in the system file manager"))
+    (unless (file-directory-p dir)
+      (user-error "Directory does not exist: %s" dir))
+
+    (pcase system-type
+      ('darwin
+       (call-process "open" nil 0 nil dir))
+      ('windows-nt
+       (call-process "explorer.exe" nil 0 nil dir))
+      ('gnu/linux
+       (call-process "xdg-open" nil 0 nil dir))
+      (_
+       (user-error "Unsupported system type: %s" system-type)))))
 
 ;; minor mode that provides support for CriticMarkup in Emacs
 ;; https://github.com/joostkremers/criticmarkup-emacs/
@@ -1336,6 +1368,10 @@ If called with a prefix argument, use that number of spaces for each tab."
   (add-to-list 'safe-local-eval-forms
                '(add-hook 'after-save-hook 'org-beamer-export-to-latex nil t))
 )
+
+(after! ob-plantuml
+  (setq org-plantuml-jar-path
+        "/opt/homebrew/opt/plantuml/libexec/plantuml.jar"))
 
 (cl-defun my/org-babel-execute-by-name (block-name &key (silent t) (no-confirm t))
   "Execute a named src block BLOCK-NAME in the current Org buffer.
