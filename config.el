@@ -3,6 +3,9 @@
 (setq user-full-name "Min-Ye Zhang"
       user-mail-address "minyez.physchem@gmail.com")
 
+;; File-local variables are checked before ox-latex may be loaded.
+(put 'org-latex-hyperref-template 'safe-local-variable #'string-or-null-p)
+
 ; (add-to-list 'load-path (concat doom-user-dir "lisp"))
 
 ; debug and profiling with environment variable EMACS_PROF non-nil
@@ -2139,8 +2142,6 @@ Caveats:
 (use-package! ox-latex
   :init
   (put 'org-latex-compiler 'safe-local-variable #'stringp)
-  (put 'org-latex-hyperref-template 'safe-local-variable
-       (lambda (value) (or (null value) (stringp value))))
   :bind
   ("C-c x l" . org-latex-export-to-latex)
   ("C-c x o" . org-latex-export-to-pdf)
