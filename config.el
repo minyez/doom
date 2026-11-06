@@ -159,10 +159,11 @@
 ;;
 ;; ================================================
 (display-time-mode 1) ;; always show time
-;; relative visual line, usually better than relative with folded blocks
-(setq display-line-numbers-type 'visual)
+;; relative visual line, usually better than 'relative with folded blocks
+(setq display-line-numbers-type 'visual
+      display-line-numbers-current-absolute nil)
 ;; calculate necessary width to correctly show all line numbers, since 28.1
-(setq display-line-numbers-width-start t)
+(setq display-line-numbers-width-start nil)
 ;; Disable prettify-symbols-mode, which makes hard to recognize keywords in code
 ;; Somehow not work, maybe it is hooked somewhere, not found in the Doom repo by grep.
 ;; Switching off the ligature module helps.
@@ -311,6 +312,10 @@ move point to the end of the (un)wrapped text."
   :bind ("<f5>" . modus-themes-toggle)
 )
 (setq doom-theme 'modus-operandi)
+
+;; Blend both fringes into the text background while retaining their indicators.
+(custom-set-faces!
+  '(fringe :inherit default :background unspecified))
 
 ;; set custom splash image if it exists
 ;(let ((img (expand-file-name "misc/splash-images/favicon.svg" doom-user-dir)))
@@ -639,6 +644,17 @@ move point to the end of the (un)wrapped text."
   :commands mini-echo-mode
   :hook (doom-after-init . mini-echo-mode)
   :config
+  (defun my/mini-echo-persistent-segments ()
+    "Add prose word counts to mini-echo's existing layouts."
+    (let* ((rule (mini-echo-normalize-rule
+                  (or (mini-echo-persistent-detect) mini-echo-persistent-rule)))
+           (extra (when (memq major-mode '(markdown-mode gfm-mode org-mode))
+                    '("word-count"))))
+      (list :long (append extra (plist-get rule :long))
+            :short (append extra (plist-get rule :short)))))
+
+  (setq mini-echo-persistent-function #'my/mini-echo-persistent-segments)
+
   ;; Follow the active theme instead of mini-echo's literal color names.
   (custom-set-faces!
     '(mini-echo-green :foreground unspecified :inherit success)
