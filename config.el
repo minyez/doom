@@ -155,6 +155,7 @@
 ;; - hl-todo
 ;; - eldoc-box
 ;; - cm-mode
+;; - mini-echo
 ;;
 ;; ================================================
 (display-time-mode 1) ;; always show time
@@ -634,6 +635,21 @@ move point to the end of the (un)wrapped text."
   :hook
   (org-mode . cm-mode))
 
+(use-package! mini-echo
+  :commands mini-echo-mode
+  :hook (doom-after-init . mini-echo-mode)
+  :config
+  ;; Follow the active theme instead of mini-echo's literal color names.
+  (custom-set-faces!
+    '(mini-echo-green :foreground unspecified :inherit success)
+    '(mini-echo-yellow :foreground unspecified :inherit warning)
+    '(mini-echo-blue :foreground unspecified :inherit font-lock-function-name-face)
+    '(mini-echo-red :foreground unspecified :inherit error)
+    '(mini-echo-magenta :foreground unspecified :inherit font-lock-constant-face)
+    '(mini-echo-cyan :foreground unspecified :inherit font-lock-type-face)
+    '(mini-echo-gray :foreground unspecified :inherit shadow)
+    '((mini-echo-buffer-position mini-echo-buffer-size mini-echo-word-count)
+      :inherit shadow)))
 
 ;; ================================================
 ;; Evil related
@@ -878,13 +894,22 @@ move point to the end of the (un)wrapped text."
 ;; spelling checker and dictionary
 ;;
 ;; - ispell
+;; - flyspell
 ;; - osx-dictionary
 ;; ================================================
 (when (modulep! :checkers spell)
   (after! ispell
-    (setq ispell-personal-dictionary (concat doom-user-dir "words"))
-  )
-)
+    (setq ispell-personal-dictionary (concat doom-user-dir "words")))
+
+  ;; Preserve Org's exclusions while skipping words containing Chinese characters.
+  (after! org
+    (defun my/org-flyspell-skip-chinese-p ()
+      "Skip words containing Chinese characters."
+      (let ((word (car (save-excursion (flyspell-get-word)))))
+        (not (and word (string-match-p "\\cc" word)))))
+
+    (advice-add 'org-mode-flyspell-verify :before-while
+                #'my/org-flyspell-skip-chinese-p)))
 
 (if (featurep :system 'macos)
   (progn

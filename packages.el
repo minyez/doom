@@ -21,6 +21,9 @@
 ; https://github.com/countvajhula/mindstream
 (package! mindstream)
 
+; https://github.com/eki3z/mini-echo.el
+(package! mini-echo)
+
 (package! ox-gfm)
 
 (package! eldoc-box)
