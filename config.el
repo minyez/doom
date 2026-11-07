@@ -1380,7 +1380,7 @@ If called with a prefix argument, use that number of spaces for each tab."
   ;;     (setq-default org-babel-C++-compiler "g++-14")
   ;;   ))
   ;; Force C++11 standard to avoid missing headers using compiler with old default (e.g. macOS clang)
-  (setq! org-babel-C++-compiler "g++ -std=c++11")
+  (setopt org-babel-C++-compiler "g++ -std=c++11")
 
   ;; disable some tags from inheriting to descendants
   (dolist (elem '("noter" "Reference" "Book" "bookrev" "drill"))
@@ -1489,6 +1489,9 @@ If called with a prefix argument, use that number of spaces for each tab."
         (:prefix-map ("e" . "extra-my")
           (:prefix-map ("p" . "property")
            :desc "Custom ID"  "i"  '(lambda () (interactive) (my/org-custom-id-get nil 'create)))))
+  ;; scale up preview image a bit
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :scale 1.8))
 )
 
 (use-package! org-relative-date)
@@ -2389,6 +2392,16 @@ Caveats:
   ;; activate when opening pdf, otherwise the evil keybindings will not work
   (pdf-loader-install)
 )
+
+;; ================================================
+;; LaTeX (not limited to using it in org)
+;;
+;; - cdlatex
+;; ================================================
+(after! cdlatex
+  (setf (alist-get ?+ cdlatex-math-symbol-alist)
+        '("\\cup" "\\dagger"))
+  (cdlatex-reset-mode))
 
 ;; ================================================
 ;; RSS
