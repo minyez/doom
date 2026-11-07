@@ -130,3 +130,7 @@
   :recipe (:host github :repo "skissue/llm-tool-collection"))
 
 (package! rainbow-delimiters)
+
+(package! org-typora-math
+  :recipe (:local-repo "~/projects/org-typora-math"
+           :files ("org-typora-math.el")))

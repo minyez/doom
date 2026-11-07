@@ -780,12 +780,25 @@ move point to the end of the (un)wrapped text."
     (when (eq major-mode 'org-mode)
       (not (eq (org-in-src-block-p) nil)))
     )
+  (defun my/pyim-probe-org-latex ()
+    "自定义探针, 在 org 的 LaTeX 公式或宏内切换到英文输入.
+与 `pyim-probe-org-latex-mode' 不同, 光标在闭合 `$' 之后时不算在公式内.
+Org 把闭合 `$' 及其后的空格算作 fragment 的一部分, 原探针因此会保持英文."
+    (and (derived-mode-p 'org-mode)
+         (or (let ((ctx (org-element-context)))
+               (and (org-element-type-p ctx '(latex-fragment latex-environment))
+                    (< (point)
+                       (save-excursion
+                         (goto-char (org-element-end ctx))
+                         (skip-chars-backward " \t\n")
+                         (point)))))
+             (org-inside-latex-macro-p))))
   ;; auto-english 会根据之前的字符来判断是否切换到英文输入, 输入空格时自动切换到英文
   ;; 具体可用 describe-function 查看 docstring 来了解
   ;; 在 latex 块和源码块中全部为英文输入
   (setq-default pyim-english-input-switch-functions
                 '(pyim-probe-auto-english
-                  pyim-probe-org-latex-mode
+                  my/pyim-probe-org-latex
                   my/pyim-probe-org-src-block
                   ; pyim-probe-org-structure-template
                   pyim-probe-program-mode))
@@ -1511,9 +1524,16 @@ If called with a prefix argument, use that number of spaces for each tab."
         org-appear-inside-latex t)  ;; show original/unprettified symbols in latex envrionment
 )
 
-(use-package! org-fragtog
+(use-package! org-typora-math
+  :commands
+  (org-typora-math-mode
+   org-typora-math-refresh
+   org-typora-math-show-log)
   :hook
-  (org-mode . org-fragtog-mode))
+  (org-mode . org-typora-math-mode)
+  :config
+  (custom-set-faces '(org-typora-math-source ((t (:inherit org-block)))))
+  )
 
 (use-package! org-table-highlight
   :hook
