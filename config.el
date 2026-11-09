@@ -1327,6 +1327,49 @@ If called with a prefix argument, use that number of spaces for each tab."
   ;; after-finalize-hook won't work, because the update should be done within the captured buffer
   (add-hook 'org-capture-before-finalize-hook '(lambda () (org-update-statistics-cookies t)))
   ;; org-table related.
+  (defun my/org-table-copy-region-as-tsv (beg end)
+    "Copy the selected table cells as tab-separated text.
+BEG and END select opposite corners of a rectangle of complete cells.
+Whole-line selections copy all columns.  Horizontal rules and cell padding
+are omitted; signs and punctuation inside cells are preserved.
+Put the result in the kill ring and system clipboard without editing the table."
+    (interactive
+     (if (use-region-p)
+         (list (region-beginning) (region-end))
+       (user-error "Select a table region first")))
+    (require 'org-table)
+    (save-excursion
+      (let ((start (min beg end))
+            (finish (max beg end)))
+        (goto-char start)
+        (unless (and (< start finish) (org-at-table-p)
+                     (<= finish (org-table-end)))
+          (user-error "Select cells within one Org table"))
+        ;; Move whole-line boundaries into the first and last data cells.
+        (while (and (< (point) finish) (org-at-table-hline-p))
+          (forward-line 1))
+        (when (looking-back "^[ \t]*" (line-beginning-position))
+          (search-forward "|" (line-end-position) t))
+        (setq start (point))
+        (goto-char finish)
+        (when (bolp) (backward-char 1))
+        (while (and (> (point) start) (org-at-table-hline-p))
+          (forward-line -1)
+          (end-of-line))
+        (when (looking-at-p "[ \t]*$")
+          (search-backward "|" (line-beginning-position) t))
+        (setq finish (point))
+        (when (> start finish)
+          (user-error "The selection contains no table cells"))
+        (let* ((rows (org-table-copy-region start finish))
+               (text (mapconcat
+                      (lambda (row)
+                        (mapconcat #'string-trim row "\t"))
+                      rows "\n"))
+               (select-enable-clipboard t))
+          (kill-new text)
+          (message "Copied %d rows as tab-separated text" (length rows))))))
+
   ;; commonly used constants for formulas
   (setq org-table-formula-constants
         '(("pi" . "3.14159265358")
